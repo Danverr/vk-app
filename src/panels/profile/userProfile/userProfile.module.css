@@ -1,0 +1,25 @@
+.panelContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.contentContainer {
+    display: flex;
+    padding-top: 0;
+    flex-direction: column;
+    flex: auto;
+}
+
+.petContainer {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.pet {
+    height: 50%;
+    max-height: 75vw;
+}

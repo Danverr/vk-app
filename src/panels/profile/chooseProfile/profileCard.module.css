@@ -3,7 +3,7 @@
     text-align: center;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .headerWrap--android {
@@ -21,8 +21,7 @@
 .petPreview {
     display: block;
     width: 50%;
-    height: auto;
     margin-left: auto;
     margin-right: auto;
-    padding: 5% 0 10% 0;
+    padding: 12px 0 24px;
 }

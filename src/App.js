@@ -1,25 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Root} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Profile from './panels/profile/profile';
 
-class App extends React.Component {
-    constructor(props) {
-        super(props);
+const App = () => {
+    let [activeView, setView] = useState("profile");
 
-        this.state = {
-            activeView: "profile",
-        }
-    }
-
-    render() {
-        return (
-            <Root activeView={this.state.activeView}>
-                <Profile id="profile"/>
-            </Root>
-        );
-    }
+    return (
+        <Root activeView={activeView}>
+            <Profile id="profile"/>
+        </Root>
+    );
 }
 
 export default App;
