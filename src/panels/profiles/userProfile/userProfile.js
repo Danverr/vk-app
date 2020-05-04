@@ -4,7 +4,6 @@ import {Panel, PanelHeader, PanelHeaderBack, Cell, Button, Avatar, Div} from "@v
 import styles from "./userProfile.module.css";
 
 import petPlaceholder from "../../../img/robot.png";
-import avatar from "../../../img/robot.png";
 
 const UserProfile = (props) => {
     return (
@@ -15,8 +14,8 @@ const UserProfile = (props) => {
                     Профиль
                 </PanelHeader>
                 <Div className={styles.contentContainer}>
-                    <Cell before={<Avatar src={avatar}/>}>
-                        Маряхин Даниил
+                    <Cell before={<Avatar src={props.userInfo.photo_100}/>}>
+                        {`${props.userInfo.first_name} ${props.userInfo.last_name}`}
                     </Cell>
                     <div className={styles.petContainer}>
                         <img className={styles.pet} src={petPlaceholder}/>
