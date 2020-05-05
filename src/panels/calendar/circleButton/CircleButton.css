@@ -1,0 +1,15 @@
+.off {
+  font-size: 12px;
+  padding: 16px; 
+  border-radius: 50%; 
+  background-color: rgb(255, 255, 255); 
+  border: none;
+} 
+.on{
+  font-size: 12px;
+  padding: 16px; 
+  border-radius: 50%; 
+  background-color: rgb(255, 255, 255); 
+  border: 2px solid rgb(68, 64, 64);
+}
+
