@@ -16,7 +16,7 @@ const ProfileCard = (props) => {
             props.setUserProfile(props.userInfo);
         }}>
             <div className={modifyedHeaderWrap}>{props.cardName}</div>
-            <img className={styles.petPreview} src={props.petSrc}/>
+            <img className={styles.petPreview} src={props.petSrc} alt=""/>
         </Card>
     )
 };

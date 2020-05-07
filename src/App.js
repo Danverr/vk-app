@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Epic, Tabbar, TabbarItem} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
@@ -13,9 +13,35 @@ import Feed from "./panels/feed/feed";
 import CheckIn from "./panels/checkIn/checkIn";
 import Calendar from "./panels/calendar/calendar";
 import Settings from "./panels/settings/settings";
+import bridge from "@vkontakte/vk-bridge";
+import api from "./utils/api";
 
 const App = () => {
     let [activeStory, setStory] = useState("profiles");
+    let [usersInfo, setUsersInfo] = useState(null);
+
+    useEffect(() => {
+        // Загрузка информации о пользователе и о друзьях, к которым есть доступ
+        // Сначала идут сведения о текущем пользователе
+        const fetchUsersInfo = async () => {
+            if (usersInfo != null) return;
+
+            const currentUserInfo = await bridge.send('VKWebAppGetUserInfo');
+
+            const friendsIdsPromise = await api("GET", "/statAccess/", {
+                userId: currentUserInfo.id,
+            });
+
+            const friendsInfoPromise = await api("GET", "/vk/users/", {
+                userIds: friendsIdsPromise.data,
+            });
+
+            friendsInfoPromise.data.unshift(currentUserInfo);
+            setUsersInfo(friendsInfoPromise.data);
+        };
+
+        fetchUsersInfo();
+    });
 
     return (
         <Epic activeStory={activeStory} tabbar={
@@ -43,13 +69,13 @@ const App = () => {
             </Tabbar>
         }>
             <Feed id="feed"/>
-            <Profiles id="profiles"/>
+            <Profiles id="profiles" usersInfo={usersInfo}/>
             <CheckIn id="checkIn"/>
             <Calendar id="calendar"/>
             <Settings id="settings"/>
         </Epic>
     );
-}
+};
 
 export default App;
 
