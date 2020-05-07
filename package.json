@@ -20,6 +20,7 @@
     "react-scripts": "^3.4.1"
   },
   "dependencies": {
+    "@nivo/calendar": "^0.61.1",
     "@vkontakte/icons": "^1.20.2",
     "@vkontakte/vk-bridge": "^2.1.8",
     "@vkontakte/vk-miniapps-deploy": "0.0.17",
