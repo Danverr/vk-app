@@ -20,6 +20,9 @@
     "react-scripts": "^3.4.1"
   },
   "dependencies": {
+    "@nivo/core": "latest",
+    "@nivo/pie": "^0.61.1",
+    "@nivo/stream": "^0.61.1",
     "@vkontakte/icons": "^1.20.2",
     "@vkontakte/vk-bridge": "^2.1.8",
     "@vkontakte/vk-miniapps-deploy": "0.0.17",
@@ -33,6 +36,7 @@
     "eruda-code": "^2.0.0",
     "eruda-dom": "^2.0.0",
     "flare-react": "^1.0.7",
+    "nivo": "^0.31.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.9.0"

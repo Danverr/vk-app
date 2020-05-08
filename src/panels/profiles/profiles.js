@@ -16,6 +16,7 @@ const Profiles = (props) => {
     const [isLoading, setLoading] = useState(true);
     const modal = <StatsModal activeModal={activeModal} user={activeUserProfile} setModal={setModal}/>;
 
+    // Преобразовываем данные в карточки
     useEffect(() => {
         if (!isLoading || !props.usersInfo) return;
 

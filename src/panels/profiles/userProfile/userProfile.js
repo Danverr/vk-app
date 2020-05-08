@@ -5,21 +5,27 @@ import styles from "./userProfile.module.css";
 
 import FlareComponent from "flare-react";
 import petPlaceholder from "../../../img/robot.flr";
+import petController from "./petController";
 
 const UserProfile = (props) => {
-    const [canvasWidth, setCanvasWidth] = useState(0);
-    const [canvasHeight, setCanvasHeight] = useState(0);
+    const [pet, setPet] = useState(null);
     const petContainerRef = createRef();
 
+    // Ищем фото пользователя
     let photo = null;
     if (props.userInfo.photo_50) photo = props.userInfo.photo_50;
     else if (props.userInfo.photo_100) photo = props.userInfo.photo_100;
     else if (props.userInfo.photo_200) photo = props.userInfo.photo_200;
     else if (props.userInfo.photo_max_orig) photo = props.userInfo.photo_max_orig;
 
+    // Устанавливаем размеры контейнера анимации
     useEffect(() => {
-        setCanvasHeight(petContainerRef.current.clientHeight);
-        setCanvasWidth(petContainerRef.current.clientWidth);
+        setPet(<FlareComponent
+            controller={new petController()}
+            width={petContainerRef.current.clientWidth}
+            height={petContainerRef.current.clientHeight}
+            file={petPlaceholder}
+        />);
     }, []);
 
     return (
@@ -34,11 +40,7 @@ const UserProfile = (props) => {
                 </Cell>
                 <Div className={styles.contentContainer}>
                     <div className={styles.petContainer} ref={petContainerRef}>
-                        <FlareComponent
-                            width={canvasWidth}
-                            height={canvasHeight}
-                            animationName="fly"
-                            file={petPlaceholder}/>
+                        {pet}
                     </div>
                     <Button size="xl" mode="secondary" onClick={() => props.setModal("stats")}>
                         Статистика

@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from "react";
 import {
     ModalPage, ModalPageHeader, ModalRoot,
-    PanelHeaderButton, Tabs, TabsItem, HorizontalScroll,
+    PanelHeaderButton, Tabs, TabsItem, HorizontalScroll, Div,
     usePlatform, IOS, ANDROID, Header,
 } from "@vkontakte/vkui";
 import api from "../../../utils/api";
+import GradientChart from "./infographics/gradientChart";
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -14,6 +15,7 @@ const StatsModal = (props) => {
     let [entries, setEntries] = useState([]);
     const platform = usePlatform();
 
+    // Загрузка записей пользователя
     useEffect(() => {
         const fetchEntries = async () => {
             if (props.user == null) return;
@@ -70,6 +72,9 @@ const StatsModal = (props) => {
                         </TabsItem>
                     </HorizontalScroll>
                 </Tabs>
+                <Div style={{height: "200px", paddingTop: "0"}}>
+                    <GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)}/>
+                </Div>
                 {
                     entries.map(entry => entry ? (<Header key={entry.entryId}>{entry[activeTab]}</Header>) : null)
                 }
