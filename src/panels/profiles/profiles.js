@@ -44,7 +44,12 @@ const Profiles = (props) => {
     }, [isLoading, props.usersInfo]);
 
     return (
-        <View id={props.id} activePanel={activePanel} modal={modal}>
+        <View id={props.id}
+              modal={modal}
+              activePanel={props.nav.panel}
+              history={props.nav.history}
+              onSwipeBack={props.nav.goBack}
+        >
             <ChooseProfile id="chooseProfile" profiles={profiles}/>
             <UserProfile id="userProfile" userInfo={activeUserProfile} setPanel={setPanel} setModal={setModal}/>
         </View>

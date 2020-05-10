@@ -4,13 +4,17 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 const Settings = (props) => {
     return (
-        <View id={props.id} activePanel="main">
+        <View id={props.id}
+              activePanel={props.nav.panel}
+              history={props.nav.history}
+              onSwipeBack={props.nav.goBack}
+        >
             <Panel id="main">
                 <PanelHeader separator={false}>Настройки</PanelHeader>
             </Panel>
         </View>
     );
-}
+};
 
 export default Settings;
 
