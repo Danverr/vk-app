@@ -19,7 +19,8 @@ const api = async (method, url, data) => {
         data: method !== "GET" ? data : null,
     })
         .catch(error => {
-            console.log(error.response.data)
+            if (error.response) console.log(error.response.data);
+            else console.log(error);
         });
 };
 

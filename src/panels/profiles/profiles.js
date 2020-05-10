@@ -9,12 +9,13 @@ import ProfileCard from "./chooseProfile/profileCard";
 import petPlaceholder from "../../img/robot.svg";
 
 const Profiles = (props) => {
-    const [activePanel, setPanel] = useState("chooseProfile");
     const [activeUserProfile, setUserProfile] = useState(null);
     const [activeModal, setModal] = useState(null);
     const [profiles, setProfiles] = useState(<Spinner size='large'/>);
     const [isLoading, setLoading] = useState(true);
-    const modal = <StatsModal activeModal={activeModal} user={activeUserProfile} setModal={setModal}/>;
+    const modal = <StatsModal activeModal={props.nav.panel === "userProfile" ? activeModal : null}
+                              user={activeUserProfile}
+                              setModal={setModal}/>;
 
     // Преобразовываем данные в карточки
     useEffect(() => {
@@ -27,7 +28,7 @@ const Profiles = (props) => {
                 userInfo={info}
                 petSrc={petPlaceholder}
                 setUserProfile={setUserProfile}
-                setPanel={setPanel}
+                goTo={() => props.nav.goTo(props.id, "userProfile")}
             />)
         );
 
@@ -48,10 +49,13 @@ const Profiles = (props) => {
               modal={modal}
               activePanel={props.nav.panel}
               history={props.nav.history}
-              onSwipeBack={props.nav.goBack}
-        >
-            <ChooseProfile id="chooseProfile" profiles={profiles}/>
-            <UserProfile id="userProfile" userInfo={activeUserProfile} setPanel={setPanel} setModal={setModal}/>
+              onSwipeBack={props.nav.goBack}>
+            <ChooseProfile id="chooseProfile"
+                           view={props.id}
+                           profiles={profiles}/>
+            <UserProfile id="userProfile"
+                         userInfo={activeUserProfile}
+                         setModal={setModal}/>
         </View>
     );
 };

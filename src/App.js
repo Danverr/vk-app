@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import React, {useEffect, useState} from 'react';
-import {Epic, Tabbar, TabbarItem} from '@vkontakte/vkui';
-=======
->>>>>>> a46ee8122b6731efa76f439b079139a44a8e8189
+import {Epic, Tabbar, TabbarItem, ConfigProvider} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from "@vkontakte/vk-bridge";
 import api from "./utils/api";
@@ -18,11 +15,11 @@ import Feed from "./panels/feed/feed";
 import CheckIn from "./panels/checkIn/checkIn";
 import Calendar from "./panels/calendar/calendar";
 import Settings from "./panels/settings/settings";
-<<<<<<< HEAD
+
 // Панели по умолчанию для каждого view
 const defaultPanels = {
     feed: "main",
-    profiles: "main",
+    profiles: "chooseProfile",
     checkIn: "main",
     calendar: "main",
     settings: "main",
@@ -65,8 +62,6 @@ const App = () => {
         if (history.length === 1) {
             bridge.send('VKWebAppDisableSwipeBack');
         }
-
-        console.log(history);
     };
 
     // Функция для перехода на другой экран
@@ -90,8 +85,6 @@ const App = () => {
         history.push(state);
         setHistory(history);
         setNavState(state);
-
-        console.log(history);
     };
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
@@ -135,40 +128,38 @@ const App = () => {
     };
 
     return (
-            <ConfigProvider isWebView={true}>
-                <Epic activeStory={navState.story} tabbar={
-                    <Tabbar>
-                        <TabbarItem
-                            onClick={() => goTo("feed")}
-                            selected={navState.story === "feed"}
-                        ><Icon28NewsfeedOutline/></TabbarItem>
-                        <TabbarItem
-                            onClick={() => goTo("profiles")}
-                            selected={navState.story === "profiles"}
-                        ><Icon28SmileOutline/></TabbarItem>
-                        <TabbarItem
-                            onClick={() => goTo("checkIn")}
-                            selected={navState.story === "checkIn"}
-                        ><Icon28AddCircleOutline/></TabbarItem>
-                        <TabbarItem
-                            onClick={() => goTo("calendar")}
-                            selected={navState.story === "calendar"}
-                        ><Icon28CalendarOutline/></TabbarItem>
-                        <TabbarItem
-                            onClick={() => goTo("settings")}
-                            selected={navState.story === "settings"}
-                        ><Icon28SettingsOutline/></TabbarItem>
-                    </Tabbar>
-                }>
-                    <Feed id="feed" nav={nav}/>
-                    <Profiles id="profiles" nav={nav}/>
-                    <CheckIn id="checkIn" nav={nav}/>
-                    <Calendar id="calendar" nav={nav}/>
-                    <Settings id="settings" nav={nav}/>
-                </Epic>
-            </ConfigProvider>
-=======
->>>>>>> a46ee8122b6731efa76f439b079139a44a8e8189
+        <ConfigProvider isWebView={true}>
+            <Epic activeStory={navState.story} tabbar={
+                <Tabbar>
+                    <TabbarItem
+                        onClick={() => goTo("feed")}
+                        selected={navState.story === "feed"}
+                    ><Icon28NewsfeedOutline/></TabbarItem>
+                    <TabbarItem
+                        onClick={() => goTo("profiles")}
+                        selected={navState.story === "profiles"}
+                    ><Icon28SmileOutline/></TabbarItem>
+                    <TabbarItem
+                        onClick={() => goTo("checkIn")}
+                        selected={navState.story === "checkIn"}
+                    ><Icon28AddCircleOutline/></TabbarItem>
+                    <TabbarItem
+                        onClick={() => goTo("calendar")}
+                        selected={navState.story === "calendar"}
+                    ><Icon28CalendarOutline/></TabbarItem>
+                    <TabbarItem
+                        onClick={() => goTo("settings")}
+                        selected={navState.story === "settings"}
+                    ><Icon28SettingsOutline/></TabbarItem>
+                </Tabbar>
+            }>
+                <Feed id="feed" nav={nav}/>
+                <Profiles id="profiles" nav={nav} usersInfo={usersInfo}/>
+                <CheckIn id="checkIn" nav={nav}/>
+                <Calendar id="calendar" nav={nav}/>
+                <Settings id="settings" nav={nav}/>
+            </Epic>
+        </ConfigProvider>
     );
 };
 

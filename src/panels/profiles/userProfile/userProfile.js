@@ -32,7 +32,7 @@ const UserProfile = (props) => {
         <Panel id={props.id}>
             <div className={styles.panelContainer}>
                 <PanelHeader separator={false}
-                             left={<PanelHeaderBack onClick={() => props.setPanel("chooseProfile")}/>}>
+                             left={<PanelHeaderBack onClick={() => window.history.back()}/>}>
                     Профиль
                 </PanelHeader>
                 <Cell before={<Avatar src={photo}/>}>

@@ -12,7 +12,7 @@ const ProfileCard = (props) => {
 
     return (
         <Card size="m" mode="shadow" onClick={() => {
-            props.setPanel("userProfile");
+            props.goTo();
             props.setUserProfile(props.userInfo);
         }}>
             <div className={modifyedHeaderWrap}>{props.cardName}</div>
