@@ -11,7 +11,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Profiles from './panels/profiles/profiles';
 import Feed from "./panels/feed/feed";
 import CheckIn from "./panels/checkIn/checkIn";
-import Calendar from "./panels/calendar/calendar";
+import Calendar from "./panels/calendar/Calendar";
 import Settings from "./panels/settings/settings";
 
 const App = () => {

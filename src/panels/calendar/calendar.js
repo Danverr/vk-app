@@ -12,7 +12,7 @@ const CalendarPanel = (props) => {
         <View id={props.id} activePanel={activePanel}>
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
-                <Calendar tileClassName = {"mybutton"}/>
+                <Calendar/>
             </Panel>
         </View>
     );

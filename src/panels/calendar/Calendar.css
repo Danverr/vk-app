@@ -1,8 +1,6 @@
 .react-calendar {
-  width: 350px;
-  max-width: 100%;
+  width: inherit;
   background: white;
-  border: 1px solid #a0a096;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.125em;
 }
@@ -43,20 +41,27 @@
 }
 .react-calendar__navigation button:enabled:hover,
 .react-calendar__navigation button:enabled:focus {
-  background-color: #e6e6e6;
+  background-color: #ffffff;
 }
 .react-calendar__navigation button[disabled] {
-  background-color: #f0f0f0;
+  background-color: #ffffff;
 }
 .react-calendar__month-view__weekdays {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 0.75em;
+  font-size: 0.65em;
+  color:  #757575;
 }
+
 .react-calendar__month-view__weekdays__weekday {
   padding: 0.5em;
 }
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
 .react-calendar__month-view__weekNumbers {
   font-weight: bold;
 }
@@ -67,10 +72,9 @@
   font-size: 0.75em;
   padding: calc(0.75em / 0.75) calc(0.5em / 0.75);
 }
-.react-calendar__month-view__days__day--weekend {
-  color: #d10000;
+.react-calendar__month-view__days__day--weekend { /*выходной*/
 }
-.react-calendar__month-view__days__day--neighboringMonth {
+.react-calendar__month-view__days__day--neighboringMonth { /*предыдущий / следующий месяц*/
   color: #757575;
 }
 .react-calendar__year-view .react-calendar__tile,
@@ -78,18 +82,18 @@
 .react-calendar__century-view .react-calendar__tile {
   padding: 2em 0.5em;
 }
-.react-calendar__tile {
-  max-width: 100%;
+.react-calendar__tile { /*дефолтный вид кнопки*/
+  height: 24px;
+  width: 24px;
   text-align: center;
-  padding: 0.75em 0.5em;
-  background: none;
+  /* padding: 0.75em 0.5em; */
+  border-radius: 50%;
+  background: #ffffff;
 }
-.react-calendar__tile:disabled {
-  background-color: #f0f0f0;
+.react-calendar__tile:disabled { /*хз что это*/
 }
 .react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
-  background-color: #207888;
+.react-calendar__tile:enabled:focus { /*на кнопку навели курсор / нажали*/
 }
 .react-calendar__tile--now {
   background: #ffff76;
@@ -98,27 +102,17 @@
 .react-calendar__tile--now:enabled:focus {
   background: #ffffa9;
 }
-.react-calendar__tile--hasActive {
-  background: #76baff;
+.react-calendar__tile--hasActive { /*хз что это*/
 }
 .react-calendar__tile--hasActive:enabled:hover,
-.react-calendar__tile--hasActive:enabled:focus {
-  background: #a9d4ff;
-}
+.react-calendar__tile--hasActive:enabled:focus { /*хз что это*/
+} 
 .react-calendar__tile--active {
-  /* background: #ff006a; */
-  /* background: none; */
-  border: 2px solid #ccc;
-  border-radius: 50%;
-  color: white;
+  border: 2px solid rgb(0, 0, 0);
 }
 .react-calendar__tile--active:enabled:hover,
 .react-calendar__tile--active:enabled:focus {
-  /* background: #ff109b; */
-  border: 2px solid #ccc;
-  border-radius: 50%;
-  /* background: none; */
+  border: 2px solid rgb(0, 0, 0);
 }
-.react-calendar--selectRange .react-calendar__tile--hover {
-  background-color: #e6e6e6;
+.react-calendar--selectRange .react-calendar__tile--hover { /*хз что это*/
 }
