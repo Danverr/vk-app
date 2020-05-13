@@ -34,8 +34,7 @@
   height: 44px;
   margin-bottom: 1em;
 }
-.react-calendar__navigation__label {
-  font: bold italic 110% serif;
+.react-calendar__navigation__label { /* май 2020 г*/
 }
 .react-calendar__navigation button {
   min-width: 44px;

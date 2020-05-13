@@ -5,6 +5,7 @@ import Flex from '../Flex';
 import { getDayOfWeek } from '../shared/dates';
 import { formatWeekday, formatShortWeekday as defaultFormatShortWeekday } from '../shared/dateFormatter';
 import { isCalendarType } from '../shared/propTypes';
+
 var className = 'react-calendar__month-view__weekdays';
 export default function Weekdays(props) {
   var calendarType = props.calendarType,
@@ -17,7 +18,8 @@ export default function Weekdays(props) {
   var year = getYear(beginOfMonth);
   var monthIndex = getMonth(beginOfMonth);
   var weekdays = [];
-
+  
+  /* пн вт ср чт пт сб вс */
   for (var weekday = 1; weekday <= 7; weekday += 1) {
     var weekdayDate = new Date(year, monthIndex, weekday - getDayOfWeek(beginOfMonth, calendarType));
     var abbr = formatWeekday(locale, weekdayDate);
