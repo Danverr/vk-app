@@ -1,10 +1,10 @@
 import React from 'react';
-import {Panel, PanelHeader, View, CellButton} from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, Div} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Calendar from './react-calendar';
 import './calendar.css';
 
-const Calendar = (props) => {
+const CalendarPanel = (props) => {
     return (
         <View id={props.id}
               activePanel={props.nav.panel}
@@ -21,4 +21,4 @@ const Calendar = (props) => {
     );
 };
 
-export default Calendar;
+export default CalendarPanel;
