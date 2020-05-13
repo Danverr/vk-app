@@ -34,10 +34,14 @@
   height: 44px;
   margin-bottom: 1em;
 }
+.react-calendar__navigation__label {
+  font: bold italic 110% serif;
+}
 .react-calendar__navigation button {
   min-width: 44px;
   background: none;
 }
+
 .react-calendar__navigation button:enabled:hover,
 .react-calendar__navigation button:enabled:focus {
   background-color: #ffffff;
@@ -51,6 +55,22 @@
   font-weight: bold;
   font-size: 0.65em;
   color:  #757575;
+}
+
+.react-calendar__year-view__months__month{
+  height: 1px !important;
+  width: auto !important;
+  border-radius: 20% !important;
+}
+.react-calendar__decade-view__years__year{
+  height: 1px !important;
+  width: auto !important;
+  border-radius: 20% !important;
+}
+.react-calendar__century-view__decades__decade{
+  height: 1px !important;
+  width: auto !important;
+  border-radius: 20% !important;
 }
 
 .react-calendar__month-view__weekdays__weekday {
