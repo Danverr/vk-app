@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { Panel, PanelHeader, View, Div } from '@vkontakte/vkui';
+import React from 'react';
+import {Panel, PanelHeader, View, CellButton} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Calendar from './react-calendar';
 import './calendar.css';
 
-const CalendarPanel = (props) => {
-    const [activePanel, setPanel] = useState("main");
-
+const Calendar = (props) => {
     return (
-        <View id={props.id} activePanel={activePanel}>
+        <View id={props.id}
+              activePanel={props.nav.panel}
+              history={props.nav.history}
+              onSwipeBack={props.nav.goBack}
+        >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Div style = {{paddingTop: "0px"}}> 
@@ -17,7 +19,6 @@ const CalendarPanel = (props) => {
             </Panel>
         </View>
     );
-}
+};
 
-export default CalendarPanel;
-
+export default Calendar;
