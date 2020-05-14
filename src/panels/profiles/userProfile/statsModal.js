@@ -31,7 +31,7 @@ const StatsModal = (props) => {
     }, [props.user]);
 
     return (
-        <ModalRoot activeModal={ props.activeModal} onClose={() => props.setModal(null)}>
+        <ModalRoot activeModal={props.activeModal} onClose={() => props.setModal(null)}>
             <ModalPage id="stats" onClose={() => props.setModal(null)} header={
                 <ModalPageHeader
                     left={(<>{

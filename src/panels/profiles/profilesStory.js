@@ -2,13 +2,13 @@ import React, {useState, useEffect} from 'react';
 import {CardGrid, Spinner, View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import ChooseProfile from './chooseProfile/chooseProfile';
-import UserProfile from "./userProfile/userProfile";
+import ChooseProfilePanel from './chooseProfile/chooseProfilePanel';
+import UserProfilePanel from "./userProfile/userProfilePanel";
 import StatsModal from "./userProfile/statsModal";
-import ProfileCard from "./chooseProfile/profileCard";
+import ProfileCardPanel from "./chooseProfile/profileCardPanel";
 import petPlaceholder from "../../img/robot.svg";
 
-const Profiles = (props) => {
+const ProfilesStory = (props) => {
     const [activeUserProfile, setUserProfile] = useState(null);
     const [activeModal, setModal] = useState(null);
     const [profiles, setProfiles] = useState(<Spinner size='large'/>);
@@ -22,7 +22,7 @@ const Profiles = (props) => {
         if (!isLoading || !props.usersInfo) return;
 
         let profileCards = props.usersInfo.map((info, i) =>
-            (<ProfileCard
+            (<ProfileCardPanel
                 key={info.id}
                 cardName={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
                 userInfo={info}
@@ -50,15 +50,15 @@ const Profiles = (props) => {
               activePanel={props.nav.panel}
               history={props.nav.history}
               onSwipeBack={props.nav.goBack}>
-            <ChooseProfile id="chooseProfile"
-                           view={props.id}
-                           profiles={profiles}/>
-            <UserProfile id="userProfile"
-                         userInfo={activeUserProfile}
-                         setModal={setModal}/>
+            <ChooseProfilePanel id="chooseProfile"
+                                view={props.id}
+                                profiles={profiles}/>
+            <UserProfilePanel id="userProfile"
+                              userInfo={activeUserProfile}
+                              setModal={setModal}/>
         </View>
     );
 };
 
-export default Profiles;
+export default ProfilesStory;
 

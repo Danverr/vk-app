@@ -10,7 +10,7 @@ import Icon28AddCircleOutline from '@vkontakte/icons/dist/28/add_circle_outline'
 import Icon28CalendarOutline from '@vkontakte/icons/dist/28/calendar_outline';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
-import Profiles from './panels/profiles/profiles';
+import ProfilesStory from './panels/profiles/profilesStory';
 import Feed from "./panels/feed/feed";
 import CheckIn from "./panels/checkIn/checkIn";
 import Calendar from "./panels/calendar/calendar";
@@ -105,10 +105,11 @@ const App = () => {
             const friendsIdsPromise = await api("GET", "/statAccess/", {
                 userId: currentUserInfo.id,
             });
+            // TODO: Обработка null значения
 
             // Информация о друзьях
             const friendsInfoPromise = await api("GET", "/vk/users/", {
-                userIds: friendsIdsPromise.data,
+                user_ids: friendsIdsPromise.data,
             });
 
             // Обновляем данные
@@ -154,7 +155,7 @@ const App = () => {
                 </Tabbar>
             }>
                 <Feed id="feed" nav={nav}/>
-                <Profiles id="profiles" nav={nav} usersInfo={usersInfo}/>
+                <ProfilesStory id="profiles" nav={nav} usersInfo={usersInfo}/>
                 <CheckIn id="checkIn" nav={nav}/>
                 <Calendar id="calendar" nav={nav}/>
                 <Settings id="settings" nav={nav}/>

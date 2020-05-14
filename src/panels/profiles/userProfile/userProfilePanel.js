@@ -1,13 +1,13 @@
 import React, {useState, useEffect, createRef} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {Panel, PanelHeader, PanelHeaderBack, Cell, Button, Avatar, Div} from "@vkontakte/vkui";
-import styles from "./userProfile.module.css";
-
+import styles from "./userProfilePanel.module.css";
 import FlareComponent from "flare-react";
+
 import petPlaceholder from "../../../img/robot.flr";
 import petController from "./petController";
 
-const UserProfile = (props) => {
+const UserProfilePanel = (props) => {
     const [pet, setPet] = useState(null);
     const petContainerRef = createRef();
 
@@ -21,10 +21,11 @@ const UserProfile = (props) => {
     // Устанавливаем размеры контейнера анимации
     useEffect(() => {
         setPet(<FlareComponent
+            file={petPlaceholder}
             controller={new petController()}
             width={petContainerRef.current.clientWidth}
             height={petContainerRef.current.clientHeight}
-            file={petPlaceholder}
+            transparent={true}
         />);
     }, []);
 
@@ -51,5 +52,5 @@ const UserProfile = (props) => {
     );
 };
 
-export default UserProfile;
+export default UserProfilePanel;
 

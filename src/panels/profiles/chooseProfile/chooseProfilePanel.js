@@ -2,7 +2,7 @@ import React from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {Panel, PanelHeader, Group} from "@vkontakte/vkui";
 
-const ChooseProfile = (props) => {
+const ChooseProfilePanel = (props) => {
     return (
         <Panel id={props.id}>
             <PanelHeader separator={false}>Профиль</PanelHeader>
@@ -13,5 +13,5 @@ const ChooseProfile = (props) => {
     );
 }
 
-export default ChooseProfile;
+export default ChooseProfilePanel;
 
