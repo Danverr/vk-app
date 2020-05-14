@@ -1,28 +1,18 @@
-.postText {
-    margin-left: 20px; 
-    margin-right: 20px;
-
-}
-
 .content {
     padding: 15px;
 }
 
 .reference {
     padding: 3px;
+    
 }
 
-.info {
-    display: flex;
-    flex-direction: column;
+.description {
+    margin-left: 15px;
 }
 
-.userInfo {
-    flex: 1;
-    font-weight: 600;
-}
-
-.userDecsription {
-    flex: 1;
-    color: gray;
+.postText {
+    margin-top: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
