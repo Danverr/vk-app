@@ -163,7 +163,7 @@ const App = () => {
                 <Feed id="feed" nav={nav}/>
                 <Profiles id="profiles" nav={nav}/>
                 <CheckIn id="checkIn" nav={nav}/>
-                <Calendar id="calendar" nav={nav}/>
+                <Calendar id="calendar" nav={nav} user = {usersInfo}/>
                 <Settings id="settings" nav={nav}/>
             </Epic>
         </ConfigProvider>
