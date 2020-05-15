@@ -34,7 +34,8 @@ export default function TileGroup(_ref) {
       tileProps = _objectWithoutProperties(_ref, ["className", "count", "dateTransform", "dateType", "end", "hover", "offset", "start", "step", "tile", "value", "valueType"]);
 
   var tiles = [];
-
+  /*инициализируются тайлы, которым надо будет менять цвета*/
+  
   for (var point = start; point <= end; point += step) {
     var date = dateTransform(point);
     tiles.push(React.createElement(Tile, _extends({
