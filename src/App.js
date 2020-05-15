@@ -100,21 +100,23 @@ const App = () => {
 
             // Данные о пользователе
             const currentUserInfo = await bridge.send('VKWebAppGetUserInfo');
+            let info = [currentUserInfo];
 
             // ID друзей к которым есть доступ
             const friendsIdsPromise = await api("GET", "/statAccess/", {
                 userId: currentUserInfo.id,
             });
-            // TODO: Обработка null значения
 
-            // Информация о друзьях
-            const friendsInfoPromise = await api("GET", "/vk/users/", {
-                user_ids: friendsIdsPromise.data,
-            });
+            if (friendsIdsPromise.data.length) {
+                // Информация о друзьях
+                const friendsInfoPromise = await api("GET", "/vk/users/", {
+                    user_ids: friendsIdsPromise.data,
+                });
 
-            // Обновляем данные
-            friendsInfoPromise.data.unshift(currentUserInfo);
-            setUsersInfo(friendsInfoPromise.data);
+                info = info.concat(friendsInfoPromise.data);
+            }
+
+            setUsersInfo(info);
         };
 
         fetchUsersInfo();
