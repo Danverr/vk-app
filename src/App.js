@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Epic, Tabbar, TabbarItem, ConfigProvider} from '@vkontakte/vkui';
 import bridge from "@vkontakte/vk-bridge";
 import '@vkontakte/vkui/dist/vkui.css';
+import api from "./utils/api";
 
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28SmileOutline from '@vkontakte/icons/dist/28/smile_outline';
@@ -41,6 +42,7 @@ const App = () => {
         story: "profiles",
         panel: defaultPanels["profiles"],
     });
+    let [usersInfo, setUsersInfo] = useState(null);
     const [history, setHistory] = useState([navState]);
 
     // Функция возврата с экрана
@@ -93,6 +95,36 @@ const App = () => {
     useEffect(() => {
         window.addEventListener('popstate', goBack);
     }, []);
+
+    // Загрузка информации о пользователе и о друзьях, к которым есть доступ
+    // Сначала идут сведения о текущем пользователе
+    useEffect(() => {
+        const fetchUsersInfo = async () => {
+            if (usersInfo != null) return;
+
+            // Данные о пользователе
+            const currentUserInfo = await bridge.send('VKWebAppGetUserInfo');
+            let info = [currentUserInfo];
+
+            // ID друзей к которым есть доступ
+            const friendsIdsPromise = await api("GET", "/statAccess/", {
+                userId: currentUserInfo.id,
+            });
+
+            if (friendsIdsPromise.data.length) {
+                // Информация о друзьях
+                const friendsInfoPromise = await api("GET", "/vk/users/", {
+                    user_ids: friendsIdsPromise.data,
+                });
+
+                info = info.concat(friendsInfoPromise.data);
+            }
+
+            setUsersInfo(info);
+        };
+
+        fetchUsersInfo();
+    });
 
     // Упаковываем все функции и передаем во view только нужную ей часть истории
     const nav = {
