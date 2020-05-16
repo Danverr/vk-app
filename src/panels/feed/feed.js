@@ -14,22 +14,22 @@ import ava_danya from './danya.jpg'
 
 
 const user = {
-  photo_200: ava,
-  first_name: 'Albert',
-  last_name: 'Skalt'
+    photo_200: ava,
+    first_name: 'Albert',
+    last_name: 'Skalt'
 };
 
 const user2 = {
-  photo_200: ava_danya,
-  first_name: 'Даниил',
-  last_name: 'Маряхин'
+    photo_200: ava_danya,
+    first_name: 'Даниил',
+    last_name: 'Маряхин'
 };
 
 const date = {
-  day: 28,
-  month: 'Апреля',
-  hour: 12,
-  minute: 33,
+    day: 28,
+    month: 'Апреля',
+    hour: 12,
+    minute: 33,
 };
 
 /*
@@ -42,39 +42,68 @@ const date = {
  */
 
 
-const Feed = ({ id, fetchedUser }) => {
-  const [usersInfo, setUsersInfo] = useState(null);
-  const [wasUpdated, setWasUpdated] = useState(null);
-  const [isFetch, setFetch] = useState(false);
+const Feed = (props) => {
+    const [usersInfo, setUsersInfo] = useState(null);
+    const [wasUpdated, setWasUpdated] = useState(null);
+    const [usersPosts, setUsersPosts] = useState(null);
+    const [posts, setPosts] = useState(null);
 
-  useEffect(() => {
-    if (wasUpdated === null) return;
-    const fetchUserInfo = async () => {
-      const Promise = await api("GET", "/entries/", { userId: 281105343 });
-      setUsersInfo(Promise.data);
-    }
-    fetchUserInfo();
-  },
-    [wasUpdated]
-  );
+    useEffect(() => {
+        if (wasUpdated === null || props.user==null) return;
 
-  const onRefresh = () => {
-    setFetch(true);
-    setWasUpdated(1);
-    setFetch(false);
-  };
+        const fetchUsersPosts = async () => {
+            const temp = new Array();
 
-  return (
-    <Panel id='Feed'>
-      <PanelHeader separator={false}>
-        Лента
+            const fetchUserPosts = async (promices) => {
+                const results = await Promise.all(promices);
+                setUsersPosts(results);
+            }
+
+            props.user.map(user => {
+                temp.push(api("GET", "/entries/", { userId: user.id }));
+            });
+
+            fetchUserPosts(temp);
+        }
+        fetchUsersPosts();
+    },
+        [wasUpdated]
+    );
+
+    useEffect(() => {
+        const temp = [];
+        if (usersPosts != null && props.user.length == usersPosts.length) {
+            props.user.map((user, i) => {
+                usersPosts[i].data.map(post => temp.push(
+                    (<TextPost
+                    user={{ photo_200: (user.photo_50 != null) ? user.photo_50 : user.photo_200, first_name: user.first_name, last_name: user.last_name }}
+                    text={post.note}
+                    description={post.title}
+                    date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
+                />)))
+            })
+        }
+        setPosts(temp);
+    },
+        [usersPosts]
+    );
+
+
+    const onRefresh = () => {
+        setWasUpdated(1);
+    };
+
+    return (
+        <Panel id='Feed'>
+            <PanelHeader separator={false}>
+                Лента
         </PanelHeader>
-      <Group className={s.content}>
-        <button onClick={onRefresh}> Update Feed </button>
-          {(usersInfo != null) ? (usersInfo.map((n, i) => (<TextPost user={user} text={n.note} description={n.title} date= {{day: getDate(new Date(n.date)), month: getMonth(new Date(n.date)), hour: getHours(new Date(n.date)), minute: getMinutes(new Date(n.date))}} />))) : null}
-        </Group>
-    </Panel>
-  );
+            <Group className={s.content}>
+                <button onClick={onRefresh}> Update Feed </button>
+                {posts}
+            </Group>
+        </Panel>
+    );
 }
 
 export default Feed;
@@ -83,7 +112,7 @@ export default Feed;
 /*
  *  {(usersInfo != null) ? (usersInfo.map((n, i) => (<TextPost user={user} text={n.note} description={n.title} date={date} />))) : null}
  *
- * 
+ *
  *  <PullToRefresh onRefresh={onRefresh} isFetching={state.fetching}>
           {(usersInfo != null) ? (usersInfo.map((n, i) => (<TextPost user={user} text={n.note} description={n.title} date={date} />))) : null}
         </PullToRefresh>
