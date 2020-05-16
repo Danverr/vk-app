@@ -21,33 +21,37 @@ const CalendarPanel = (props) => {
             let day = getDate(curDate);
             let temp = new Array();
 
-            const fetchUserPosts = async (user) => {
-                const Promise = await api("GET", "/entries/", { userId: user.id, date: year + "-" + month + "-" + day });
-                temp.push(Promise.data);
+            const fetchUserPosts = async (promices) => {
+                let results = await Promise.all(promices);
+                setUsersPosts(results);
             }
 
             props.user.map(user => {
-                fetchUserPosts(user);
+                temp.push(api("GET", "/entries/", { userId: user.id, date: year + "-" + month + "-" + day }));          
             });
 
-            setUsersPosts(temp);
-
-            let temp1 = [];
-            if (usersPosts != null && props.user.length == usersPosts.length) {
-                props.user.map((user, i) => {
-                    usersPosts[i].map(post => temp1.push((<TextPost
-                        user={{ photo_200: user.photo_200, first_name: user.first_name, last_name: user.last_name }}
-                        text={post.note}
-                        description={post.title}
-                        date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
-                    />)))
-                })
-            }          
-            setPosts(temp1);
+            fetchUserPosts(temp);         
         }
         fetchUsersPosts();
     },
     [curDate]
+    );
+
+    useEffect(() => {
+        let temp = [];
+        if (usersPosts != null && props.user.length == usersPosts.length) {
+            props.user.map((user, i) => {
+                usersPosts[i].data.map(post => temp.push((<TextPost
+                    user={{ photo_200: user.photo_200, first_name: user.first_name, last_name: user.last_name }}
+                    text={post.note}
+                    description={post.title}
+                    date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
+                />)))
+            })
+        }          
+        setPosts(temp);
+    },
+    [usersPosts]
     );
 
     return (
