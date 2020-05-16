@@ -19,18 +19,9 @@ const CalendarPanel = (props) => {
             let year = getYear(curDate);
             let month = (parseInt(getMonth(curDate)) + 1).toString();
             let day = getDate(curDate);
-            let temp = new Array();
 
-            const fetchUserPosts = async (promices) => {
-                let results = await Promise.all(promices);
-                setUsersPosts(results);
-            }
-
-            props.user.map(user => {
-                temp.push(api("GET", "/entries/", { userId: user.id, date: year + "-" + month + "-" + day }));          
-            });
-
-            fetchUserPosts(temp);         
+            let results = await api("GET", "/entries/", { userId: props.user[0].id, date: year + "-" + month + "-" + day });   
+            setUsersPosts(results);         
         }
         fetchUsersPosts();
     },
@@ -39,15 +30,14 @@ const CalendarPanel = (props) => {
 
     useEffect(() => {
         let temp = [];
-        if (usersPosts != null && props.user.length == usersPosts.length) {
-            props.user.map((user, i) => {
-                usersPosts[i].data.map(post => temp.push((<TextPost
-                    user={{ photo_200: user.photo_200, first_name: user.first_name, last_name: user.last_name }}
+
+        if (usersPosts != null) {
+                usersPosts.data.map(post => temp.push((<TextPost
+                    user={{ photo_200: props.user[0].photo_100, first_name: props.user[0].first_name, last_name: props.user[0].last_name }}
                     text={post.note}
                     description={post.title}
                     date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
                 />)))
-            })
         }          
         setPosts(temp);
     },
