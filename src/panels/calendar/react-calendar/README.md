@@ -1,9 +1,9 @@
-[![npm](https://img.shields.io/npm/v/react-calendar.svg)](https://www.npmjs.com/package/react-calendar) ![downloads](https://img.shields.io/npm/dt/react-calendar.svg) ![build](https://img.shields.io/travis/wojtekmaj/react-calendar/master.svg) ![dependencies](https://img.shields.io/david/wojtekmaj/react-calendar.svg) ![dev dependencies](https://img.shields.io/david/dev/wojtekmaj/react-calendar.svg) [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
+[![npm](https://img.shields.io/npm/v/react-calendar.svg)](https://www.npmjs.com/package/react-calendar) ![downloads](https://img.shields.io/npm/dt/react-calendar.svg) ![build](https://travis-ci.com/wojtekmaj/react-calendar.svg?branch=master) ![dependencies](https://img.shields.io/david/wojtekmaj/react-calendar.svg) ![dev dependencies](https://img.shields.io/david/dev/wojtekmaj/react-calendar.svg) [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 
 # React-Calendar
 
 <div align="center">
-  <img width="436" heigth="398" src="https://wojtekmaj.home.pl/projekty/react-calendar/react-calendar.jpg">
+  <img width="436" heigth="398" src="https://projects.wojtekmaj.pl/react-calendar/react-calendar.jpg">
 </div>
 
 Ultimate calendar for your React app.
@@ -51,26 +51,20 @@ Add React-Calendar to your project by executing `npm install react-calendar` or 
 Here's an example of basic usage:
 
 ```js
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 
-class MyApp extends Component {
-  state = {
-    date: new Date(),
-  }
+function MyApp() {
+  const [value, onChange] = useState(new Date());
 
-  onChange = date => this.setState({ date })
-
-  render() {
-    return (
-      <div>
-        <Calendar
-          onChange={this.onChange}
-          value={this.state.date}
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Calendar
+        onChange={onChange}
+        value={value}
+      />
+    </div>
+  );
 }
 ```
 
@@ -97,6 +91,7 @@ Displays a complete, interactive calendar.
 |Prop name|Description|Default value|Example values|
 |----|----|----|----|
 |activeStartDate|The beginning of a period that shall be displayed. If you wish to use React-Calendar in an uncontrolled way, use `defaultActiveStartDate` instead.|(today)|`new Date(2017, 0, 1)`|
+|allowPartialRange|Whether to call onChange with only partial result given `selectRange` prop.|`false`|`true`|
 |calendarType|Type of calendar that should be used. Can be `"ISO 8601"`, `"US"`, `"Arabic"`, or `"Hebrew"`. Setting to `"US"` or `"Hebrew"` will change the first day of the week to Sunday. Setting to `"Arabic"` will change the first day of the week to Saturday. Setting to `"Arabic"` or `"Hebrew"` will make weekends appear on Friday to Saturday.|Type of calendar most commonly used in a given locale|`"ISO 8601"`|
 |className|Class name(s) that will be added along with `"react-calendar"` to the main React-Calendar `<div>` element.|n/a|<ul><li>String: `"class1 class2"`</li><li>Array of strings: `["class1", "class2 class3"]`</li></ul>|
 |defaultActiveStartDate|The beginning of a period that shall be displayed by default. If you wish to use React-Calendar in a controlled way, use `activeStartDate` instead.|(today)|`new Date(2017, 0, 1)`|
@@ -115,9 +110,9 @@ Displays a complete, interactive calendar.
 |navigationAriaLabel|`aria-label` attribute of a label rendered on calendar navigation bar.|n/a|`"Go up"`|
 |navigationLabel|Content of a label rendered on calendar navigation bar.|(default label)|``({ date, label, locale, view }) => `Current view: ${view}, date: ${date.toLocaleDateString(locale)}` ``|
 |nextAriaLabel|`aria-label` attribute of the "next" button on the navigation pane.|n/a|`"Next"`|
-|nextLabel|Content of the "next" button on the navigation pane.|`"›"`|<ul><li>String: `"›"`</li><li>React element: `<NextIcon />`</li></ul>|
+|nextLabel|Content of the "next" button on the navigation pane. Setting the value explicitly to null will hide the icon.|`"›"`|<ul><li>String: `"›"`</li><li>React element: `<NextIcon />`</li></ul>|
 |next2AriaLabel|`aria-label` attribute of the "next on higher level" button on the navigation pane.|n/a|`"Jump forwards"`|
-|next2Label|Content of the "next on higher level" button on the navigation pane.|`"»"`|<ul><li>String: `"»"`</li><li>React element: `<DoubleNextIcon />`</li></ul>|
+|next2Label|Content of the "next on higher level" button on the navigation pane. Setting the value explicitly to null will hide the icon.|`"»"`|<ul><li>String: `"»"`</li><li>React element: `<DoubleNextIcon />`</li></ul>|
 |onActiveStartDateChange|Function called when the user navigates from one view to another using previous/next button.|n/a|`({ activeStartDate, view }) => alert('Changed view to: ', activeStartDate, view)`|
 |onChange|Function called when the user clicks an item (day on month view, month on year view and so on) on the most detailed view available.|n/a|`(value, event) => alert('New date is: ', value)`|
 |onViewChange|Function called when the user navigates from one view to another using drill up button or by clicking a tile.|n/a|`({ activeStartDate, view }) => alert('New view is: ', view)`|
@@ -129,9 +124,9 @@ Displays a complete, interactive calendar.
 |onDrillDown|Function called when the user drills down by clicking a tile.|n/a|`({ activeStartDate, view }) => alert('Drilled down to: ', activeStartDate, view)`|
 |onDrillUp|Function called when the user drills up by clicking drill up button.|n/a|`({ activeStartDate, view }) => alert('Drilled up to: ', activeStartDate, view)`|
 |prevAriaLabel|`aria-label` attribute of the "previous" button on the navigation pane.|n/a|`"Previous"`|
-|prevLabel|Content of the "previous" button on the navigation pane.|`"‹"`|<ul><li>String: `"‹"`</li><li>React element: `<PreviousIcon />`</li></ul>|
+|prevLabel|Content of the "previous" button on the navigation pane. Setting the value explicitly to null will hide the icon.|`"‹"`|<ul><li>String: `"‹"`</li><li>React element: `<PreviousIcon />`</li></ul>|
 |prev2AriaLabel|`aria-label` attribute of the "previous on higher level" button on the navigation pane.|n/a|`"Jump backwards"`|
-|prev2Label|Content of the "previous on higher level" button on the navigation pane.| `"«"`|<ul><li>String: `"«"`</li><li>React element: `<DoublePreviousIcon />`</li></ul>|
+|prev2Label|Content of the "previous on higher level" button on the navigation pane. Setting the value explicitly to null will hide the icon.|`"«"`|<ul><li>String: `"«"`</li><li>React element: `<DoublePreviousIcon />`</li></ul>|
 |returnValue|Which dates shall be passed by the calendar to the onChange function and onClick{Period} functions. Can be `"start"`, `"end"` or `"range"`. The latter will cause an array with start and end values to be passed.|`"start"`|`"range"`|
 |showDoubleView|Whether to show two months/years/… at a time instead of one. Forces `showFixedNumberOfWeeks` prop to be `true`.|`false`|`true`|
 |showFixedNumberOfWeeks|Whether to always show fixed number of weeks (6). Forces `showNeighboringMonth` prop to be `true`.|`false`|`true`|

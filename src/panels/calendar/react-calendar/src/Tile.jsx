@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import mergeClassNames from 'merge-class-names';
 
 import { tileProps } from './shared/propTypes';
+import { Gradient } from '@vkontakte/vkui';
 
 function getValue(nextProps, prop) {
   const { activeStartDate, date, view } = nextProps;
@@ -13,6 +14,12 @@ function getValue(nextProps, prop) {
 }
 
 export default class Tile extends Component {
+  constructor(props) {
+    super(props);
+    // Нельзя вызывать this.setState() здесь!
+    this.colors = ["9EF9A7", "D1F99E", "F3F59E", "FAA49E", "FAD19E"];
+  }
+
   static getDerivedStateFromProps(nextProps, prevState) {
     const { tileClassName, tileContent } = nextProps;
 
@@ -64,7 +71,7 @@ export default class Tile extends Component {
         onClick={onClick && (event => onClick(date, event))}
         onFocus={onMouseOver && (() => onMouseOver(date))}
         onMouseOver={onMouseOver && (() => onMouseOver(date))}
-        style={style}
+        style={{background: 'conic-gradient(#9EF9A7, #F3F59E, #FAD19E, #9EF9A7)'}}
         type="button"
       >
         {formatAbbr

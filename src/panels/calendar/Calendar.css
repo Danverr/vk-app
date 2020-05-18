@@ -57,19 +57,19 @@
 }
 
 .react-calendar__year-view__months__month{
-  height: 1px !important;
-  width: auto !important;
-  border-radius: 20% !important;
+  height: 1px;
+  width: auto;
+  border-radius: 20%;
 }
 .react-calendar__decade-view__years__year{
-  height: 1px !important;
-  width: auto !important;
-  border-radius: 20% !important;
+  height: 1px;
+  width: auto;
+  border-radius: 20%;
 }
 .react-calendar__century-view__decades__decade{
-  height: 1px !important;
-  width: auto !important;
-  border-radius: 20% !important;
+  height: 1px;
+  width: auto;
+  border-radius: 20%;
 }
 
 .react-calendar__month-view__weekdays__weekday {
@@ -96,6 +96,21 @@
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
+
+.react-calendar__month-view__days__day{
+  height: 32px;
+  width: 32px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  text-align: center;
+  border-radius: 50%;
+  background: #ffffff;
+  flex-basis: initial !important;
+  max-width: none !important;
+}
+
 .react-calendar__month-view__days__day--weekend { /*выходной*/
 }
 .react-calendar__month-view__days__day--neighboringMonth { /*предыдущий / следующий месяц*/
@@ -106,16 +121,8 @@
 .react-calendar__century-view .react-calendar__tile {
   padding: 2em 0.5em;
 }
-.react-calendar__tile { /*дефолтный вид кнопки*/
-  height: 32px;
-  width: 32px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  border-radius: 50%;
-  background: #ffffff;
-  flex-basis: initial !important;
-  max-width: none !important;
+.react-calendar__tile { /*общий вид всех кнопок*/
+  
 }
 .react-calendar__tile:disabled { /*хз что это*/
 }

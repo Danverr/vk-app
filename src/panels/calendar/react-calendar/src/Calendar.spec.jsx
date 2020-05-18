@@ -1,8 +1,10 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { getMonthStart } from '@wojtekmaj/date-utils';
 
 import Calendar from './Calendar';
+
+const { format } = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
 describe('Calendar', () => {
   it('renders Navigation by default', () => {
@@ -336,6 +338,32 @@ describe('Calendar', () => {
 
       expect(monthView.prop('activeStartDate')).toEqual(beginOfCurrentMonth);
     });
+
+    it('displays days on the correct weekdays when given a defaultActiveStartDate', () => {
+      const defaultActiveStartDate = new Date(2012, 5, 6);
+      const component = mount(
+        <Calendar defaultActiveStartDate={defaultActiveStartDate} />,
+      );
+
+      const firstDayTile = component.find('.react-calendar__tile').first();
+      const firstDayTileTimeAbbr = firstDayTile.find('abbr').prop('aria-label');
+
+      // The date of the first Monday that this calendar should show is May 28, 2012.
+      expect(firstDayTileTimeAbbr).toBe(format(new Date(2012, 4, 28)));
+    });
+
+    it('displays days on the correct weekdays when given an activeStartDate', () => {
+      const activeStartDate = new Date(2012, 5, 6);
+      const component = mount(
+        <Calendar activeStartDate={activeStartDate} />,
+      );
+
+      const firstDayTile = component.find('.react-calendar__tile').first();
+      const firstDayTileTimeAbbr = firstDayTile.find('abbr').prop('aria-label');
+
+      // The date of the first Monday that this calendar should show is May 28, 2012.
+      expect(firstDayTileTimeAbbr).toBe(format(new Date(2012, 4, 28)));
+    });
   });
 
   describe('handles drill up properly', () => {
@@ -631,21 +659,6 @@ describe('Calendar', () => {
       expect(onChange).toHaveBeenCalledWith(new Date(2017, 0, 1));
     });
 
-    it('calls onChange function returning the beginning of the selected period when returnValue is set to "start"', () => {
-      const onChange = jest.fn();
-      const component = shallow(
-        <Calendar
-          onChange={onChange}
-          returnValue="start"
-          view="month"
-        />,
-      );
-
-      component.instance().onChange(new Date(2017, 0, 1));
-
-      expect(onChange).toHaveBeenCalledWith(new Date(2017, 0, 1));
-    });
-
     it('calls onChange function returning the end of the selected period when returnValue is set to "end"', () => {
       const onChange = jest.fn();
       const component = shallow(
@@ -743,7 +756,7 @@ describe('Calendar', () => {
       expect(onChange).toHaveBeenCalledWith(new Date(2017, 0, 1, 12));
     });
 
-    it('does not call onChange function returning a range when selected one piece of a range', () => {
+    it('does not call onChange function returning a range when selected one piece of a range by default', () => {
       const onChange = jest.fn();
       const component = shallow(
         <Calendar
@@ -756,6 +769,41 @@ describe('Calendar', () => {
       component.instance().onChange(new Date(2018, 0, 1));
 
       expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not call onChange function returning a range when selected one piece of a range given allowPartialRange = false', () => {
+      const onChange = jest.fn();
+      const component = shallow(
+        <Calendar
+          allowPartialRange={false}
+          onChange={onChange}
+          selectRange
+          view="month"
+        />,
+      );
+
+      component.instance().onChange(new Date(2018, 0, 1));
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('calls onChange function returning a partial range when selected one piece of a range given allowPartialRange = true', () => {
+      const onChange = jest.fn();
+      const component = shallow(
+        <Calendar
+          allowPartialRange
+          onChange={onChange}
+          selectRange
+          view="month"
+        />,
+      );
+
+      component.instance().onChange(new Date(2018, 0, 1));
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith([
+        new Date(2018, 0, 1),
+      ]);
     });
 
     it('calls onChange function returning a range when selected two pieces of a range', () => {
