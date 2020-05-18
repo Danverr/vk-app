@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+.bulletsContainer {
+    display: flex;
+    position: absolute;
+    top: calc(50% - 4px);
+    left: calc(50vw - 28px);
+    padding: 0 !important;
+    width: 56px;
+    justify-content: space-between;
+}
+
+.bullet {
+    height: 8px;
+    width: 8px;
+    padding: 0 !important;
+    background: #c5c5c5;
+    border-radius: 50%;
+}
+
+.bulletSelected {
+    background: #000000;
+}
+
+.panelContainer {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--tabbar_height));
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+}
+
+.console {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    background: #000000;
+    font-family: 'Fira Code', monospace;
+}
+
+.consoleContent {
+    font-size: 14px;
+    padding-top: 0;
+    color: #ffffff;
+}
+
+.consoleHeaderText {
+    font-weight: 700;
+    color: #808080;
+}
+
+.formLayout :global(.Button__in) {
+    justify-content: flex-start;
+}
+
+.formLayout button {
+    margin-top: 12px;
+}
+
+:global(.Button__before) img {
+    display: flex;
+    margin-right: 6px;
+}
+
+:global(.Button.Tappable--active) {
+    opacity: 1;
+}

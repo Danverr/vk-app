@@ -12,7 +12,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
 import Profiles from './panels/profiles/profiles';
 import Feed from "./panels/feed/feed";
-import CheckIn from "./panels/checkIn/checkIn";
+import CheckInStory from "./panels/checkIn/checkInStory";
 import Calendar from "./panels/calendar/calendar";
 import Settings from "./panels/settings/settings";
 
@@ -20,7 +20,7 @@ import Settings from "./panels/settings/settings";
 const defaultPanels = {
     feed: "main",
     profiles: "main",
-    checkIn: "main",
+    checkIn: "mood",
     calendar: "main",
     settings: "main",
 };
@@ -39,8 +39,8 @@ const getLastViewHistory = (history) => {
 
 const App = () => {
     const [navState, setNavState] = useState({
-        story: "profiles",
-        panel: defaultPanels["profiles"],
+        story: "checkIn",
+        panel: defaultPanels["checkIn"],
     });
     let [usersInfo, setUsersInfo] = useState(null);
     const [history, setHistory] = useState([navState]);
@@ -62,8 +62,6 @@ const App = () => {
         if (history.length === 1) {
             bridge.send('VKWebAppDisableSwipeBack');
         }
-
-        console.log(history);
     };
 
     // Функция для перехода на другой экран
@@ -87,8 +85,6 @@ const App = () => {
         history.push(state);
         setHistory(history);
         setNavState(state);
-
-        console.log(history);
     };
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
@@ -111,7 +107,7 @@ const App = () => {
                 userId: currentUserInfo.id,
             });
 
-            if (friendsIdsPromise.data.length) {
+            if (friendsIdsPromise.data && friendsIdsPromise.data.length) {
                 // Информация о друзьях
                 const friendsInfoPromise = await api("GET", "/vk/users/", {
                     user_ids: friendsIdsPromise.data,
@@ -162,7 +158,7 @@ const App = () => {
             }>
                 <Feed id="feed" nav={nav}/>
                 <Profiles id="profiles" nav={nav}/>
-                <CheckIn id="checkIn" nav={nav}/>
+                <CheckInStory id="checkIn" nav={nav} usersInfo={usersInfo}/>
                 <Calendar id="calendar" nav={nav}/>
                 <Settings id="settings" nav={nav}/>
             </Epic>
