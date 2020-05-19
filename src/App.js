@@ -34,6 +34,7 @@ const getLastViewHistory = (history) => {
         viewHistory.push(history[i].panel);
     }
 
+    viewHistory.reverse();
     return viewHistory;
 };
 
