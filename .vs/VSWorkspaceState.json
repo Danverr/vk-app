@@ -4,9 +4,9 @@
     "\\src",
     "\\src\\panels",
     "\\src\\panels\\feed",
-    "\\src\\panels\\feed\\components\\TextPost",
+    "\\src\\panels\\feed\\components",
     "\\src\\utils"
   ],
-  "SelectedNode": "\\src\\App.js",
+  "SelectedNode": "\\src\\panels\\feed\\feed.js",
   "PreviewInSolutionExplorer": false
 }

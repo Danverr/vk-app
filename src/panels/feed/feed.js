@@ -9,39 +9,6 @@ import PullToRefresh from '@vkontakte/vkui/dist/components/PullToRefresh/PullToR
 
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
 
-import ava from './ava.jpg';
-import ava_danya from './danya.jpg'
-
-
-const user = {
-    photo_200: ava,
-    first_name: 'Albert',
-    last_name: 'Skalt'
-};
-
-const user2 = {
-    photo_200: ava_danya,
-    first_name: 'Даниил',
-    last_name: 'Маряхин'
-};
-
-const date = {
-    day: 28,
-    month: 'Апреля',
-    hour: 12,
-    minute: 33,
-};
-
-/*
- * 
- *  <TextPost user={user} text='Я скажу то, что для тебя не новость: мир не такой уж солнечный и приветливый. Это очень опасное, жесткое место, и если только дашь слабину, он опрокинет с такой силой тебя, что больше уже не встанешь. Ни ты, ни я, никто на свете, не бьёт так сильно, как жизнь! Совсем не важно, как ты ударишь, а важно, какой держишь удар, как двигаешься вперёд. Будешь идти — ИДИ! Если с испугу не свернёшь... Только так побеждают! Если знаешь, чего ты стоишь — иди и бери своё! Но будь готов удары держать, а не забрасывай кф на 2 месяца ' description='обычный день' date={date}/>
-
-        <TextPost user={user2} text='Годно! ' description='Солнечно' date={date}/>
- * 
- * 
- */
-
-
 const Feed = (props) => {
     const [usersInfo, setUsersInfo] = useState(null);
     const [wasUpdated, setWasUpdated] = useState(null);
@@ -74,13 +41,18 @@ const Feed = (props) => {
         const temp = [];
         if (usersPosts != null && props.user.length == usersPosts.length) {
             props.user.map((user, i) => {
-                usersPosts[i].data.map(post => temp.push(
-                    (<TextPost
-                    user={{ photo_200: (user.photo_50 != null) ? user.photo_50 : user.photo_200, first_name: user.first_name, last_name: user.last_name }}
-                    text={post.note}
-                    description={post.title}
-                    date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
-                />)))
+                usersPosts[i].data.map(post => {
+                    const obj = { user: user, post: post };
+                    if (post.isPublic === "1" || user.id === props.user.id) {
+                        temp.push(<TextPost postData={obj} />);
+                            //(<TextPost
+                            //    user={{ photo_200: (user.photo_50 != null) ? user.photo_50 : user.photo_200, first_name: user.first_name, last_name: user.last_name }}
+                            //    text={post.note}
+                            //    description={post.title}
+                            //    date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
+                            ///>))
+                    }
+                })
             })
         }
         setPosts(temp);
@@ -107,14 +79,3 @@ const Feed = (props) => {
 }
 
 export default Feed;
-
-
-/*
- *  {(usersInfo != null) ? (usersInfo.map((n, i) => (<TextPost user={user} text={n.note} description={n.title} date={date} />))) : null}
- *
- *
- *  <PullToRefresh onRefresh={onRefresh} isFetching={state.fetching}>
-          {(usersInfo != null) ? (usersInfo.map((n, i) => (<TextPost user={user} text={n.note} description={n.title} date={date} />))) : null}
-        </PullToRefresh>
- *
- */
