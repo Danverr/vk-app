@@ -58,17 +58,17 @@
 
 .react-calendar__year-view__months__month{
   height: 1px;
-  width: auto;
+  width: auto !important;
   border-radius: 20%;
 }
 .react-calendar__decade-view__years__year{
   height: 1px;
-  width: auto;
+  width: auto !important;
   border-radius: 20%;
 }
 .react-calendar__century-view__decades__decade{
   height: 1px;
-  width: auto;
+  width: auto !important;
   border-radius: 20%;
 }
 
@@ -98,17 +98,25 @@
 }
 
 .react-calendar__month-view__days__day{
-  height: 32px;
-  width: 32px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 4px;
-  margin-bottom: 4px;
+  font-size: 13px;
+  height: 100%;
+  width: 100%;
   text-align: center;
   border-radius: 50%;
-  background: #ffffff;
   flex-basis: initial !important;
   max-width: none !important;
+}
+
+.react-calendar__tile__border__gradient{
+    border-radius: 50%;
+    display: inline-block;
+    padding: 4px;
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 .react-calendar__month-view__days__day--weekend { /*выходной*/
@@ -122,7 +130,8 @@
   padding: 2em 0.5em;
 }
 .react-calendar__tile { /*общий вид всех кнопок*/
-  
+  max-width: none !important;
+  background: white;
 }
 .react-calendar__tile:disabled { /*хз что это*/
 }
@@ -130,7 +139,6 @@
 .react-calendar__tile:enabled:focus { /*на кнопку навели курсор / нажали*/
 }
 .react-calendar__tile--now {
-  background: #ffff76;
 }
 .react-calendar__tile--now:enabled:hover,
 .react-calendar__tile--now:enabled:focus {
@@ -144,7 +152,7 @@
 }
 .react-calendar__tile--active:enabled:hover,
 .react-calendar__tile--active:enabled:focus {
-  border: 2px solid rgb(0, 0, 0); 
 }
+
 .react-calendar--selectRange .react-calendar__tile--hover { /*хз что это*/
 }

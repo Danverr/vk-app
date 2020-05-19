@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getUserLocale } from 'get-user-locale';
+import { Title } from '@vkontakte/vkui';
+import '@vkontakte/vkui/dist/vkui.css';
 
 import {
   getCenturyLabel,
@@ -133,9 +135,9 @@ export default function Navigation({
         style={{ flexGrow: 1 }}
         type="button"
       >
-        <span className={`${labelClassName}__labelText ${labelClassName}__labelText--from`}>
+        <Title level="3" weight="semibold" className={`${labelClassName}__labelText ${labelClassName}__labelText--from`}>
           {renderLabel(activeStartDate)}
-        </span>
+        </Title>
         {showDoubleView && (
           <>
             <span className={`${labelClassName}__divider`}>

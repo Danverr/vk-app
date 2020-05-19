@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Div, Header, Group } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
@@ -31,8 +31,8 @@ const CalendarPanel = (props) => {
     useEffect(() => {
         let temp = [];
         if (usersPosts != null) {
-                temp = usersPosts.data.map((post, i) => <TextPost
-                key = {i}
+            temp = usersPosts.data.map((post, i) => <TextPost
+                key={i}
                 user={{ photo_200: props.user[0].photo_100, first_name: props.user[0].first_name, last_name: props.user[0].last_name }}
                 text={post.note}
                 description={post.title}
@@ -46,7 +46,7 @@ const CalendarPanel = (props) => {
     );
 
     return (
-        <View id={props.id} 
+        <View id={props.id}
             activePanel={props.nav.panel}
             history={props.nav.history}
             onSwipeBack={props.nav.goBack}
@@ -56,8 +56,9 @@ const CalendarPanel = (props) => {
                 <Div style={{ paddingTop: "0px" }}>
                     <Calendar onClickDay={(value, event) => setCurDate(value)} />
                 </ Div>
-                <Header mode="secondary"> Записи за этот день: </Header>
-                {posts}        
+                <Group header={<Header mode="secondary"> Записи за этот день: </Header>} separator="show">
+                    {posts}
+                </Group>
             </Panel>
         </View>
     );
