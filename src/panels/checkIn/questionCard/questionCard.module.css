@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+.console {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    background: #000000;
+    font-family: 'Fira Code', monospace;
+}
+
+.consoleContent {
+    font-size: 14px;
+    padding-top: 0;
+    color: #ffffff;
+}
+
+.consoleHeaderText {
+    font-weight: 700;
+    color: #808080;
+}

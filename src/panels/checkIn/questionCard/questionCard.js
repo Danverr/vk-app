@@ -1,0 +1,34 @@
+import React, {useState, useEffect} from 'react';
+import {Card, Avatar, Div, Cell} from '@vkontakte/vkui';
+import '@vkontakte/vkui/dist/vkui.css';
+import style from './questionCard.module.css';
+
+import roboHead from "../../../assets/roboHead.svg";
+
+const QuestionCard = (props) => {
+    const [isCursorVisible, setCursorVisability] = useState(false);
+
+    // Мигаем курсором
+    useEffect(() => {
+        setTimeout(() => {
+            setCursorVisability(!isCursorVisible);
+        }, 800);
+    }, [isCursorVisible]);
+
+    return (
+        <Card className={style.console} mode="shadow" size="l">
+            <Cell before={<Avatar size={48} src={roboHead}/>}
+                  description={<div className={style.consoleHeaderText}>Health Check-in</div>}>
+                <div className={style.consoleHeaderText}>ROBOCONSOLE v1.0</div>
+            </Cell>
+            <Div className={style.consoleContent}>
+                <div>> Запись за {props.date}</div>
+                <div>> {props.question}</div>
+                <div>> {isCursorVisible ? "_" : ""}</div>
+            </Div>
+        </Card>
+    );
+};
+
+export default QuestionCard;
+
