@@ -9,7 +9,6 @@ import './Calendar.css';
 
 const CalendarPanel = (props) => {
     let [posts, setPosts] = useState(null);
-    let [usersPosts, setUsersPosts] = useState(null);
     let [curDate, setCurDate] = useState(null);
 
     useEffect(() => {
@@ -20,25 +19,18 @@ const CalendarPanel = (props) => {
             let month = (parseInt(getMonth(curDate)) + 1).toString();
             let day = getDate(curDate);
 
-            let results = await api("GET", "/entries/", { userId: props.user[0].id, date: year + "-" + month + "-" + day });
-            setUsersPosts(results);
+            let results = await api("GET", "/entries/", { userId: props.user[0].id, day: year + "-" + month + "-" + day });
+
+            if (results != null) {
+                setPosts(results.data.map((post, i) => <TextPost
+                    key={i}
+                    postData={{ user: props.user[0], post: post }}
+                />));
+            }
         }
         fetchUsersPosts();
     },
         [curDate]
-    );
-
-    useEffect(() => {
-        let temp = [];
-        if (usersPosts != null) {
-            temp = usersPosts.data.map((post, i) => <TextPost
-                key={i}
-                postData = {{user: props.user[0], post: post}}
-            />)
-        }
-        setPosts(temp);
-    },
-        [usersPosts]
     );
 
     return (

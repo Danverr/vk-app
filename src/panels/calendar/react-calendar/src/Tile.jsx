@@ -1,9 +1,7 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import mergeClassNames from 'merge-class-names';
 import { tileProps } from './shared/propTypes';
-import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
-import api from '../../../../utils/api'
 
 function getValue(nextProps, prop) {
   const { activeStartDate, date, view } = nextProps;
