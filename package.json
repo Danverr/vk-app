@@ -20,6 +20,9 @@
     "react-scripts": "^3.4.1"
   },
   "dependencies": {
+    "@nivo/core": "latest",
+    "@nivo/pie": "^0.61.1",
+    "@nivo/stream": "^0.61.1",
     "@vkontakte/icons": "^1.20.2",
     "@vkontakte/vk-bridge": "^2.1.8",
     "@vkontakte/vk-miniapps-deploy": "0.0.17",
@@ -32,9 +35,14 @@
     "eruda": "^2.2.0",
     "eruda-code": "^2.0.0",
     "eruda-dom": "^2.0.0",
+    "flare-react": "^1.0.7",
+    "flickity": "^2.2.1",
+    "nivo": "^0.31.0",
     "prop-types": "^15.7.2",
+    "qs": "^6.9.4",
     "react": "^16.13.1",
-    "react-dom": "^16.9.0"
+    "react-dom": "^16.9.0",
+    "react-flickity-component": "^3.5.0"
   },
   "browserslist": {
     "production": [

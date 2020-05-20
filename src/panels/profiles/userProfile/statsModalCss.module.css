@@ -1,0 +1,27 @@
+.main { 
+    overflow-y: hidden;
+}
+
+.main div {
+    color: yellow;
+    font-size: 15px;
+}
+
+.color {
+    color: blueviolet;
+    font-size: 40px;
+}
+
+.block {
+    width: 500px;
+    height: 200px;
+    border: 2px solid white;
+}
+
+
+::-webkit-scrollbar{
+    width: 0px;
+    }    
+
+:focus {outline:none !important;}
+    
