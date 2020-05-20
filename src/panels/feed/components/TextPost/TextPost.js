@@ -1,11 +1,7 @@
 
 import React from 'react';
-import { Cell, CardGrid } from '@vkontakte/vkui';
+import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
-import Avatar from '@vkontakte/vkui/dist/components/Avatar/Avatar';
-import Card from '@vkontakte/vkui/dist/components/Card/Card'
-import Text from '@vkontakte/vkui/dist/components/Typography/Text/Text'
-import Title from '@vkontakte/vkui/dist/components/Typography/Title/Title'
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
 
 const TextPost = (props) => {
@@ -14,7 +10,10 @@ const TextPost = (props) => {
     const date = { day: getDate(new Date(unDate)), month: getMonth(new Date(unDate)), hour: getHours(new Date(unDate)), minute: getMinutes(new Date(unDate)) };
     const description = props.postData.post.title;
     const text = props.postData.post.note;
-    const userAva = ((user.photo_50 != null) ? user.photo_50 : user.photo_200);
+    const userAva = user.photo_100;
+    const mood = Number.parseInt(props.postData.post.mood) * 20;
+    const stress = Number.parseInt(props.postData.post.stress) * 20;
+    const anxiety = Number.parseInt(props.postData.post.anxiety) * 20;
     return (
         <CardGrid className={s.content}>
             <Card size="l" mode="shadow">
@@ -29,6 +28,17 @@ const TextPost = (props) => {
                 <Text weight='medium' className={s.postText} >
                     {text}
                 </Text>
+
+                <div className={s.par}>
+                    <div className={s.parName}> <Text weight='medium' className={s.parText}> Настроение </Text> </div>
+                    <div className={s.parProgress}> <Progress value={mood}/> </div>
+                    <div className={s.parName}>  <Text weight='medium' className={s.parText}> Стресс </Text> </div>
+                    <div className={s.parProgress}>  <Progress value={stress} /> </div>
+                    <div className={s.parName}>  <Text weight='medium' className={s.parText}> Тревожность </Text> </div>
+                    <div className={s.parProgress}>  <Progress value={anxiety} /> </div>
+                </div>
+
+
                 <div style={{ height: 25 }} />
             </Card>
         </CardGrid>
@@ -36,3 +46,8 @@ const TextPost = (props) => {
 }
 
 export default TextPost;
+
+/*
+ *  <Progress value={mood} />
+ *
+ */

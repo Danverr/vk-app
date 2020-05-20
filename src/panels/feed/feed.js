@@ -40,17 +40,12 @@ const Feed = (props) => {
     useEffect(() => {
         const temp = [];
         if (usersPosts != null && props.user.length == usersPosts.length) {
+         //   debugger;
             props.user.map((user, i) => {
                 usersPosts[i].data.map(post => {
                     const obj = { user: user, post: post };
                     if (post.isPublic === "1" || user.id === props.user.id) {
                         temp.push(<TextPost postData={obj} />);
-                            //(<TextPost
-                            //    user={{ photo_200: (user.photo_50 != null) ? user.photo_50 : user.photo_200, first_name: user.first_name, last_name: user.last_name }}
-                            //    text={post.note}
-                            //    description={post.title}
-                            //    date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
-                            ///>))
                     }
                 })
             })
