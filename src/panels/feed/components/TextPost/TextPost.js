@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title } from '@vkontakte/vkui';
+import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title, PanelHeaderButton} from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
+import Icon24Dropdown from '@vkontakte/icons/dist/24/dropdown';
+import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 const TextPost = (props) => {
     const user = props.postData.user;
@@ -19,6 +21,8 @@ const TextPost = (props) => {
             <Card size="l" mode="shadow">
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
+                    indicator={<PanelHeaderButton className={s.drop} onClick={() => { alert("YES"); }}>
+                        <Icon24MoreVertical /> </PanelHeaderButton>} 
                 >
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>
@@ -37,7 +41,6 @@ const TextPost = (props) => {
                     <div className={s.parName}>  <Text weight='medium' className={s.parText}> Тревожность </Text> </div>
                     <div className={s.parProgress}>  <Progress value={anxiety} /> </div>
                 </div>
-
 
                 <div style={{ height: 25 }} />
             </Card>

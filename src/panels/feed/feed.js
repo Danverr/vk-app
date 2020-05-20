@@ -6,14 +6,12 @@ import TextPost from './components/TextPost/TextPost.js';
 import api from '../../utils/api'
 import PullToRefresh from '@vkontakte/vkui/dist/components/PullToRefresh/PullToRefresh';
 
-
-import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
-
 const Feed = (props) => {
-    const [usersInfo, setUsersInfo] = useState(null);
-    const [wasUpdated, setWasUpdated] = useState(null);
-    const [usersPosts, setUsersPosts] = useState(null);
-    const [posts, setPosts] = useState(null);
+    const [usersInfo, setUsersInfo] = useState(0);
+    const [wasUpdated, setWasUpdated] = useState(0);
+    const [usersPosts, setUsersPosts] = useState(wasUpdated); //  присваеваем значение хука другому хуку, чтобы лента грузилась сразу
+    const [posts, setPosts] = useState(0);
+
 
     useEffect(() => {
         if (wasUpdated === null || props.user==null) return;
@@ -39,7 +37,8 @@ const Feed = (props) => {
 
     useEffect(() => {
         const temp = [];
-        if (usersPosts != null && props.user.length == usersPosts.length) {
+
+        if (usersPosts != null && props.user != null && props.user.length == usersPosts.length) {
          //   debugger;
             props.user.map((user, i) => {
                 usersPosts[i].data.map(post => {
