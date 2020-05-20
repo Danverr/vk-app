@@ -21,33 +21,33 @@ const testPanelsData = [
         name: "mood",
         question: "Как у вас настроение?",
         buttons: [
-            {text: "Ужасно", img: mood1},
-            {text: "Так себе", img: mood2},
-            {text: "Никак", img: mood3},
-            {text: "Нормально", img: mood4},
-            {text: "Великолепно", img: mood5}
+            {text: "Великолепно", value: 5, img: mood5},
+            {text: "Нормально", value: 4, img: mood4},
+            {text: "Никак", value: 3, img: mood3},
+            {text: "Так себе", value: 2, img: mood2},
+            {text: "Ужасно", value: 1, img: mood1}
         ],
     },
     {
         name: "anxiety",
         question: "Вы чувствовали тревожность?",
         buttons: [
-            {text: "Я спокоен", img: anxiety1},
-            {text: "Скорее нет", img: anxiety2},
-            {text: "Немного", img: anxiety3},
-            {text: "Скорее да", img: anxiety4},
-            {text: "Я очень т-т-тревожен", img: anxiety5}
+            {text: "Я спокоен", value: 1, img: anxiety1},
+            {text: "Скорее нет", value: 2, img: anxiety2},
+            {text: "Немного", value: 3, img: anxiety3},
+            {text: "Скорее да", value: 4, img: anxiety4},
+            {text: "Я очень т-т-тревожен", value: 5, img: anxiety5}
         ],
     },
     {
         name: "stress",
         question: "Вы испытывали стресс за день?",
         buttons: [
-            {text: "Я спокоен", img: stress1},
-            {text: "Скорее нет", img: stress2},
-            {text: "Немного", img: stress3},
-            {text: "Скорее да", img: stress4},
-            {text: "Я ОЧЕНЬ ЗОЛ", img: stress5}
+            {text: "Я спокоен", value: 1, img: stress1},
+            {text: "Скорее нет", value: 2, img: stress2},
+            {text: "Немного", value: 3, img: stress3},
+            {text: "Скорее да", value: 4, img: stress4},
+            {text: "Я ОЧЕНЬ ЗОЛ", value: 5, img: stress5}
         ],
     },
 ];

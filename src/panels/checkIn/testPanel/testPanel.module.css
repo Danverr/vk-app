@@ -1,0 +1,27 @@
+.formLayout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.formLayout button {
+    margin-top: 12px;
+}
+
+.radioButton :global(.Button__in) {
+    justify-content: flex-start;
+}
+
+.radioButton :global(.Button__before) img {
+    display: flex;
+    margin-right: 8px;
+}
+
+.radioButton:global(.Tappable--active) {
+    opacity: 1;
+}
+
+.skipButton {
+    color: grey;
+}

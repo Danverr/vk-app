@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Button, Div, Panel, PanelHeader, PanelHeaderBack} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import style from '../checkInStory.module.css';
+import style from './testPanel.module.css';
 
 import QuestionCard from "../questionCard/questionCard";
 
@@ -10,7 +10,7 @@ const TestPanel = (props) => {
 
     const onRadioClick = (i) => {
         if (activeButton !== i) {
-            props.answer[props.panelData.name] = i + 1;
+            props.answer[props.panelData.name] = props.panelData.buttons[i].value;
             props.setAnswer(props.answer);
             setActiveButton(i);
 
@@ -22,26 +22,11 @@ const TestPanel = (props) => {
         }
     };
 
-    const getBullets = () => {
-        let bullets = [];
-
-        for (let i = 0; i < props.panelsCount; i++) {
-            let bulletStyles = style.bullet;
-
-            if (i === props.panelIndex) {
-                bulletStyles += " " + style.bulletSelected;
-            }
-
-            bullets.push(<div key={i} className={bulletStyles}/>);
-        }
-
-        return (bullets);
-    };
-
     const getRadioButtons = () => {
         return props.panelData.buttons.map((button, i) => {
             return (<Button
                 key={i}
+                className={style.radioButton}
                 mode={activeButton === i ? "primary" : "outline"}
                 before={<img src={button.img} alt=""/>}
                 onClick={() => onRadioClick(i)}
@@ -58,21 +43,23 @@ const TestPanel = (props) => {
 
     return (
         <Panel id={props.id}>
-            <div className={style.panelContainer}>
-                <PanelHeader separator={false}
-                             left={props.panelIndex == 0 ? null :
-                                 <PanelHeaderBack onClick={() => window.history.back()}/>}>
-                    <div className={style.bulletsContainer}>
-                        {getBullets()}
-                    </div>
-                </PanelHeader>
-                <Div className={style.contentContainer}>
-                    <QuestionCard date={props.date} question={props.panelData.question}/>
-                    <div className={style.formLayout}>
-                        {radioButtons}
-                    </div>
-                </Div>
-            </div>
+
+            <PanelHeader separator={false}
+                         left={props.panelIndex == 0 ? null :
+                             <PanelHeaderBack onClick={() => window.history.back()}/>}>
+                {props.bullets}
+            </PanelHeader>
+
+            <Div>
+                <QuestionCard question={props.panelData.question}/>
+                <div className={style.formLayout}>
+                    {radioButtons}
+                    <Button className={style.skipButton} mode="tertiary" onClick={props.goTo}>
+                        Пропустить
+                    </Button>
+                </div>
+            </Div>
+
         </Panel>
     );
 };

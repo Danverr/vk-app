@@ -1,26 +1,45 @@
-import React, {useState, useEffect} from 'react';
-import {View, Panel} from '@vkontakte/vkui';
+import React, {useState} from 'react';
+import {View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import TestPanel from "./testPanel/testPanel";
+import SubmitPanel from "./submitPanel/submitPanel";
 import testPanelsData from "./testPanel/testPanelsData";
+import style from "./checkInStory.module.css";
+
+const getBullets = (index = testPanelsData.length) => {
+    let bullets = [];
+
+    for (let i = 0; i < testPanelsData.length + 1; i++) {
+        let bulletStyles = style.bullet;
+
+        if (i === index) {
+            bulletStyles += " " + style.bulletSelected;
+        }
+
+        bullets.push(<div key={i} className={bulletStyles}/>);
+    }
+
+    return (<div className={style.bulletsContainer}>{bullets}</div>);
+};
 
 const CheckInStory = (props) => {
-    const [testPanels] = useState(testPanelsData.map((panelData, i, arr) => {
+    const [loading, setLoading] = useState(null);
+    const testPanels = testPanelsData.map((panelData, i, arr) => {
         return (<TestPanel id={panelData.name}
                            goTo={() => {
                                props.nav.goTo(props.id, i + 1 < arr.length ? arr[i + 1].name : "submit");
                            }}
                            answer={props.answer}
                            setAnswer={props.setAnswer}
+                           bullets={getBullets(i)}
                            panelData={panelData}
-                           panelIndex={i}
-                           panelsCount={arr.length + 1}
         />);
-    }));
+    });
 
     return (
         <View id={props.id}
+              popout={loading}
               activePanel={props.nav.activePanel}
               history={props.nav.viewHistory}
               onSwipeBack={props.nav.goBack}
@@ -28,9 +47,13 @@ const CheckInStory = (props) => {
             {testPanels[0]}
             {testPanels[1]}
             {testPanels[2]}
-            <Panel id="submit">
-                submit
-            </Panel>
+            <SubmitPanel id="submit"
+                         answer={props.answer}
+                         setAnswer={props.setAnswer}
+                         bullets={getBullets()}
+                         goTo={props.nav.goTo}
+                         setLoading={setLoading}
+            />
         </View>
     );
 };

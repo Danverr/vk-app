@@ -19,32 +19,3 @@
 .bulletSelected {
     background: #000000;
 }
-
-.panelContainer {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - var(--tabbar_height));
-}
-
-.contentContainer {
-    display: flex;
-    flex-direction: column;
-    flex: auto;
-}
-
-.formLayout :global(.Button__in) {
-    justify-content: flex-start;
-}
-
-.formLayout button {
-    margin-top: 12px;
-}
-
-:global(.Button__before) img {
-    display: flex;
-    margin-right: 6px;
-}
-
-:global(.Button.Tappable--active) {
-    opacity: 1;
-}

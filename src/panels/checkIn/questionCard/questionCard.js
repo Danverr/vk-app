@@ -8,11 +8,14 @@ import roboHead from "../../../assets/roboHead.svg";
 const QuestionCard = (props) => {
     const [isCursorVisible, setCursorVisability] = useState(false);
 
-    // Мигаем курсором
     useEffect(() => {
-        setTimeout(() => {
+        // Мигаем курсором через timeout мс
+        const blink = setTimeout(() => {
             setCursorVisability(!isCursorVisible);
-        }, 800);
+        }, 800); // timeout
+
+        // Указываем, как сбросить этот эффект
+        return () => clearTimeout(blink);
     }, [isCursorVisible]);
 
     return (
@@ -22,7 +25,7 @@ const QuestionCard = (props) => {
                 <div className={style.consoleHeaderText}>ROBOCONSOLE v1.0</div>
             </Cell>
             <Div className={style.consoleContent}>
-                <div>> Запись за {props.date}</div>
+                <div>> Запись за сегодня</div>
                 <div>> {props.question}</div>
                 <div>> {isCursorVisible ? "_" : ""}</div>
             </Div>
