@@ -5,7 +5,7 @@ import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './react-calendar/src/Calendar';
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
-import './calendar.css';
+import './Calendar.css';
 
 const CalendarPanel = (props) => {
     let [posts, setPosts] = useState(null);
@@ -33,14 +33,10 @@ const CalendarPanel = (props) => {
         if (usersPosts != null) {
             temp = usersPosts.data.map((post, i) => <TextPost
                 key={i}
-                user={{ photo_200: props.user[0].photo_100, first_name: props.user[0].first_name, last_name: props.user[0].last_name }}
-                text={post.note}
-                description={post.title}
-                date={{ day: getDate(new Date(post.date)), month: getMonth(new Date(post.date)), hour: getHours(new Date(post.date)), minute: getMinutes(new Date(post.date)) }}
+                postData = {{user: props.user[0], post: post}}
             />)
         }
         setPosts(temp);
-        //console.log(temp);
     },
         [usersPosts]
     );

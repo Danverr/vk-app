@@ -32,6 +32,9 @@ export default function TileGroup({
           value, valueType, date, dateType, hover,
         })}
         date={date}
+        mood = {1}
+        stress = {3}
+        anxiety = {4}
         point={point}
         {...tileProps}
       />,

@@ -16,8 +16,7 @@ function getValue(nextProps, prop) {
 export default class Tile extends Component {
   constructor(props) {
     super(props);
-    // Нельзя вызывать this.setState() здесь!
-    this.colors = ["9EF9A7", "D1F99E", "F3F59E", "FAD19E", "FAA49E"];
+    this.colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -57,17 +56,27 @@ export default class Tile extends Component {
       style,
       tileDisabled,
       view,
+      mood,
+      stress,
+      anxiety
     } = this.props;
     const { tileClassName, tileContent } = this.state;
 
     /*цвет дня*/
+    let gradient = [];
+
+    gradient.push(this.colors[mood]);
+    gradient.push(this.colors[stress]);
+    gradient.push(this.colors[anxiety]);
+    gradient.push(this.colors[mood]);
+
     if (classes.indexOf("react-calendar__tile--active") != -1){ //пользователь выбрал этот день
-      style.background = 'conic-gradient(#9EF9A7, #D1F99E, #F3F59E, #9EF9A7)';
+      style.background = 'conic-gradient(' + gradient.join(', ') + ')';
     }
     let borderClasses = [], borderStyle = [];
     if(classes.indexOf("react-calendar__month-view__days__day") != -1){ //если это день
       borderClasses.push("react-calendar__tile__border__gradient");
-      borderStyle.background = 'conic-gradient(#9EF9A7, #D1F99E, #F3F59E, #9EF9A7)';
+      borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
     }
 
     return (
