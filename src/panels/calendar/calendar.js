@@ -41,10 +41,12 @@ const CalendarPanel = (props) => {
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
-                <Div style={{ paddingTop: "0px" }}>
-                    <Calendar onClickDay={(value, event) => setCurDate(value)} />
-                </ Div>
-                <Group header={<Header mode="secondary"> Записи за этот день: </Header>} separator="show">
+                <Group separator="show">
+                    <Div style={{ paddingTop: "0px" }}>
+                        <Calendar onClickDay={(value, event) => setCurDate(value)} />
+                    </ Div>
+                </Group>
+                <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
                     {posts}
                 </Group>
             </Panel>
