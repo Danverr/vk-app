@@ -3,11 +3,9 @@
     "",
     "\\src",
     "\\src\\panels",
-    "\\src\\panels\\feed",
     "\\src\\panels\\feed\\components",
-    "\\src\\panels\\feed\\components\\TextPost",
-    "\\src\\utils"
+    "\\src\\panels\\feed\\components\\TextPost"
   ],
-  "SelectedNode": "\\src\\panels\\feed\\components\\TextPost",
+  "SelectedNode": "\\src\\panels",
   "PreviewInSolutionExplorer": false
 }

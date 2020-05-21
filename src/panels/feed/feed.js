@@ -17,6 +17,7 @@ const Feed = (props) => {
         if (wasUpdated === null || props.user==null) return;
 
         const fetchUsersPosts = async () => {
+
             const temp = new Array();
 
             const fetchUserPosts = async (promices) => {
@@ -29,8 +30,10 @@ const Feed = (props) => {
             });
 
             fetchUserPosts(temp);
+
         }
         fetchUsersPosts();
+
     },
         [wasUpdated]
     );

@@ -7,7 +7,6 @@ import '@vkontakte/vkui/dist/vkui.css';
 //import Home from './panels/Home';
 //import Persik from './panels/Persik';
 //import Load from './panels/Load';
-import Feed from './Feed';
 
 /* 
  * 
@@ -45,9 +44,9 @@ const App = (props) => {
 	//};
 
 	return (
-		<View activePanel={activePanel} popout={popout}>
-			<Feed id='Feed' fetchedUser={fetchedUser} />
-		</View>
+		<div>
+
+			</div>
 	);
 
 	//return (

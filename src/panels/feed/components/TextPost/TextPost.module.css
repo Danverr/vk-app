@@ -11,6 +11,7 @@
 }
 
 .postText {
+    word-break: break-all;
     margin-top: 5px;
     margin-left: 20px;
     margin-right: 20px;
@@ -19,7 +20,7 @@
 
 .par {
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 1fr 5fr 45px;
     grid-auto-columns: minmax(90px, 500px);
 }
 
@@ -31,13 +32,13 @@
 
 .parProgress {
     margin-top: 7px;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 .parText{
     font-size: 75%;
 }
 
-.drop{
-    margin-bottom: 15px;
+.emoji{
+    margin-top: -4px;
 }
