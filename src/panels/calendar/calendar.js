@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header, Group } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
@@ -13,7 +13,8 @@ const CalendarPanel = (props) => {
 
     useEffect(() => {
         if (curDate === null || props.user === null) return;
-
+        
+        setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
         const fetchUsersPosts = async () => {
             let year = getYear(curDate);
             let month = (parseInt(getMonth(curDate)) + 1).toString();
@@ -27,6 +28,8 @@ const CalendarPanel = (props) => {
                     postData={{ user: props.user[0], post: post }}
                 />));
             }
+            else
+                setPosts(null);
         }
         fetchUsersPosts();
     },
