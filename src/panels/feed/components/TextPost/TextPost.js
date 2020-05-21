@@ -31,6 +31,7 @@ const TextPost = (props) => {
     const description = props.postData.post.title;
     const text = props.postData.post.note;
     const userAva = user.photo_100;
+    const currentUser = props.postData.currentUser;
 
     const moodInt = Number.parseInt(props.postData.post.mood);
     const stressInt = Number.parseInt(props.postData.post.stress);
@@ -44,17 +45,21 @@ const TextPost = (props) => {
     const anxietys = [anxiety1, anxiety2, anxiety3, anxiety4, anxiety5];
     const stresses = [stress1, stress2, stress3, stress4, stress5];
 
+    debugger;
+
     const emojiMood = moods[moodInt - 1];
     const emojiStress = stresses[stressInt - 1];
     const emojiAnxiety = anxietys[anxietyInt - 1];
+
 
     return (
         <CardGrid className={s.content}>
             <Card size="l" mode="shadow">
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
-                    //indicator={<PanelHeaderButton className={s.drop} onClick={() => { alert("YES"); }}>
-                    //    <Icon24MoreVertical /> </PanelHeaderButton>} 
+                    indicator={(user.id == currentUser.id) ? < div className={s.settingIcon}>
+                        <PanelHeaderButton onClick={() => { alert("YES"); }}> 
+                        <Icon24MoreVertical /> </PanelHeaderButton> </div> : null} 
                 >
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, Group, Spinner, PanelSpinner  } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Spinner, PanelSpinner } from '@vkontakte/vkui';
 import s from './Feed.module.css'
 import TextPost from './components/TextPost/TextPost.js';
 import api from '../../utils/api'
@@ -11,7 +11,7 @@ const Feed = (props) => {
     const [wasUpdated, setWasUpdated] = useState(0);
     const [usersPosts, setUsersPosts] = useState(wasUpdated);
     const [posts, setPosts] = useState(<Spinner size="large" style={{ marginTop: 20 }} />);
-     
+
     useEffect(() => {
         if (wasUpdated === null || props.user == null) return;
 
@@ -45,8 +45,8 @@ const Feed = (props) => {
         if (usersPosts != null && props.user != null && props.user.length == usersPosts.length) {
             props.user.map((user, i) => {
                 usersPosts[i].data.map(post => {
-                    const obj = { user: user, post: post };
-                    if (post.isPublic === "1" || user.id === props.user.id) {
+                    const obj = { user: user, post: post, currentUser : props.user[0] };
+                    if (post.isPublic === "1" || user.id === props.user[0].id) {
                         temp.push(<TextPost postData={obj} />);
                     }
                 })
