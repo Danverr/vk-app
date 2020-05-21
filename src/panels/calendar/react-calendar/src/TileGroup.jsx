@@ -23,7 +23,7 @@ export default function TileGroup({
   valueType,
   ...tileProps
 }) {
-  let [posts, setPosts] = useState(new Map());
+  var [posts, setPosts] = useState(new Map());
   const tiles = [];
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function TileGroup({
       let month = (parseInt(getMonth(curDate)) + 1).toString();
       let results = await api("GET", "/entries/", { userId: "281105343", month: year + "-" + month });
       let temp = posts;
-      results.data.map((post, i) => {
+      results.data.map(post => {
         temp.set(post.date.split(' ')[0], {mood: post.mood, stress: post.stress, anxiety: post.anxiety});
       });
       setPosts(temp);
