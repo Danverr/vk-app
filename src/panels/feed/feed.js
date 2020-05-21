@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, Group } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Spinner } from '@vkontakte/vkui';
 import s from './Feed.module.css'
 import TextPost from './components/TextPost/TextPost.js';
 import api from '../../utils/api'
@@ -12,9 +12,12 @@ const Feed = (props) => {
     const [usersPosts, setUsersPosts] = useState(wasUpdated); //  присваеваем значение хука другому хуку, чтобы лента грузилась сразу
     const [posts, setPosts] = useState(0);
 
+    const Spinner = true;
 
     useEffect(() => {
-        if (wasUpdated === null || props.user==null) return;
+        if (wasUpdated === null || props.user == null) return;
+
+        setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
 
         const fetchUsersPosts = async () => {
 
