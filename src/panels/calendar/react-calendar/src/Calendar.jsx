@@ -502,7 +502,6 @@ export default class Calendar extends Component {
           <YearView
             formatMonth={formatMonth}
             formatMonthYear={formatMonthYear}
-            user={user}
             {...commonProps}
           />
         );

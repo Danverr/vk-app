@@ -34,7 +34,7 @@ const CalendarPanel = (props) => {
         }
         fetchUsersPosts();
     },
-        [curDate]
+        [curDate, props.user]
     );
 
     let calendarProps = {onClickDay: (value, event) => setCurDate(value)};

@@ -59,7 +59,7 @@ export default function TileGroup({
   );
 
   let temp = dateTransform(start);
-  if (temp > startDate || temp < startDate)
+  if (startDate == null || temp.toString() != startDate.toString())
     setStartDate(temp);
 
   for (let point = start; point <= end; point += step) {
