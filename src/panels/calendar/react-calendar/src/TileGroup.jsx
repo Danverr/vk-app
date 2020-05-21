@@ -5,7 +5,9 @@ import Flex from './Flex';
 
 import { getTileClasses } from './shared/utils';
 import { tileGroupProps } from './shared/propTypes';
-import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
+import { getDate, getMonth, getYear } from '@wojtekmaj/date-utils';
+import { Spinner } from '@vkontakte/vkui';
+import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../../../utils/api'
 
 export default function TileGroup({
@@ -28,6 +30,8 @@ export default function TileGroup({
   const tiles = [];
 
   useEffect(() => {
+    if (className != "react-calendar__month-view__days" || tileProps.user == null)
+      return;
     const fetchUsersPosts = async () => {
       let months = new Set();
       let temp = new Map();
@@ -38,7 +42,7 @@ export default function TileGroup({
         if (!months.has(getMonth(curDate))) {
           let year = getYear(curDate);
           let month = (parseInt(getMonth(curDate)) + 1).toString();
-          let results = await api("GET", "/entries/", { userId: "281105343", month: year + "-" + month });
+          let results = await api("GET", "/entries/", { userId: tileProps.user, month: year + "-" + month });
           if (results != null) {
             results.data.map(post => {
               temp.set(post.date.split(' ')[0], { mood: post.mood, stress: post.stress, anxiety: post.anxiety });
@@ -51,7 +55,7 @@ export default function TileGroup({
     }
     fetchUsersPosts();
   },
-    [startDate]
+    [startDate, tileProps.user]
   );
 
   let temp = dateTransform(start);
@@ -67,7 +71,7 @@ export default function TileGroup({
 
     let curTileProps = Object.assign({}, tileProps);
 
-    if (posts.has(curDate)) {
+    if (className == "react-calendar__month-view__days" && posts.has(curDate)) {
       curTileProps.mood = posts.get(curDate).mood - 1;
       curTileProps.stress = posts.get(curDate).stress - 1;
       curTileProps.anxiety = posts.get(curDate).anxiety - 1;

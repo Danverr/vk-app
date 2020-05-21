@@ -61,7 +61,7 @@ export default function Days(props) {
 
     return daysInMonth;
   })();
-
+  console.log(otherProps.user);
   return (
     <TileGroup
       {...otherProps}
