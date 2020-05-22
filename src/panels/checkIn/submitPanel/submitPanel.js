@@ -13,7 +13,6 @@ const SubmitPanel = (props) => {
     const [titleText, setTitleText] = useState(props.answer.title);
     const [noteText, setNoteText] = useState(props.answer.note);
     const [formMessage, setFormMessage] = useState({text: " ", status: "default"});
-    console.log(props);
 
     // Обрабатываем изменения в поле заголовка
     const handleTitle = (event, name) => {
@@ -66,6 +65,8 @@ const SubmitPanel = (props) => {
                         note: "",
                         isPublic: 0,
                     });
+
+                    props.nav.clearStoryHistory("checkIn", () => props.nav.goTo("feed"));
                 }, (error) => setFormMessage({ // Ошибка
                         text: error,
                         status: "error"
@@ -81,7 +82,7 @@ const SubmitPanel = (props) => {
         <Panel id={props.id}>
 
             <PanelHeader separator={false}
-                         left={props.panelIndex == 0 ? null :
+                         left={props.panelIndex === 0 ? null :
                              <PanelHeaderBack onClick={() => window.history.back()}/>}>
                 {props.bullets}
             </PanelHeader>

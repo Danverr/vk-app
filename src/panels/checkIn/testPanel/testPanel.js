@@ -45,8 +45,7 @@ const TestPanel = (props) => {
         <Panel id={props.id}>
 
             <PanelHeader separator={false}
-                         left={props.panelIndex == 0 ? null :
-                             <PanelHeaderBack onClick={() => window.history.back()}/>}>
+                         left={<PanelHeaderBack onClick={() => window.history.back()}/>}>
                 {props.bullets}
             </PanelHeader>
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
@@ -37,11 +37,18 @@ const CheckInStory = (props) => {
         />);
     });
 
+    useEffect(() => {
+        props.nav.setNavbarVis(false);
+        return () => {
+            props.nav.setNavbarVis(true);
+        };
+    }, []);
+
     return (
         <View id={props.id}
               popout={loading}
               activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
+              history={props.nav.panelHistory[props.id]}
               onSwipeBack={props.nav.goBack}
         >
             {testPanels[0]}
@@ -51,7 +58,7 @@ const CheckInStory = (props) => {
                          answer={props.answer}
                          setAnswer={props.setAnswer}
                          bullets={getBullets()}
-                         goTo={props.nav.goTo}
+                         nav={props.nav}
                          setLoading={setLoading}
             />
         </View>
