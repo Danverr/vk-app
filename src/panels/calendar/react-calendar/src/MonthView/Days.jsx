@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Spinner } from '@vkontakte/vkui';
+import '@vkontakte/vkui/dist/vkui.css';
+
 import {
   getYear,
   getMonth,
@@ -61,9 +64,10 @@ export default function Days(props) {
 
     return daysInMonth;
   })();
-  console.log(otherProps.user);
+
   return (
-    <TileGroup
+    <div>
+    {props.dataIsReady ? (<TileGroup
       {...otherProps}
       className="react-calendar__month-view__days"
       count={7}
@@ -79,7 +83,9 @@ export default function Days(props) {
       offset={offset}
       start={start}
       tile={Day}
-    />
+    />) : 
+    (<Spinner size="large" style={{ marginTop: 20 }} />)}
+    </ div>
   );
 }
 

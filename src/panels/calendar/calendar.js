@@ -4,44 +4,55 @@ import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './react-calendar/src/Calendar';
-import { getDate, getMonth, getYear} from '@wojtekmaj/date-utils';
+import { getDate, getMonth, getYear } from '@wojtekmaj/date-utils';
 import './Calendar.css';
 
 const CalendarPanel = (props) => {
-    let [posts, setPosts] = useState(null);
-    let [curDate, setCurDate] = useState(null);
+    var [posts, setPosts] = useState(null);
+    var [allPosts, setAllPosts] = useState(new Object());
+    var [curDate, setCurDate] = useState(null);
+    var [dataIsReady, setDataIsReady] = useState(false);
 
     useEffect(() => {
-        if (curDate === null || props.user === null) 
+        if (curDate === null || props.user === null)
             return;
-        
         setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
         const fetchUsersPosts = async () => {
             let year = getYear(curDate);
-            let month = (parseInt(getMonth(curDate)) + 1).toString();
-            let day = getDate(curDate);
-
-            let results = await api("GET", "/entries/", { userId: props.user[0].id, day: year + "-" + month + "-" + day });
-
-            if (results != null) {
-                setPosts(results.data.map((post, i) => <TextPost
-                    key={i}
-                    postData={{ user: props.user[0], post: post }}
-                />));
-            }
+            let month = ('0' + (parseInt(getMonth(curDate)) + 1).toString()).slice(-2);
+            let day = ('0' + getDate(curDate)).slice(-2);
+            
+            if (allPosts[year + "-" + month + "-" + day] != null) 
+                setPosts(<TextPost postData={{ user: props.user[0], post: allPosts[year + "-" + month + "-" + day] }} />);
             else
                 setPosts(null);
         }
         fetchUsersPosts();
     },
-        [curDate, props.user]
+        [allPosts, curDate, props.user]
     );
 
-    let calendarProps = {    
-    onClickDay: (value, event) => setCurDate(value),
-    onActiveStartDateChange: (activeStartDate, view) => console.log(activeStartDate)};
-    if(props.user != null)
-        calendarProps.user = props.user[0].id;
+    useEffect(() => {
+        if (props.user === null)
+            return;
+        setDataIsReady(false);
+        const getPosts = (obj, posts) => {
+            let temp = { ...obj }
+            posts.data.map(post => { temp[post.date.split(' ')[0]] = post; });
+            return temp;
+        }
+        const fetchUsersPosts = async () => {
+            let results = await api("GET", "/entries/", { userId: props.user[0].id });
+            if (results != null)
+                setAllPosts(obj => getPosts(obj, results));
+            setDataIsReady(true);
+        }
+        fetchUsersPosts();
+    },
+        [props.user]
+    );
+
+    let calendarProps = { onClickDay: (value, event) => setCurDate(value), allPosts: allPosts, dataIsReady: dataIsReady};
 
     return (
         <View id={props.id}

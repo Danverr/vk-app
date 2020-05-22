@@ -23,44 +23,10 @@ export default function TileGroup({
   tile: Tile,
   value,
   valueType,
+  allPosts,
   ...tileProps
 }) {
-  var [posts, setPosts] = useState(new Map());
-  var [startDate, setStartDate] = useState(null);
   const tiles = [];
-
-  useEffect(() => {
-    if (className != "react-calendar__month-view__days" || tileProps.user == null)
-      return;
-    const fetchUsersPosts = async () => {
-      let months = new Set();
-      let temp = new Map();
-
-      for (let point = start; point <= end; point += step) {
-        let curDate = dateTransform(point);
-
-        if (!months.has(getMonth(curDate))) {
-          let year = getYear(curDate);
-          let month = (parseInt(getMonth(curDate)) + 1).toString();
-          let results = await api("GET", "/entries/", { userId: tileProps.user, month: year + "-" + month });
-          if (results != null) {
-            results.data.map(post => {
-              temp.set(post.date.split(' ')[0], { mood: post.mood, stress: post.stress, anxiety: post.anxiety });
-            });
-          }
-        }
-        months.add(getMonth(curDate));
-      }
-      setPosts(temp);
-    }
-    fetchUsersPosts();
-  },
-    [startDate, tileProps.user]
-  );
-
-  let temp = dateTransform(start);
-  if (startDate == null || temp.toString() != startDate.toString())
-    setStartDate(temp);
 
   for (let point = start; point <= end; point += step) {
     const date = dateTransform(point);
@@ -69,12 +35,12 @@ export default function TileGroup({
     let day = ('0' + getDate(date)).slice(-2);
     let curDate = year + "-" + month + "-" + day;
 
-    let curTileProps = Object.assign({}, tileProps);
+    let curTileProps = {...tileProps};
 
-    if (className == "react-calendar__month-view__days" && posts.has(curDate)) {
-      curTileProps.mood = posts.get(curDate).mood - 1;
-      curTileProps.stress = posts.get(curDate).stress - 1;
-      curTileProps.anxiety = posts.get(curDate).anxiety - 1;
+    if (allPosts != null && allPosts[curDate] != null) {
+      curTileProps.mood = allPosts[curDate].mood - 1;
+      curTileProps.stress = allPosts[curDate].stress - 1;
+      curTileProps.anxiety = allPosts[curDate].anxiety - 1;
     }
     tiles.push(
       <Tile

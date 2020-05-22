@@ -447,7 +447,8 @@ export default class Calendar extends Component {
       tileClassName,
       tileContent,
       tileDisabled,
-      user
+      allPosts,
+      dataIsReady
     } = this.props;
     const { hover } = this;
 
@@ -528,7 +529,8 @@ export default class Calendar extends Component {
             showFixedNumberOfWeeks={showFixedNumberOfWeeks || showDoubleView}
             showNeighboringMonth={showNeighboringMonth}
             showWeekNumbers={showWeekNumbers}
-            user = {user}
+            allPosts = {allPosts}
+            dataIsReady = {dataIsReady}
             {...commonProps}
           />
         );
