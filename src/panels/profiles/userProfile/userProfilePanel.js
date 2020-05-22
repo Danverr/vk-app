@@ -4,7 +4,7 @@ import {Panel, PanelHeader, PanelHeaderBack, Cell, Button, Avatar, Div} from "@v
 import styles from "./userProfilePanel.module.css";
 import FlareComponent from "flare-react";
 
-import petPlaceholder from "../../../img/robot.flr";
+import petPlaceholder from "../../../assets/robot.flr";
 import petController from "./petController";
 
 const UserProfilePanel = (props) => {

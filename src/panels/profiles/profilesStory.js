@@ -6,21 +6,16 @@ import ChooseProfilePanel from './chooseProfile/chooseProfilePanel';
 import UserProfilePanel from "./userProfile/userProfilePanel";
 import StatsModal from "./userProfile/statsModal";
 import ProfileCardPanel from "./chooseProfile/profileCardPanel";
-import petPlaceholder from "../../img/robot.svg";
+import petPlaceholder from "../../assets/robot.svg";
 
 const ProfilesStory = (props) => {
     const [activeUserProfile, setUserProfile] = useState(null);
     const [activeModal, setModal] = useState(null);
     const [profiles, setProfiles] = useState(<Spinner size='large'/>);
-    const [isLoading, setLoading] = useState(true);
-    const modal = <StatsModal activeModal={props.nav.panel === "userProfile" ? activeModal : null}
-                              user={activeUserProfile}
-                              setModal={setModal}/>;
+    const modal = <StatsModal activeModal={activeModal} setModal={setModal} user={activeUserProfile}/>;
 
     // Преобразовываем данные в карточки
     useEffect(() => {
-        if (!isLoading || !props.usersInfo) return;
-
         let profileCards = props.usersInfo.map((info, i) =>
             (<ProfileCardPanel
                 key={info.id}
@@ -41,14 +36,13 @@ const ProfilesStory = (props) => {
         }
 
         setProfiles(cardGrids);
-        setLoading(false);
-    }, [isLoading, props.usersInfo]);
+    }, []);
 
     return (
         <View id={props.id}
               modal={modal}
-              activePanel={props.nav.panel}
-              history={props.nav.history}
+              activePanel={props.nav.activePanel}
+              history={props.nav.panelHistory[props.id]}
               onSwipeBack={props.nav.goBack}>
             <ChooseProfilePanel id="chooseProfile"
                                 view={props.id}

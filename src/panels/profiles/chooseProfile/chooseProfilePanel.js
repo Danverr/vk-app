@@ -11,7 +11,7 @@ const ChooseProfilePanel = (props) => {
             </Group>
         </Panel>
     );
-}
+};
 
 export default ChooseProfilePanel;
 
