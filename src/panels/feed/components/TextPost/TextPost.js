@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title, PanelHeaderButton} from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title, PanelHeaderButton, PanelHeaderContext } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
 import Icon24Dropdown from '@vkontakte/icons/dist/24/dropdown';
@@ -27,9 +27,11 @@ import anxiety5 from '../../../../assets/emoji/anxiety/anxiety5.png'
 const TextPost = (props) => {
     const user = props.postData.user;
     const unDate = props.postData.post.date;
+
     const date = { day: getDate(new Date(unDate)), month: getMonth(new Date(unDate)), hour: getHours(new Date(unDate)), minute: getMinutes(new Date(unDate)) };
     const description = props.postData.post.title;
     const text = props.postData.post.note;
+
     const userAva = user.photo_100;
     const currentUser = props.postData.currentUser;
 
@@ -45,37 +47,41 @@ const TextPost = (props) => {
     const anxietys = [anxiety1, anxiety2, anxiety3, anxiety4, anxiety5];
     const stresses = [stress1, stress2, stress3, stress4, stress5];
 
-    debugger;
-
     const emojiMood = moods[moodInt - 1];
     const emojiStress = stresses[stressInt - 1];
     const emojiAnxiety = anxietys[anxietyInt - 1];
 
-
     return (
-        <CardGrid className={s.content}>
+        <CardGrid className={s.all}>
             <Card size="l" mode="shadow">
+
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
                     indicator={(user.id == currentUser.id) ? < div className={s.settingIcon}>
-                        <PanelHeaderButton onClick={() => { alert("YES"); }}> 
-                        <Icon24MoreVertical /> </PanelHeaderButton> </div> : null} 
+                        <PanelHeaderButton>
+                            <Icon24MoreVertical /> </PanelHeaderButton>
+                    </div> : null}
                 >
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>
-                <Title level='3' weight='semibold' className={s.description} >
-                    {description}
-                </Title>
-                <Text weight='medium' className={s.postText} >
-                    {text}
-                </Text>
+
+                <div className={s.content}>
+                    <Title level='3' weight='semibold'>
+                        {description}
+                    </Title>
+
+                    <Text weight='medium'>
+                        {text}
+                    </Text>
+                </div>
+
 
                 <div className={s.par}>
                     <div className={s.parName}> <Text weight='medium' className={s.parText}> Настроение </Text> </div>
                     <div className={s.parProgress}> <Progress value={mood} /> </div>
                     <div className={s.emoji}>
                         <img src={emojiMood}>
-                            </img>
+                        </img>
                     </div>
 
                     <div className={s.parName}>  <Text weight='medium' className={s.parText}> Стресс </Text> </div>
@@ -93,7 +99,6 @@ const TextPost = (props) => {
                     </div>
                 </div>
 
-                <div style={{ height: 25 }} />
             </Card>
         </CardGrid>
     );

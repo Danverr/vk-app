@@ -2,9 +2,7 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\panels",
-    "\\src\\panels\\feed\\components",
-    "\\src\\panels\\feed\\components\\TextPost"
+    "\\src\\panels"
   ],
   "SelectedNode": "\\src\\panels",
   "PreviewInSolutionExplorer": false

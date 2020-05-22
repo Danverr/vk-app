@@ -1,32 +1,28 @@
-.content {
+.all {
     padding: 15px;
 }
 
 .reference {
-    padding: 10px;
+    margin-right: 6px;
+    margin-left: 6px;
 }
 
-.description {
-    margin-left: 20px;
-}
-
-.postText {
+.content {
     line-height: 1.5;
     word-break: break-all;
-    margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 16px;
+    margin-right: 16px;
     margin-bottom: 16px;
 }
 
 .par {
     display: grid;
-    grid-template-columns: 1fr 5fr 45px;
+    grid-template-columns: 1fr 5fr 42px;
     grid-auto-columns: minmax(90px, 500px);
 }
 
 .parName{
-    margin-left: 20px;
+    margin-left: 16px;
     margin-right: 20px;
     margin-bottom: 10px;
 }
