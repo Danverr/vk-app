@@ -1,5 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import bridge from "@vkontakte/vk-bridge";
+import {Tabbar, TabbarItem} from "@vkontakte/vkui";
+
+import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
+import Icon28SmileOutline from '@vkontakte/icons/dist/28/smile_outline';
+import Icon28AddCircleOutline from '@vkontakte/icons/dist/28/add_circle_outline';
+import Icon28CalendarOutline from '@vkontakte/icons/dist/28/calendar_outline';
+import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
 // Панели по умолчанию для каждого view
 const defaultPanels = {
@@ -10,78 +17,129 @@ const defaultPanels = {
     settings: "main",
 };
 
-// История панелей последнего view
-const getLastViewHistory = (history) => {
-    let viewHistory = [];
-    let lastView = history[history.length - 1].story;
-
-    for (let i = history.length - 1; i >= 0 && history[i].story === lastView; i--) {
-        viewHistory.push(history[i].panel);
-    }
-
-    viewHistory.reverse();
-    return viewHistory;
-};
-
 const useNav = () => {
-    const [history] = useState([{
-        story: "checkIn",
-        panel: defaultPanels["checkIn"],
-    }]);
+    const [isNavbarVis, setNavbarVis] = useState(true);
+    const [viewHistory] = useState(["feed"]);
+    const [panelHistory] = useState({
+        feed: [defaultPanels.feed],
+        profiles: [defaultPanels.profiles],
+        checkIn: [defaultPanels.checkIn],
+        calendar: [defaultPanels.calendar],
+        settings: [defaultPanels.settings],
+    });
+
+    const getActiveStory = () => viewHistory[viewHistory.length - 1];
+    const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
     // Функция возврата с экрана
-    const goBack = () => {
-        if (history.length === 1) {
-            // Отправляем bridge на закрытие сервиса.
-            bridge.send("VKWebAppClose", {"status": "success"});
-        } else {
-            // Обновляем историю и текущее состояние
-            history.pop();
-            setNav(getNav());
+    function goBack() {
+        if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
+            panelHistory[getActiveStory()].pop();
+        } else { // Переход между историями
+            if (viewHistory.length === 1) {
+                // Отправляем bridge на закрытие сервиса.
+                bridge.send("VKWebAppClose", {"status": "success"});
+            } else {
+                viewHistory.pop();
+            }
+
+            // Убираем iOS Swipe Back
+            // Таким образом VKUI свайп не будет конфликтовать со свайпом нативного клиента
+            if (viewHistory.length === 1) {
+                bridge.send('VKWebAppDisableSwipeBack');
+            }
         }
 
-        // Убираем iOS Swipe Back
-        // Таким образом VKUI свайп не будет конфликтовать со свайпом нативного клиента
-        if (history.length === 1) {
-            bridge.send('VKWebAppDisableSwipeBack');
-        }
-    };
+        setNav(getNav());
+    }
 
     // Функция для перехода на другой экран
-    const goTo = (story, panel = null) => {
-        if (history[history.length - 1].story === story && history[history.length - 1].panel === panel) return;
+    function goTo(story, panel = null) {
+        // Если переход на ту же историю
+        // Если переход на ту же панель внутри истории
+        if (getActiveStory() === story && (getActivePanel() === panel || panel === null)) return;
 
-        const state = {
-            story: story,
-            panel: panel === null ? defaultPanels[story] : panel,
-        };
+        if (panel === null) {
+            // Возвращаем iOS Swipe Back
+            if (viewHistory.length === 1) {
+                bridge.send('VKWebAppEnableSwipeBack');
+            }
 
-        // Возвращаем iOS Swipe Back
-        if (history.length === 1) {
-            bridge.send('VKWebAppEnableSwipeBack');
+            // Если история есть в стеке, вынимаем ее
+            if (viewHistory.includes(story)) {
+                viewHistory.splice(viewHistory.indexOf(story), 1);
+            } else {
+                // Создаём новую запись в истории браузера
+                window.history.pushState([story, panel], panel);
+            }
+
+            // Добавляем в стек историю
+            viewHistory.push(story);
+        } else {
+            // Создаём новую запись в истории браузера
+            window.history.pushState([story, panel], panel);
+
+            panelHistory[getActiveStory()].push(panel);
         }
 
-        // Создаём новую запись в истории браузера
-        window.history.pushState(state, panel);
-
-        // Обновляем историю и текущее состояние
-        history.push(state);
         setNav(getNav());
-    };
+    }
 
-    const getNav = () => {
+    function clearStory(story, callback) {
+        if (viewHistory.includes(story)) {
+            viewHistory.splice(viewHistory.indexOf(story), 1);
+        }
+        panelHistory[story] = [defaultPanels[story]];
+
+        callback();
+        setNav(getNav());
+    }
+
+    function getNav() {
         return {
-            activeStory: history[history.length - 1].story,
-            activePanel: history[history.length - 1].panel,
-            viewHistory: getLastViewHistory(history),
+            activeStory: getActiveStory(),
+            activePanel: getActivePanel(),
+            panelHistory: panelHistory,
+            clearStory: clearStory,
             goBack: goBack,
             goTo: goTo,
+            setNavbarVis: setNavbarVis,
+            navbar: isNavbarVis ? (<Tabbar>
+                <TabbarItem
+                    onClick={() => goTo("feed")}
+                    selected={getActiveStory() === "feed"}
+                ><Icon28NewsfeedOutline/></TabbarItem>
+                <TabbarItem
+                    onClick={() => goTo("profiles")}
+                    selected={getActiveStory() === "profiles"}
+                ><Icon28SmileOutline/></TabbarItem>
+                <TabbarItem
+                    onClick={() => goTo("checkIn")}
+                    selected={getActiveStory() === "checkIn"}
+                ><Icon28AddCircleOutline/></TabbarItem>
+                <TabbarItem
+                    onClick={() => goTo("calendar")}
+                    selected={getActiveStory() === "calendar"}
+                ><Icon28CalendarOutline/></TabbarItem>
+                <TabbarItem
+                    onClick={() => goTo("settings")}
+                    selected={getActiveStory() === "settings"}
+                ><Icon28SettingsOutline/></TabbarItem>
+            </Tabbar>) : null,
         };
-    };
+    }
 
-    // Упаковываем все функции и передаем во view только нужную ей часть истории
-    const [nav, setNav] = useState(getNav());
-    return nav;
+    // Упаковываем все функции
+    let [nav, setNav] = useState(getNav());
+    useEffect(() => {
+        nav.isNavbarVis = isNavbarVis;
+    }, [isNavbarVis]);
+
+    console.log(
+        "View history: ", viewHistory,
+        "\nCurrent panel history: ", panelHistory[getActiveStory()]
+    );
+    return getNav();
 };
 
 export default useNav;
