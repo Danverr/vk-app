@@ -37,7 +37,9 @@ const CalendarPanel = (props) => {
         [curDate, props.user]
     );
 
-    let calendarProps = {onClickDay: (value, event) => setCurDate(value)};
+    let calendarProps = {    
+    onClickDay: (value, event) => setCurDate(value),
+    onActiveStartDateChange: (activeStartDate, view) => console.log(activeStartDate)};
     if(props.user != null)
         calendarProps.user = props.user[0].id;
 

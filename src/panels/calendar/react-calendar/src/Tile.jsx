@@ -63,15 +63,17 @@ export default class Tile extends Component {
     /*цвет дня*/
     let gradient = [];
 
-    gradient.push(this.colors[mood]);
+    gradient.push(this.colors[4 - mood]);
     gradient.push(this.colors[stress]);
     gradient.push(this.colors[anxiety]);
-    gradient.push(this.colors[mood]);
+    gradient.push(this.colors[4 - mood]);
 
+    let borderClasses = [], borderStyle = [];
     if (classes.indexOf("react-calendar__tile--active") != -1){ //пользователь выбрал этот день
       style.background = 'conic-gradient(' + gradient.join(', ') + ')';
+      borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)'; 
     }
-    let borderClasses = [], borderStyle = [];
+    
     if(classes.indexOf("react-calendar__month-view__days__day") != -1){ //если это день
       borderClasses.push("react-calendar__tile__border__gradient");
       borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
