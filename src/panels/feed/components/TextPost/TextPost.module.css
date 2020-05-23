@@ -8,8 +8,8 @@
 }
 
 .content {
+    hyphens: auto;
     line-height: 1.5;
-    word-break: break-all;
     margin-left: 16px;
     margin-right: 16px;
     margin-bottom: 16px;
@@ -20,6 +20,7 @@
     display: grid;
     grid-template-columns: 1fr 5fr 42px;
     grid-auto-columns: minmax(90px, 500px);
+    margin-bottom: 10px;
 }
 
 .parName{
@@ -44,4 +45,8 @@
 .settingIcon{
     margin-right: -14px;
     margin-top: -15px;
+}
+
+.title{
+    margin-bottom: 6px;
 }

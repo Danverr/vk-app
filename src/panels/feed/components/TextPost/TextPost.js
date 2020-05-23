@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title, PanelHeaderButton, PanelHeaderContext } from '@vkontakte/vkui';
+import { Cell, CardGrid, Progress, ActionSheetItem, Avatar, Card, Text, Title, PanelHeaderButton, ActionSheet, Subhead, UsersStack } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
 import Icon24Dropdown from '@vkontakte/icons/dist/24/dropdown';
@@ -51,14 +51,18 @@ const TextPost = (props) => {
     const emojiStress = stresses[stressInt - 1];
     const emojiAnxiety = anxietys[anxietyInt - 1];
 
+    const summon = () => {
+        props.postData.func(props.postData.post);
+    };
+
     return (
         <CardGrid className={s.all}>
             <Card size="l" mode="shadow">
 
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
-                    indicator={(user.id == currentUser.id) ? < div className={s.settingIcon}>
-                        <PanelHeaderButton>
+                    indicator={(user.id == currentUser.id) ? <div className={s.settingIcon}>
+                        <PanelHeaderButton onClick={summon}>
                             <Icon24MoreVertical /> </PanelHeaderButton>
                     </div> : null}
                 >
@@ -66,10 +70,9 @@ const TextPost = (props) => {
                 </Cell>
 
                 <div className={s.content}>
-                    <Title level='3' weight='semibold'>
+                    <Subhead weight='semibold' className={s.title}>
                         {description}
-                    </Title>
-
+                    </Subhead>
                     <Text weight='medium'>
                         {text}
                     </Text>
@@ -105,8 +108,3 @@ const TextPost = (props) => {
 }
 
 export default TextPost;
-
-/*
- *  <Progress value={mood} />
- *
- */
