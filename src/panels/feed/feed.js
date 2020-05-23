@@ -14,11 +14,11 @@ const Feed = (props) => {
     const [wasUpdated, setWasUpdated] = useState(0);
     const [usersPosts, setUsersPosts] = useState(wasUpdated);
     const [posts, setPosts] = useState(<Spinner size="large" style={{ marginTop: 20 }} />);
-    const [curPopout, setCurPopout] = useState(0);
-    const osname = platform();
+    const [curPopout, setCurPopout] = useState(0); // отвечает за вылезающее окно настроек поста
+    const osname = platform(); // получаем платформу для косметических деталей
 
-    var lastPost;
-    var allPostsArray = new Array();
+    var lastPost; // пост, у которого кнопка настроек была нажата последней (для удаления или редактирования)
+    var allPostsArray = new Array(); // поддерживаем массив постов в явном виде
 
     useEffect(() => {
         if (wasUpdated === null || props.user === null) return;
@@ -85,7 +85,7 @@ const Feed = (props) => {
     const deletePost = async () => {
         setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
         var query = await api("DELETE", "/entries/", { entryId: lastPost.entryId });
-        for (var i = 0; i < allPostsArray.length; ++i) {
+        for (var i = 0; i < allPostsArray.length; ++i) { // удаление поста
             if (allPostsArray[i].post.entryId === lastPost.entryId) {
                 allPostsArray.splice(i, 1);
                 break;
