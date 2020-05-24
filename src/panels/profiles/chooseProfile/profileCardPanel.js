@@ -13,10 +13,10 @@ const ProfileCardPanel = (props) => {
     return (
         <Card size="m" mode="shadow" onClick={() => {
             props.goTo();
-            props.setUserProfile(props.userInfo);
+            props.setActiveUserProfile(props.userInfo);
         }}>
             <div className={modifyedHeaderWrap}>{props.cardName}</div>
-            <img className={styles.petPreview} src={props.petSrc} alt=""/>
+            <img className={styles.petPreview} src={props.petPreview} alt=""/>
         </Card>
     )
 };

@@ -3,7 +3,9 @@ import {Epic, Root, ConfigProvider, ScreenSpinner} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import useNav from "./utils/useNav";
+import useUserToken from "./utils/useUserToken";
 import useUsersInfo from "./utils/useUsersInfo";
+import useUserEntries from "./utils/useUserEntries";
 
 import ProfilesStory from './panels/profiles/profilesStory';
 import FeedStory from "./panels/feed/feedStory";
@@ -13,7 +15,9 @@ import SettingsStory from "./panels/settings/settingsStory";
 
 const App = () => {
     const nav = useNav();
-    const usersInfo = useUsersInfo();
+    const userToken = useUserToken();
+    const usersInfo = useUsersInfo(userToken);
+    let userEntries = useUserEntries(usersInfo);
     const [loading, setLoading] = useState(<ScreenSpinner/>);
     const [answer, setAnswer] = useState({
         userId: null,
@@ -25,14 +29,20 @@ const App = () => {
         isPublic: 0,
     });
 
-    // Когда загрузили данные о юзере, укажем его id
+    // Когда загрузили данные о юзерах, добавляем id в ответ
     useEffect(() => {
         if (usersInfo) {
             answer.userId = usersInfo[0].id;
             setAnswer(answer);
-            setLoading(null);
         }
     }, [usersInfo]);
+
+    // Когда загрузили записи, убираем спиннер загрузки
+    useEffect(() => {
+        if (userEntries && usersInfo) {
+            setLoading(null);
+        }
+    }, [userEntries, usersInfo]);
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
     useEffect(() => {
@@ -44,7 +54,7 @@ const App = () => {
             <ConfigProvider isWebView={true}>
                 <Epic activeStory={nav.activeStory} tabbar={nav.navbar}>
                     <FeedStory id="feed" nav={nav}/>
-                    <ProfilesStory id="profiles" nav={nav} usersInfo={usersInfo}/>
+                    <ProfilesStory id="profiles" nav={nav} usersInfo={usersInfo} userEntries={userEntries}/>
                     <CheckInStory id="checkIn" nav={nav}/>
                     <CalendarStory id="calendar" nav={nav}/>
                     <SettingsStory id="settings" nav={nav}/>

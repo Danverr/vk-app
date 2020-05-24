@@ -12,22 +12,22 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 const StatsModal = (props) => {
     let [activeTab, setTab] = useState("mood");
-    let [entries, setEntries] = useState([]);
+    let [stats, setStats] = useState([]);
     const platform = usePlatform();
 
-    // Загрузка записей пользователя
+    // Загрузка статистики пользователя
     useEffect(() => {
-        const fetchEntries = async () => {
+        const fetchStats = async () => {
             if (props.user == null) return;
-
-            const entriesPromise = await api("GET", "/entries/", {
+            
+            await api("GET", "/entries/stats/", {
                 userId: props.user.id,
+            }).then((res) => {
+                setStats(res.data);
             });
-
-            setEntries(entriesPromise.data);
         };
 
-        fetchEntries();
+        fetchStats();
     }, [props.user]);
 
     return (
@@ -73,10 +73,12 @@ const StatsModal = (props) => {
                     </HorizontalScroll>
                 </Tabs>
                 <Div style={{height: "200px", paddingTop: "0"}}>
-                    <GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)}/>
+                    <GradientChart data={stats.map(stat => stat ? stat[activeTab] : null)}/>
                 </Div>
                 {
-                    entries.map(entry => entry ? (<Header key={entry.entryId}>{entry[activeTab]}</Header>) : null)
+                    stats.map(
+                        stat => stat ? (<Header key={stat.entryId}>{stat[activeTab]}</Header>) : null
+                    )
                 }
             </ModalPage>
         </ModalRoot>
