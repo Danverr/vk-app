@@ -2,34 +2,38 @@ import React, {useState, useEffect} from 'react';
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
 
-const useUsersInfo = () => {
+const useUsersInfo = (userToken) => {
     let [usersInfo, setUsersInfo] = useState(null);
 
     // Загрузка информации о пользователе и о друзьях, к которым есть доступ
     // Сначала идут сведения о текущем пользователе
     useEffect(() => {
-        const fetchUsersInfo = async () => {
-            if (usersInfo != null) return;
+        if (usersInfo || !userToken) return;
 
+        const fetchUsersInfo = async () => {
             // Данные о пользователе
             const currentUserInfo = await bridge.send('VKWebAppGetUserInfo');
-            let info = [currentUserInfo];
 
             // ID друзей к которым есть доступ
             const friendsIdsPromise = await api("GET", "/statAccess/", {
                 userId: currentUserInfo.id,
             });
 
-            if (friendsIdsPromise.data && friendsIdsPromise.data.length) {
-                // Информация о друзьях
-                const friendsInfoPromise = await api("GET", "/vk/users/", {
-                    user_ids: friendsIdsPromise.data,
-                });
+            // Удаляем id текущего юзера
+            friendsIdsPromise.data.splice(friendsIdsPromise.data.indexOf(currentUserInfo.id, 0), 1);
 
-                info = info.concat(friendsInfoPromise.data);
-            }
+            // Информация о друзьях
+            const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
+                method: "users.get",
+                params: {
+                    access_token: userToken,
+                    v: "5.103",
+                    user_ids: friendsIdsPromise.data.join(","),
+                    fields: "photo_50, photo_100"
+                }
+            });
 
-            setUsersInfo(info);
+            setUsersInfo([currentUserInfo, ...friendsInfoPromise.response]);
         };
 
         fetchUsersInfo();
