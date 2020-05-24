@@ -32,7 +32,7 @@
 }
 .react-calendar__navigation {
   height: 44px;
-  margin-bottom: 1em;
+  margin-bottom: 4px;
 }
 .react-calendar__navigation__label { /* май 2020 г*/
 }
@@ -57,18 +57,24 @@
 }
 
 .react-calendar__year-view__months__month{
-  height: 1px;
-  width: auto !important;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100% !important;
+  flex-basis: initial !important; 
   border-radius: 20%;
 }
 .react-calendar__decade-view__years__year{
-  height: 1px;
-  width: auto !important;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100% !important;
+  flex-basis: initial !important; 
   border-radius: 20%;
 }
 .react-calendar__century-view__decades__decade{
-  height: 1px;
-  width: auto !important;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100% !important;
+  flex-basis: initial !important; 
   border-radius: 20%;
 }
 
@@ -90,6 +96,28 @@
   font-size: 0.75em;
   padding: calc(0.75em / 0.75) calc(0.5em / 0.75);
 }
+
+.react-calendar__century-view__decades { 
+  display: grid !important;
+  flex-wrap: nowrap !important;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+}
+
+.react-calendar__decade-view__years {
+  display: grid !important;
+  flex-wrap: nowrap !important;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.react-calendar__year-view__months {
+  display: grid !important;
+  flex-wrap: nowrap !important;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 .react-calendar__month-view__days { /*контейнер для тайлов*/
   display: grid !important;
   flex-wrap: nowrap !important;
@@ -101,11 +129,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 13px;
+  font-size: 12px;
+  font-family: monospace;
   height: 100%;
   width: 100%;
-  text-align: center;
   border-radius: 50%;
   white-space: nowrap;
   flex-basis: initial !important;
@@ -113,7 +140,7 @@
 }
 
 .react-calendar__month-view__days__day abbr{
-  margin: 0
+  margin: 0;
 }
 
 .react-calendar__tile__border__gradient{
@@ -128,40 +155,15 @@
     margin-bottom: 4px;
 }
 
-.react-calendar__month-view__days__day--weekend { /*выходной*/
-}
 .react-calendar__month-view__days__day--neighboringMonth { /*предыдущий / следующий месяц*/
   color: #757575;
 }
 .react-calendar__year-view .react-calendar__tile,
 .react-calendar__decade-view .react-calendar__tile,
 .react-calendar__century-view .react-calendar__tile {
-  padding: 2em 0.5em;
+  
 }
 .react-calendar__tile { /*общий вид всех кнопок*/
   max-width: none !important;
   background: white;
-}
-.react-calendar__tile:disabled { /*хз что это*/
-}
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus { /*на кнопку навели курсор / нажали*/
-}
-.react-calendar__tile--now {
-}
-.react-calendar__tile--now:enabled:hover,
-.react-calendar__tile--now:enabled:focus {
-}
-.react-calendar__tile--hasActive { /*хз что это*/
-}
-.react-calendar__tile--hasActive:enabled:hover,
-.react-calendar__tile--hasActive:enabled:focus { /*хз что это*/
-} 
-.react-calendar__tile--active {
-}
-.react-calendar__tile--active:enabled:hover,
-.react-calendar__tile--active:enabled:focus {
-}
-
-.react-calendar--selectRange .react-calendar__tile--hover { /*хз что это*/
 }

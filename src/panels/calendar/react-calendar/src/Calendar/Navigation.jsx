@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { getUserLocale } from 'get-user-locale';
 import { Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import Icon24BrowserBack from '@vkontakte/icons/dist/24/browser_back';
+import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
+import Icon24SkipPrevious from '@vkontakte/icons/dist/24/skip_previous';
+import Icon24SkipNext from '@vkontakte/icons/dist/24/skip_next';
 
 import {
   getCenturyLabel,
@@ -145,9 +149,9 @@ export default function Navigation({
               –
               {' '}
             </span>
-            <span className={`${labelClassName}__labelText ${labelClassName}__labelText--to`}>
+            <Title level="2" weight="semibold" className={`${labelClassName}__labelText ${labelClassName}__labelText--to`}>
               {renderLabel(nextActiveStartDate)}
-            </span>
+            </Title>
           </>
         )}
       </button>
@@ -157,9 +161,9 @@ export default function Navigation({
   return (
     <div
       className={className}
-      style={{ display: 'flex' }}
+      style={{ display: 'flex', justifyContent: 'center'}}
     >
-      {prev2Label !== null && shouldShowPrevNext2Buttons && (
+      {/* {prev2Label !== null && shouldShowPrevNext2Buttons && (
         <button
           aria-label={prev2AriaLabel}
           className={`${className}__arrow ${className}__prev2-button`}
@@ -167,9 +171,12 @@ export default function Navigation({
           onClick={onClickPrevious2}
           type="button"
         >
-          {prev2Label}
+          <div style={{ display: 'flex' }}>
+          <Icon24BrowserBack width={14} height={14}/>
+          <Icon24BrowserBack width={14} height={14}/>
+          </div>
         </button>
-      )}
+      )} */}
       <button
         aria-label={prevAriaLabel}
         className={`${className}__arrow ${className}__prev-button`}
@@ -177,7 +184,7 @@ export default function Navigation({
         onClick={onClickPrevious}
         type="button"
       >
-        {prevLabel}
+        <Icon24BrowserBack width={20} height={20} style = {{marginLeft: 'auto', marginRight: 'auto'}}/>
       </button>
       {renderButton()}
       <button
@@ -187,9 +194,9 @@ export default function Navigation({
         onClick={onClickNext}
         type="button"
       >
-        {nextLabel}
+        <Icon24BrowserForward width={20} height={20} style = {{marginLeft: 'auto', marginRight: 'auto'}}/>
       </button>
-      {next2Label !== null && shouldShowPrevNext2Buttons && (
+      {/* {next2Label !== null && shouldShowPrevNext2Buttons && (
         <button
           aria-label={next2AriaLabel}
           className={`${className}__arrow ${className}__next2-button`}
@@ -197,9 +204,12 @@ export default function Navigation({
           onClick={onClickNext2}
           type="button"
         >
-          {next2Label}
+          <div style={{ display: 'flex' }}>
+          <Icon24BrowserForward width={14} height={14}/>
+          <Icon24BrowserForward width={14} height={14}/>
+          </div>
         </button>
-      )}
+      )} */}
     </div>
   );
 }

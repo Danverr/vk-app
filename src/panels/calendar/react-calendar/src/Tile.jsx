@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import mergeClassNames from 'merge-class-names';
 import { tileProps } from './shared/propTypes';
+import { Text} from '@vkontakte/vkui';
+import '@vkontakte/vkui/dist/vkui.css';
 
 function getValue(nextProps, prop) {
   const { activeStartDate, date, view } = nextProps;
@@ -65,22 +67,54 @@ export default class Tile extends Component {
 
     gradient.push(this.colors[4 - mood]);
     gradient.push(this.colors[stress]);
+    gradient.push(this.colors[stress]);
+    gradient.push(this.colors[anxiety]);
     gradient.push(this.colors[anxiety]);
     gradient.push(this.colors[4 - mood]);
 
-    let borderClasses = [], borderStyle = [];
-    
-    if(classes.indexOf("react-calendar__month-view__days__day") != -1){ 
+    if (classes.indexOf("react-calendar__month-view__days__day") != -1) {
+      let borderClasses = [], borderStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      };
       borderClasses.push("react-calendar__tile__border__gradient");
       borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
-      if (classes.indexOf("react-calendar__tile--active") != -1){
-        style.background = 'conic-gradient(' + gradient.join(', ') + ')';
-        borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)'; 
-      }
-    }
 
-    return (
-      <div className={borderClasses} style = {borderStyle}>
+      if (classes.indexOf("react-calendar__tile--active") != -1) {
+        style.background = 'conic-gradient(' + gradient.join(', ') + ')';
+        borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
+      }
+
+      return (
+        <div className={borderClasses} style={borderStyle}>
+          <button
+            className={mergeClassNames(classes, tileClassName)}
+            disabled={
+              (minDate && minDateTransform(minDate) > date)
+              || (maxDate && maxDateTransform(maxDate) < date)
+              || (tileDisabled && tileDisabled({ activeStartDate, date, view }))
+            }
+            onClick={onClick && (event => onClick(date, event))}
+            onFocus={onMouseOver && (() => onMouseOver(date))}
+            onMouseOver={onMouseOver && (() => onMouseOver(date))}
+            style={style}
+            type="button"
+          >
+            {formatAbbr
+            ? (
+              <abbr aria-label={formatAbbr(locale, date)}>
+                {children}
+              </abbr>
+            )
+            : children}
+            {tileContent}
+          </button>
+        </div>
+      );
+    }
+    else {
+      return (
         <button
           className={mergeClassNames(classes, tileClassName)}
           disabled={
@@ -94,17 +128,13 @@ export default class Tile extends Component {
           style={style}
           type="button"
         >
-          {formatAbbr
-            ? (
-              <abbr aria-label={formatAbbr(locale, date)}>
-                {children}
-              </abbr>
-            )
-            : children}
+          <Text mode='medium'> 
+                {children[0].toUpperCase() + children.slice(1)}
+          </Text>
           {tileContent}
         </button>
-      </div>
-    );
+      );
+    }
   }
 }
 

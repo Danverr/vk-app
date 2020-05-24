@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Flex from './Flex';
@@ -6,9 +6,6 @@ import Flex from './Flex';
 import { getTileClasses } from './shared/utils';
 import { tileGroupProps } from './shared/propTypes';
 import { getDate, getMonth, getYear } from '@wojtekmaj/date-utils';
-import { Spinner } from '@vkontakte/vkui';
-import '@vkontakte/vkui/dist/vkui.css';
-import api from '../../../../utils/api'
 
 export default function TileGroup({
   className,

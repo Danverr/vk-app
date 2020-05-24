@@ -4,7 +4,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './react-calendar/src/Calendar';
-import { getDate, getMonth, getYear } from '@wojtekmaj/date-utils';
+import { getDate, getMonthHuman, getYear, getMonth } from '@wojtekmaj/date-utils';
 import './Calendar.css';
 
 const CalendarPanel = (props) => {
@@ -19,7 +19,7 @@ const CalendarPanel = (props) => {
         setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
         const fetchUsersPosts = async () => {
             let year = getYear(curDate);
-            let month = ('0' + (parseInt(getMonth(curDate)) + 1).toString()).slice(-2);
+            let month = ('0' + getMonthHuman(curDate).toString()).slice(-2);
             let day = ('0' + getDate(curDate)).slice(-2);
             
             if (allPosts[year + "-" + month + "-" + day] != null) 
@@ -52,7 +52,24 @@ const CalendarPanel = (props) => {
         [props.user]
     );
 
-    let calendarProps = { onClickDay: (value, event) => setCurDate(value), allPosts: allPosts, dataIsReady: dataIsReady};
+    const getNavTitle = ({ date, label, locale, view }) => {
+        let months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        if(view == 'month')
+            return months[getMonth(date)];
+        else if(view == 'year')
+            return getYear(date);
+        else if(view == 'decade')
+            return 'Год';
+        else
+            return 'Десятилетие';
+    }
+
+    let calendarProps = { 
+        onClickDay: (value, event) => setCurDate(value), 
+        navigationLabel: ({ date, label, locale, view }) => getNavTitle({ date, label, locale, view }), 
+        allPosts: allPosts, 
+        dataIsReady: dataIsReady
+    };
 
     return (
         <View id={props.id}
