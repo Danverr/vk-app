@@ -10,8 +10,10 @@ import GradientChart from "./infographics/gradientChart";
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Pie from "./infographics/Paint/Pie/Pie";
+import Pie from "./infographics/Pie";
 import styles from './statsModalCss.module.css'
+import InfoPie from "./infographics/InfoPie";
+
 
 
 const StatsModal = (props) => {
@@ -62,6 +64,8 @@ const StatsModal = (props) => {
             }>
                 <Tabs mode="buttons">
                     <HorizontalScroll>
+
+
                         <TabsItem
                             onClick={() => setTab('mood')}
                             selected={activeTab === 'mood'}
@@ -73,40 +77,35 @@ const StatsModal = (props) => {
                             selected={activeTab === 'stress'}
                         >
                             Стресс
-                        </TabsItem>
+                          </TabsItem>
                         <TabsItem
                             onClick={() => setTab('anxiety')}
                             selected={activeTab === 'anxiety'}
                         >
                             Тревожность
                         </TabsItem>
+
                     </HorizontalScroll>
                 </Tabs>
-
-
-
-
-                {/* <Div style={{ height: "200px", paddingTop: "0" }}>
-                    <GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)} />
-                </Div> */}
 
 
 
                 <Div style={{ height: "220px", paddingTop: "0" }}>
                     <Flickity
                         elementType={'div'}
-                        options={{ freeScroll: true, prevNextButtons: false, cellAlign: 'left', pageDots: false }}
+                        options={{ freeScroll: true, prevNextButtons: false, cellAlign: 'left', pageDots: false, contain: true }}
                     >
-                        <div className={styles.block} style={{ height: 200 }}><GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)} /></div>
+                        <div className={styles.block} style={{ height: 200, width: entries.length * 10 + '%'}}><GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)} /></div>
                         <div style={{ height: 200, width: 1 }}></div>
                     </Flickity>
                 </Div>
 
 
 
-                <Group header={<Header mode="secondary">Недавние</Header>} style={{ width: '90%'}} >
-                    <div style={{ height: 200 }}><Pie /></div>
-                </Group>
+            
+
+
+            <InfoPie data={entries.map(entry => entry ? entry[activeTab] : null)}/>    
 
 
 
@@ -121,12 +120,27 @@ const StatsModal = (props) => {
 export default StatsModal;
 
 
-//  <GradientChart data={entries.map(entry => entry ? entry[activeTab] : null)}/>
 
 
-{/* <Div style={{height: "200px", paddingTop: "0"}}>
-<GradientChart data={moodData}/>
-</Div>
-{
-entries.map(entry => entry ? (<Header key={entry.entryId}>{entry[activeTab]}</Header>) : null)
-} */}
+
+
+
+
+
+
+
+    {/* <Group header={<Header mode="secondary">Недавние</Header>} style={{ width: '100%' }} >
+                    <div className={styles.grid}>
+                        <div style={{ height: 200, width: 200, margin: 'auto'}} className={styles.pie}><Pie /></div>
+                        <div className={styles.info}>
+
+                            <div className={styles.outer} style={{height: '100%', width: '100%'}}>
+                                <span className={styles.inner}>
+                                    <span style={{fontSize: 80}}>3.5 <br/></span>
+                                    <span style={{color: 'gray'}}>Среднее значение за все время</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </Group> */}

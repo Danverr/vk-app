@@ -8,7 +8,7 @@ const createDate = (arr) => {
     let objArr = [];
 
     for (let it of arr)
-        objArr.push({'main': it});
+        objArr.push({'Оценка в этот день': it});
 
     return objArr
 };
@@ -36,23 +36,20 @@ let getMiddleValue = (arr) => {
 const setCol = ['#3ae374', '#32ff7e', '#fffa65', '#ffaf40', '#ff4d4d']
 
 
-// let data = [5,3,5,5,5,1,1,5,4]
+
 
 
 
 const GradientChart = (props) => {
     let data = props.data
-    console.log(createDate(data))
-    console.log(getMiddleValue(data))
-    console.log(getGradient(getMiddleValue(data)))
+
 
 
     return (
 
         <ResponsiveStream
             data={createDate(data)}
-            keys={['main']}
-            // width={5000}
+            keys={['Оценка в этот день']}
             margin={{top: 10, right: 5, bottom: 20, left: 5}}
             enableGridX={false}
             enableGridY={false}
@@ -105,7 +102,7 @@ const GradientChart = (props) => {
 
             ]}
             fill={[
-                {match: {id: 'main'}, id: getGradient(getMiddleValue(data))},
+                {match: {id: 'Оценка в этот день'}, id: getGradient(getMiddleValue(data))},
             ]}
         />
 
@@ -115,4 +112,4 @@ const GradientChart = (props) => {
 
 export default GradientChart
 
-// getGradient(getMiddleValue(data))
+
