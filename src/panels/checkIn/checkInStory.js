@@ -1,16 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import {View} from '@vkontakte/vkui';
+import {View, Gallery, Panel, PanelHeaderBack, PanelHeader} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import TestPanel from "./testPanel/testPanel";
+import TestSlide from "./testPanel/testSlide";
 import SubmitPanel from "./submitPanel/submitPanel";
-import testPanelsData from "./testPanel/testPanelsData";
+import testSlideData from "./testPanel/testSlideData";
 import style from "./checkInStory.module.css";
 
-const getBullets = (index = testPanelsData.length) => {
+const getBullets = (index = testSlideData.length) => {
     let bullets = [];
 
-    for (let i = 0; i < testPanelsData.length + 1; i++) {
+    for (let i = 0; i < testSlideData.length + 1; i++) {
         let bulletStyles = style.bullet;
 
         if (i === index) {
@@ -25,17 +25,7 @@ const getBullets = (index = testPanelsData.length) => {
 
 const CheckInStory = (props) => {
     const [loading, setLoading] = useState(null);
-    const testPanels = testPanelsData.map((panelData, i, arr) => {
-        return (<TestPanel id={panelData.name}
-                           goTo={() => {
-                               props.nav.goTo(props.id, i + 1 < arr.length ? arr[i + 1].name : "submit");
-                           }}
-                           answer={props.answer}
-                           setAnswer={props.setAnswer}
-                           bullets={getBullets(i)}
-                           panelData={panelData}
-        />);
-    });
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
     useEffect(() => {
         props.nav.setNavbarVis(false);
@@ -51,16 +41,42 @@ const CheckInStory = (props) => {
               history={props.nav.panelHistory[props.id]}
               onSwipeBack={props.nav.goBack}
         >
-            {testPanels[0]}
-            {testPanels[1]}
-            {testPanels[2]}
-            <SubmitPanel id="submit"
-                         answer={props.answer}
-                         setAnswer={props.setAnswer}
-                         bullets={getBullets()}
-                         nav={props.nav}
-                         setLoading={setLoading}
-            />
+            <Panel id="main">
+
+                <PanelHeader
+                    separator={false}
+                    left={<PanelHeaderBack onClick={() => {
+                        if (activeSlideIndex == 0) window.history.back();
+                        else setActiveSlideIndex(activeSlideIndex - 1);
+                    }}/>}
+                >
+                    {getBullets(activeSlideIndex)}
+                </PanelHeader>
+
+                <Gallery
+                    slideIndex={activeSlideIndex}
+                    style={{height: "auto"}}
+                    align="center"
+                    onChange={slideIndex => setActiveSlideIndex(slideIndex)}
+                >
+                    {testSlideData.map((slideData, i) => {
+                        return (<TestSlide
+                            key={i}
+                            goToNext={() => setActiveSlideIndex(i + 1)}
+                            answer={props.answer}
+                            setAnswer={props.setAnswer}
+                            slideData={slideData}
+                        />);
+                    })}
+                    <SubmitPanel
+                        answer={props.answer}
+                        setAnswer={props.setAnswer}
+                        nav={props.nav}
+                        setLoading={setLoading}
+                    />
+                </Gallery>
+
+            </Panel>
         </View>
     );
 };

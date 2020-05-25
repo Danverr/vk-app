@@ -43,19 +43,10 @@ const SubmitPanel = (props) => {
                 status: "error"
             });
         } else {
-            setFormMessage({
-                text: "Отправка...",
-                status: "default"
-            });
-
             props.setLoading(<ScreenSpinner/>);
 
             api("POST", "/entries/", props.answer)
                 .then(() => { // Успех
-                    setFormMessage({
-                        text: "Запись успешно добавлена!",
-                        status: "valid"
-                    });
                     props.setAnswer({
                         userId: null,
                         mood: null,
@@ -66,7 +57,7 @@ const SubmitPanel = (props) => {
                         isPublic: 0,
                     });
 
-                    props.nav.clearStoryHistory("checkIn", () => props.nav.goTo("feed"));
+                    props.nav.goTo("feed");
                 }, (error) => setFormMessage({ // Ошибка
                         text: error,
                         status: "error"
@@ -79,13 +70,7 @@ const SubmitPanel = (props) => {
     };
 
     return (
-        <Panel id={props.id}>
-
-            <PanelHeader separator={false}
-                         left={props.panelIndex === 0 ? null :
-                             <PanelHeaderBack onClick={() => window.history.back()}/>}>
-                {props.bullets}
-            </PanelHeader>
+        <div>
 
             <Div>
                 <QuestionCard question="Оставьте заметку об этом дне!"/>
@@ -101,23 +86,22 @@ const SubmitPanel = (props) => {
                               maxLength="2048"
                               value={noteText}
                               onChange={handleNote}/>
-                    <Cell asideContent={<Switch checked={isChecked}
-                                                onClick={switchPublic}
-                                                onChange={() => null}
-                    />}>
+                    <Cell asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>}>
                         Видно друзьям
                     </Cell>
                 </FormLayoutGroup>
-                <Button size="xl"
-                        mode="primary"
-                        onClick={saveAnswer}
-                        status={formMessage.status}
-                        bottom={formMessage.text}>
+                <Button
+                    size="xl"
+                    mode="primary"
+                    onClick={saveAnswer}
+                    status={formMessage.status}
+                    bottom={formMessage.text}
+                >
                     Сохранить
                 </Button>
             </FormLayout>
 
-        </Panel>
+        </div>
     );
 };
 

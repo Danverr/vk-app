@@ -2,16 +2,15 @@
     display: flex;
     position: absolute;
     top: calc(50% - 4px);
-    left: calc(50vw - 28px);
+    left: calc(50vw - 36px);
     padding: 0 !important;
-    width: 56px;
-    justify-content: space-between;
 }
 
 .bullet {
     height: 8px;
     width: 8px;
     padding: 0 !important;
+    margin: 0 5px;
     background: #c5c5c5;
     border-radius: 50%;
 }

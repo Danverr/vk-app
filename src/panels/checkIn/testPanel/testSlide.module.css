@@ -1,3 +1,7 @@
+.slideContainer {
+    width: auto;
+}
+
 .formLayout {
     display: flex;
     flex-direction: column;
@@ -20,8 +24,4 @@
 
 .radioButton:global(.Tappable--active) {
     opacity: 1;
-}
-
-.skipButton {
-    color: grey;
 }

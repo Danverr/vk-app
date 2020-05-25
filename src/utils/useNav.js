@@ -12,7 +12,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 const defaultPanels = {
     feed: "main",
     profiles: "main",
-    checkIn: "mood",
+    checkIn: "main",
     calendar: "main",
     settings: "main",
 };

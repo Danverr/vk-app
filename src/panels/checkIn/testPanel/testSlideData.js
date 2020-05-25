@@ -16,7 +16,7 @@ import stress3 from "../../../assets/emoji/stress/stress3.png";
 import stress4 from "../../../assets/emoji/stress/stress4.png";
 import stress5 from "../../../assets/emoji/stress/stress5.png";
 
-const testPanelsData = [
+const testSlideData = [
     {
         name: "mood",
         question: "Как у вас настроение?",
@@ -52,4 +52,4 @@ const testPanelsData = [
     },
 ];
 
-export default testPanelsData;
+export default testSlideData;

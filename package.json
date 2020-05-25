@@ -32,6 +32,7 @@
     "eruda": "^2.2.0",
     "eruda-code": "^2.0.0",
     "eruda-dom": "^2.0.0",
+    "lottie-web": "^5.6.10",
     "prop-types": "^15.7.2",
     "qs": "^6.9.4",
     "react": "^16.13.1",
