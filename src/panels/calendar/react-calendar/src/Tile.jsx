@@ -73,22 +73,19 @@ export default class Tile extends Component {
     gradient.push(this.colors[4 - mood]);
 
     if (classes.indexOf("react-calendar__month-view__days__day") != -1) {
-      let borderClasses = [], borderStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      };
+      let borderClasses = [], borderStyle = {};
       borderClasses.push("react-calendar__tile__border__gradient");
       borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
+      style.background = 'conic-gradient(' + gradient.join(', ') + ')';
 
       if (classes.indexOf("react-calendar__tile--active") != -1) {
-        style.background = 'conic-gradient(' + gradient.join(', ') + ')';
         borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
       }
 
       return (
         <div className={borderClasses} style={borderStyle}>
-          <button
+          <div className = 'container'>
+          <div
             className={mergeClassNames(classes, tileClassName)}
             disabled={
               (minDate && minDateTransform(minDate) > date)
@@ -101,15 +98,10 @@ export default class Tile extends Component {
             style={style}
             type="button"
           >
-            {formatAbbr
-            ? (
-              <abbr aria-label={formatAbbr(locale, date)}>
-                {children}
-              </abbr>
-            )
-            : children}
+            {children}
             {tileContent}
-          </button>
+          </div>
+          </div>
         </div>
       );
     }

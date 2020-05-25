@@ -126,26 +126,40 @@
 }
 
 .react-calendar__month-view__days__day{
+  padding: 0 !important;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
   font-size: 12px;
   font-family: monospace;
-  height: 100%;
-  width: 100%;
+  height: 0%;
+  width: 0%;
   border-radius: 50%;
   white-space: nowrap;
   flex-basis: initial !important;
   max-width: none !important;
+  overflow: initial !important;
+  transition-property: height, width;
+  transition-duration: 0.3s;
 }
 
 .react-calendar__month-view__days__day abbr{
   margin: 0;
 }
 
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%; 
+  background: white;
+}
+
 .react-calendar__tile__border__gradient{
     border-radius: 50%;
-    display: inline-block;
     padding: 4px;
     width: 32px;
     height: 32px;
@@ -158,10 +172,9 @@
 .react-calendar__month-view__days__day--neighboringMonth { /*предыдущий / следующий месяц*/
   color: #757575;
 }
-.react-calendar__year-view .react-calendar__tile,
-.react-calendar__decade-view .react-calendar__tile,
-.react-calendar__century-view .react-calendar__tile {
-  
+.react-calendar__tile--active {
+  height: 100%;
+  width: 100%;
 }
 .react-calendar__tile { /*общий вид всех кнопок*/
   max-width: none !important;
