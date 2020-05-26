@@ -1,16 +1,10 @@
 import React, {useState, useEffect, createRef} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
-import {
-    ModalPage, ModalPageHeader, ModalRoot,
-    PanelHeaderButton, Tabs, TabsItem, HorizontalScroll, Div,
-    usePlatform, IOS, ANDROID, Header, CardScroll, Card, Group,Avatar,Panel,PanelHeader,
-    Cell,Button,PanelHeaderBack
-} from "@vkontakte/vkui";
+import {Panel, PanelHeader, PanelHeaderBack, Cell, Button, Avatar, Div} from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
 import FlareComponent from "flare-react";
-import Icon24User from '@vkontakte/icons/dist/24/user';
 
-import petPlaceholder from "../../../img/robot.flr";
+import petPlaceholder from "../../../assets/robot.flr";
 import petController from "./petController";
 
 const UserProfilePanel = (props) => {
@@ -35,17 +29,6 @@ const UserProfilePanel = (props) => {
         />);
     }, []);
 
-
-    const itemStyle = {
-        flexShrink: 0,
-        width: 80,
-        height: 94,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        fontSize: 12,
-    };
-
     return (
         <Panel id={props.id}>
             <div className={styles.panelContainer}>
@@ -60,11 +43,6 @@ const UserProfilePanel = (props) => {
                     <div className={styles.petContainer} ref={petContainerRef}>
                         {pet}
                     </div>
-
-                   
-
-
-
                     <Button size="xl" mode="secondary" onClick={() => props.setModal("stats")}>
                         Статистика
                     </Button>

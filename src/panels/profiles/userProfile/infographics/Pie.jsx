@@ -80,7 +80,7 @@ const generateData = (values) => {
 
 const Pie = (props) => {
 
-    
+    if(data == null) return (null)
     
 
 
@@ -99,7 +99,7 @@ const Pie = (props) => {
         motionDamping={15}
         enableRadialLabels={false}
         slicesLabelsTextColor="#333333"
-        sliceLabel={function(e){return e.value > 1 ? e.value : null}}
+        sliceLabel={function(e){return e.value >= 1 ? e.value : null}}
         defs={[
             {
                 id: 'dots',
