@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, Group, Spinner, View, ActionSheet, ActionSheetItem } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Spinner, View, ActionSheet, ActionSheetItem, } from '@vkontakte/vkui';
 import s from './Feed.module.css'
 import TextPost from './components/TextPost/TextPost.js';
+import DeleteBar from './components/DeleteBar/DeleteBar.js'
 import api from '../../utils/api'
-import PullToRefresh from '@vkontakte/vkui/dist/components/PullToRefresh/PullToRefresh';
 import { Array } from 'core-js';
 
 import { platform, IOS } from '@vkontakte/vkui';
@@ -33,7 +33,7 @@ const Feed = (props) => {
                 anxiety: "3",
                 isPublic: "1",
                 title: "стандарт, порешал кф, поделал приложуху",
-                note: "аааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааааа",
+                note: "грустный день",
             });
         };
 
@@ -50,7 +50,7 @@ const Feed = (props) => {
         }
         fetchUsersPosts();
 
-//        createPost();
+        //createPost();
 
     },
         [wasUpdated]
@@ -58,7 +58,7 @@ const Feed = (props) => {
 
     useEffect(() => {
         if (props.user === null) return;
-        if (props.user.length != usersPosts.length) return;
+        if (props.user.length !== usersPosts.length) return;
         if (usersPosts === null) return;
 
         const temp = new Array();
@@ -82,22 +82,51 @@ const Feed = (props) => {
         setWasUpdated(!wasUpdated);
     };
 
-    const deletePost = async () => {
+    const reconstruction = () => {
         setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
-        var query = await api("DELETE", "/entries/", { entryId: lastPost.entryId });
-        for (var i = 0; i < allPostsArray.length; ++i) {
+        for (var i in allPostsArray) {
             if (allPostsArray[i].post.entryId === lastPost.entryId) {
-                allPostsArray.splice(i, 1);
-                break;
+                allPostsArray[i].wasDeleted = 0;
             }
         }
         const temp = new Array();
         for (var key in allPostsArray) {
+            if (allPostsArray[key].wasDeleted === 1) continue;
+            temp.push(<TextPost postData={allPostsArray[key]} />);
+        }
+        setCurPopout(null);
+        setPosts(temp);
+    };
+
+    const finallyDelete = async () => {
+        var query = await api("DELETE", "/entries/", { entryId: lastPost.entryId });
+    }
+
+    const goDeletePost = () => {
+        setCurPopout(null);
+        finallyDelete();
+    }
+
+    const afterDelete = () => {
+        setCurPopout(<DeleteBar goDeletePost={goDeletePost} reconstruction={reconstruction}/> );
+    }
+
+    const deletePost = async () => {
+        setPosts(<Spinner size="large" style={{ marginTop: 20 }} />);
+        for (var i in allPostsArray) {
+            if (allPostsArray[i].post.entryId === lastPost.entryId) {
+                allPostsArray[i].wasDeleted = 1;
+            }
+        }
+        const temp = new Array();
+        for (var key in allPostsArray) {
+            if (allPostsArray[key].wasDeleted === 1) continue;
             temp.push(<TextPost postData={allPostsArray[key]} />);
         }
         setPosts(temp);
+        afterDelete();
     }
-    
+
     const changePopout = (post) => {
         lastPost = post;
         setCurPopout(<ActionSheet onClose={() => { setCurPopout(null); }}>

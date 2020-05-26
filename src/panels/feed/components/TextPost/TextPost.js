@@ -103,6 +103,7 @@ const TextPost = (props) => {
                 </div>
 
             </Card>
+
         </CardGrid>
     );
 }

@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\panels"
+    "\\src\\panels",
+    "\\src\\panels\\checkIn",
+    "\\src\\utils"
   ],
-  "SelectedNode": "\\src\\panels",
+  "SelectedNode": "\\src\\App.js",
   "PreviewInSolutionExplorer": false
 }
