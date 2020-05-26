@@ -1,0 +1,25 @@
+import React from 'react';
+import '@vkontakte/vkui/dist/vkui.css';
+import {Card, usePlatform, getClassName} from "@vkontakte/vkui";
+import styles from "./profileCardPanel.module.css";
+
+const ProfileCardPanel = (props) => {
+    const platform = usePlatform();
+    const headerWrap = getClassName("headerWrap", platform).split(" ");
+
+    let modifyedHeaderWrap = "";
+    for (let cl of headerWrap) modifyedHeaderWrap += styles[cl] + " ";
+
+    return (
+        <Card size="m" mode="shadow" onClick={() => {
+            props.goTo();
+            props.setActiveUserProfile(props.userInfo);
+        }}>
+            <div className={modifyedHeaderWrap}>{props.cardName}</div>
+            <img className={styles.petPreview} src={props.petPreview} alt=""/>
+        </Card>
+    )
+};
+
+export default ProfileCardPanel;
+

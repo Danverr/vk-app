@@ -106,4 +106,3 @@ const GradientChart = (props) => {
 export default GradientChart
 
 
-

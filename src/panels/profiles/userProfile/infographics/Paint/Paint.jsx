@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
 import {Panel, PanelHeader, Group, CardGrid, Card, Div, View, Header} from '@vkontakte/vkui';
+<<<<<<< HEAD
 import Statistics from './statistics/Statistics';
+=======
+>>>>>>> chart
 import MediumMood from './MediumMood/MediumMood';
 import Pie from './Pie/Pie';
 
@@ -34,12 +37,20 @@ const Paint = (props) => {
                 </PanelHeader>
 
 
+<<<<<<< HEAD
                 <Group>
                     <Statistics statePaint={statePaint} setActiveStatistics={setActiveStatistics}/>
                 </Group>
 
 
                 <MediumMood statePaint={statePaint}/>
+=======
+               
+
+
+                {/* <MediumMood statePaint={statePaint}/> */}
+
+>>>>>>> chart
                 <Group>
                     <div style={{height: 300, width: window.innerWidth * 0.5}}>
                         <Pie/>

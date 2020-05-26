@@ -1,0 +1,60 @@
+.main { 
+    overflow-y: hidden;
+}
+
+.main div {
+    color: yellow;
+    font-size: 15px;
+}
+
+.color {
+    color: blueviolet;
+    font-size: 40px;
+}
+
+.block {
+    width: 100%;
+    height: 200px;
+    border: 2px solid white;
+}
+
+.info {
+    width: 100%;
+    height: 100%; 
+    /* color: rgb(255, 0, 119); */
+    font-size: 30px;
+    /* background-color: deepskyblue; */
+    text-align: center;
+}
+
+
+
+.grid {
+    /* background-color: gold; */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    
+}
+
+
+::-webkit-scrollbar{
+    width: 0px;
+    }    
+
+:focus {outline:none !important;}
+
+
+
+.outer:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+  }
+  
+  .inner {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+    
