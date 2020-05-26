@@ -10,7 +10,6 @@ const Tile = (props) => {
         anxiety
     } = props;
 
-
     let borderStyle = {}, circleStyle = {}, containerStyle = {};
     if (mood != null && stress != null && anxiety != null) {
         let colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];

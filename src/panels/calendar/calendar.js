@@ -36,17 +36,17 @@ const CalendarPanel = (props) => {
         if (props.user === null)
             return;
 
-        const getPosts = (obj, posts) => {
-            let temp = { ...obj }
+        const getPosts = (posts) => {
+            let temp = {};
             posts.data.map(post => { temp[post.date.split(' ')[0]] = post; });
             return temp;
         }
         const fetchUsersPosts = async () => {
             let results = await api("GET", "/entries/", { userId: props.user[0].id });
-            if (results != null)
-                setAllPosts(obj => getPosts(obj, results));
-            if(allPosts != null)
-                setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {allPosts}/>);
+            if (results != null){
+                setAllPosts(getPosts(results));
+                setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getPosts(results)}/>);
+            }
         }
         fetchUsersPosts();
     },
