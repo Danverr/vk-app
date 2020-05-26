@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { Text } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import { getDate, getMonthHuman, getYear, getMonth, getMonthStart, getMonthEnd, getNextDayStart, getNextMonthStart } from '@wojtekmaj/date-utils';
+import { getDate, getYear, getMonth, getMonthStart, getNextDayStart, getNextMonthStart } from '@wojtekmaj/date-utils';
 import Tile from './Tile'
 
 const TileGroup = (props) => {
@@ -9,7 +9,6 @@ const TileGroup = (props) => {
 
     let Tiles = [];
     let cur = getMonthStart(props.curDate);
-    console.log(activeTile);
     for(let i = 1; i < cur.getDay(); i++) //push empty
         Tiles.push(<Tile onClickTile = {() => {}}/>);
     while(cur < getNextMonthStart(props.curDate)){

@@ -45,6 +45,7 @@
     border-radius: 50%;
   }
 .container{
+    visibility: visible;
     height: 100%;
     width: 100%;
     display: flex;
@@ -54,6 +55,7 @@
     background: white;
 }  
 .circle {
+    visibility: visible;
     display: flex;
     align-items: center;
     justify-content: center;

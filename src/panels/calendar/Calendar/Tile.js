@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import { getDate, getMonthHuman, getYear, getMonth, getMonthStart, getMonthEnd, getNextDayStart } from '@wojtekmaj/date-utils';
+import { getDate } from '@wojtekmaj/date-utils';
 
 const Tile = (props) => {
     const {
@@ -11,7 +11,7 @@ const Tile = (props) => {
     } = props;
 
 
-    let borderStyle = {}, circleStyle = {};
+    let borderStyle = {}, circleStyle = {}, containerStyle = {};
     if (mood != null && stress != null && anxiety != null) {
         let colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
         let gradient = [];
@@ -25,11 +25,12 @@ const Tile = (props) => {
         borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
         circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
         if(props.active){
-            circleStyle.height = '105%';
-            circleStyle.width = '105%';
+            circleStyle.height = '100%';
+            circleStyle.width = '100%';
         }
     }
     if (props.active){
+        containerStyle.visibility = 'hidden';
         borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
         borderStyle.height = '20px';
         borderStyle.width = '20px';
@@ -38,7 +39,7 @@ const Tile = (props) => {
     return (
         <div className='tile' onClick={() => { props.onClickTile(props.date) }}>
             <div className='border' style={borderStyle}>
-                <div className='container'>
+                <div className='container' style = {containerStyle}>
                     <div className='circle' style = {circleStyle}> {(props.date != null) ? getDate(props.date) : null} </div>
                 </div>
             </div>
