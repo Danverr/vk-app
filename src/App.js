@@ -13,7 +13,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Profiles from './panels/profiles/profiles';
 import Feed from "./panels/feed/feed";
 import CheckIn from "./panels/checkIn/checkIn";
-import Calendar from "./panels/calendar/calendar";
+import CalendarStory from "./panels/calendar/calendarStory";
 import Settings from "./panels/settings/settings";
 
 // Панели по умолчанию для каждого view
@@ -163,7 +163,7 @@ const App = () => {
                 <Feed id="feed" nav={nav}/>
                 <Profiles id="profiles" nav={nav}/>
                 <CheckIn id="checkIn" nav={nav}/>
-                <Calendar id="calendar" nav={nav} user = {usersInfo}/>
+                <CalendarStory id="calendar" nav={nav} user = {usersInfo}/>
                 <Settings id="settings" nav={nav}/>
             </Epic>
         </ConfigProvider>

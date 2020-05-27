@@ -6,7 +6,7 @@ import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 import { getDate, getMonthHuman, getYear } from '@wojtekmaj/date-utils';
 
-const CalendarPanel = (props) => {
+const CalendarStory = (props) => {
     var [postsField, setPostsField] = useState(null);
     var [calendarField, setCalendarField] = useState(null);
     var [allPosts, setAllPosts] = useState(new Object());
@@ -74,4 +74,4 @@ const CalendarPanel = (props) => {
     );
 };
 
-export default CalendarPanel;
+export default CalendarStory;
