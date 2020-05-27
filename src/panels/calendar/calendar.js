@@ -12,7 +12,7 @@ const CalendarPanel = (props) => {
     var [allPosts, setAllPosts] = useState(new Object());
     var [curDate, setCurDate] = useState(null);
 
-    useEffect(() => {       
+    useEffect(() => {
         if (curDate === null || props.user === null)
             return;
         setPostsField(<Spinner size="large" style={{ marginTop: 20 }} />);
@@ -20,8 +20,8 @@ const CalendarPanel = (props) => {
             let year = getYear(curDate);
             let month = ('0' + getMonthHuman(curDate).toString()).slice(-2);
             let day = ('0' + getDate(curDate)).slice(-2);
-            
-            if (allPosts[year + "-" + month + "-" + day] != null) 
+
+            if (allPosts[year + "-" + month + "-" + day] != null)
                 setPostsField(<TextPost postData={{ user: props.user[0], post: allPosts[year + "-" + month + "-" + day] }} />);
             else
                 setPostsField(null);
@@ -43,9 +43,9 @@ const CalendarPanel = (props) => {
         }
         const fetchUsersPosts = async () => {
             let results = await api("GET", "/entries/", { userId: props.user[0].id });
-            if (results != null){
+            if (results != null) {
                 setAllPosts(getPosts(results));
-                setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getPosts(results)}/>);
+                setCalendarField(<Calendar onClickTile={(date) => { setCurDate(date) }} userPosts={getPosts(results)} />);
             }
         }
         fetchUsersPosts();
@@ -61,11 +61,11 @@ const CalendarPanel = (props) => {
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
-                <Group separator="show">
-                    <Div style={{ paddingTop: "0px" }}>
+                <Div style={{ paddingTop: "0px" }}>
+                    <Group separator="show">
                         {calendarField}
-                    </Div>
-                </Group>
+                    </Group>
+                </Div>
                 <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
                     {postsField}
                 </Group>

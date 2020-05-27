@@ -23,16 +23,13 @@ const Tile = (props) => {
 
         borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
         circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
-        if(props.active){
-            circleStyle.height = '100%';
-            circleStyle.width = '100%';
-        }
     }
     if (props.active){
-        containerStyle.visibility = 'hidden';
         borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
         borderStyle.height = '20px';
         borderStyle.width = '20px';
+        circleStyle.height = '100%';
+        circleStyle.width = '100%';
     }
 
     return (
