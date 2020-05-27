@@ -6,7 +6,7 @@ import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 import { getDate, getMonthHuman, getYear } from '@wojtekmaj/date-utils';
 
-const CalendarStory = (props) => {
+const Calendar = (props) => {
     var [postsField, setPostsField] = useState(null);
     var [calendarField, setCalendarField] = useState(null);
     var [allPosts, setAllPosts] = useState(new Object());
@@ -74,4 +74,4 @@ const CalendarStory = (props) => {
     );
 };
 
-export default CalendarStory;
+export default Calendar;
