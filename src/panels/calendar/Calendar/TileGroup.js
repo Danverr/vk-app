@@ -9,9 +9,8 @@ const TileGroup = (props) => {
 
     let Tiles = [];
     let cur = getMonthStart(props.curDate);
-    let key = 0;
-    for(let i = 1; i < cur.getDay(); i++, key++) //push empty
-        Tiles.push(<Tile key = {key} onClickTile = {() => {}}/>);
+    for(let i = 1; i < cur.getDay(); i++) //push empty
+        Tiles.push(<Tile onClickTile = {() => {}}/>);
     while(cur < getNextMonthStart(props.curDate)){
         let year = getYear(cur);
         let month = ('0' + (parseInt(getMonth(cur)) + 1).toString()).slice(-2);
@@ -27,10 +26,11 @@ const TileGroup = (props) => {
         }
         if(activeTile.toString() == cur.toString())
             curTileProps.active = true;
-        Tiles.push(<Tile key = {key} date = {cur} onClickTile = {(date) => {setActiveTile(date); props.onClickTile(date);}} {...curTileProps}/>);
+        Tiles.push(<Tile date = {cur} onClickTile = {(date) => {setActiveTile(date); props.onClickTile(date);}} {...curTileProps}/>);
         cur = getNextDayStart(cur);
-        key++;
     }
+    while(Tiles.length < 35) //push empty
+        Tiles.push(<Tile onClickTile = {() => {}}/>);
 
     return (
         <div className = 'tile-group'>
