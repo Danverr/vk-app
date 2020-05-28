@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
-import React from 'react';
-import {Panel, PanelHeader, View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
+import useUserEntries from '../../utils/useUserEntries';
+import useUserToken from '../../utils/useUserToken';
+import useUsersInfo from '../../utils/useUsersInfo';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 import { getDate, getMonthHuman, getYear } from '@wojtekmaj/date-utils';
 
-const Calendar = (props) => {
+const CalendarStory = (props) => {
     var [postsField, setPostsField] = useState(null);
     var [calendarField, setCalendarField] = useState(null);
+    var [userToken, setUserToken] = useState(null); 
+
     var [allPosts, setAllPosts] = useState(new Object());
     var [curDate, setCurDate] = useState(null);
 
     useEffect(() => {       
-        if (curDate === null || props.user === null)
+        if (curDate === null || userToken === null)
             return;
         setPostsField(<Spinner size="large" style={{ marginTop: 20 }} />);
         const fetchUsersPosts = async () => {
@@ -24,7 +27,7 @@ const Calendar = (props) => {
             let day = ('0' + getDate(curDate)).slice(-2);
             
             if (allPosts[year + "-" + month + "-" + day] != null) 
-                setPostsField(<TextPost postData={{ user: props.user[0], post: allPosts[year + "-" + month + "-" + day] }} />);
+                setPostsField(<TextPost postData={{ user: userToken, post: allPosts[year + "-" + month + "-" + day] }} />);
             else
                 setPostsField(null);
         }
@@ -35,7 +38,7 @@ const Calendar = (props) => {
 
     useEffect(() => {
         setCalendarField(<Spinner size="large" style={{ marginTop: 20 }} />);
-        if (props.user === null)
+        if (userToken === null)
             return;
 
         const getPosts = (posts) => {
@@ -44,7 +47,7 @@ const Calendar = (props) => {
             return temp;
         }
         const fetchUsersPosts = async () => {
-            let results = await api("GET", "/entries/", { userId: props.user[0].id });
+            let results = await api("GET", "/entries/", { userId: userToken });
             if (results != null){
                 setAllPosts(getPosts(results));
                 setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getPosts(results)}/>);
@@ -52,20 +55,16 @@ const Calendar = (props) => {
         }
         fetchUsersPosts();
     },
-        [props.user]
+        [userToken]
     );
+
+    setUserToken(useUserToken());
 
     return (
         <View id={props.id}
             activePanel={props.nav.panel}
             history={props.nav.history}
             onSwipeBack={props.nav.goBack}
-const CalendarStory = (props) => {
-    return (
-        <View id={props.id}
-              activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
-              onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
