@@ -22,15 +22,12 @@ const Tile = (props) => {
         gradient.push(colors[4 - mood]);
 
         borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
-        circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
-        if(props.active){
-            circleStyle.height = '100%';
-            circleStyle.width = '100%';
-        }
+        circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';        
     }
     if (props.active){
-        containerStyle.visibility = 'hidden';
         borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
+        circleStyle.height = '100%';
+        circleStyle.width = '100%';
         borderStyle.height = '20px';
         borderStyle.width = '20px';
     }
