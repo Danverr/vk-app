@@ -1,70 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import api from '../../utils/api';
-import useUserEntries from '../../utils/useUserEntries';
-import useUserToken from '../../utils/useUserToken';
-import useUsersInfo from '../../utils/useUsersInfo';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 import { getDate, getMonthHuman, getYear } from '@wojtekmaj/date-utils';
 
 const CalendarStory = (props) => {
-    var [postsField, setPostsField] = useState(null);
-    var [calendarField, setCalendarField] = useState(null);
-    var [userToken, setUserToken] = useState(null); 
-
-    var [allPosts, setAllPosts] = useState(new Object());
-    var [curDate, setCurDate] = useState(null);
+    var[calendarField, setCalendarField] = useState(null);
+    var[entriesField, setEntriesField] = useState(null);
+    var[curDate, setCurDate] = useState(null);
+    var[userEntriesMap, setUserEntriesMap] = useState(new Object());
 
     useEffect(() => {       
-        if (curDate === null || userToken === null)
+        if (!props.usersInfo || !props.userEntries || !curDate)
             return;
-        setPostsField(<Spinner size="large" style={{ marginTop: 20 }} />);
-        const fetchUsersPosts = async () => {
+            setEntriesField(<Spinner size="large" style={{ marginTop: 20 }} />);
+
             let year = getYear(curDate);
             let month = ('0' + getMonthHuman(curDate).toString()).slice(-2);
             let day = ('0' + getDate(curDate)).slice(-2);
             
-            if (allPosts[year + "-" + month + "-" + day] != null) 
-                setPostsField(<TextPost postData={{ user: userToken, post: allPosts[year + "-" + month + "-" + day] }} />);
+            if (userEntriesMap[year + "-" + month + "-" + day]) 
+                setEntriesField(<TextPost postData={{ user: props.usersInfo[0], post: userEntriesMap[year + "-" + month + "-" + day] }} />);
             else
-                setPostsField(null);
-        }
-        fetchUsersPosts();
+                setEntriesField(null);
     },
-        [allPosts, curDate, props.user]
+        [props.usersInfo[0], userEntriesMap, curDate]
     );
 
     useEffect(() => {
         setCalendarField(<Spinner size="large" style={{ marginTop: 20 }} />);
-        if (userToken === null)
+        if(!props.userEntries)
             return;
-
-        const getPosts = (posts) => {
-            let temp = {};
-            posts.data.map(post => { temp[post.date.split(' ')[0]] = post; });
-            return temp;
-        }
-        const fetchUsersPosts = async () => {
-            let results = await api("GET", "/entries/", { userId: userToken });
-            if (results != null){
-                setAllPosts(getPosts(results));
-                setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getPosts(results)}/>);
+        
+            const getEntries = (entries) => {
+                let temp = {};
+                entries.map(entry => { temp[entry.date.split(' ')[0]] = entry; });
+                return temp;
             }
-        }
-        fetchUsersPosts();
-    },
-        [userToken]
+            setUserEntriesMap(getEntries(props.userEntries));
+            setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getEntries(props.userEntries)}/>);
+        },
+        [props.userEntries]
     );
-
-    setUserToken(useUserToken());
 
     return (
         <View id={props.id}
-            activePanel={props.nav.panel}
-            history={props.nav.history}
-            onSwipeBack={props.nav.goBack}
+              activePanel={props.nav.activePanel}
+              history={props.nav.viewHistory}
+              onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
@@ -74,7 +58,7 @@ const CalendarStory = (props) => {
                     </Div>
                 </Group>
                 <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    {postsField}
+                    {entriesField}
                 </Group>
             </Panel>
         </View>
