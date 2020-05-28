@@ -2,19 +2,19 @@ import React from 'react';
 import {Panel, PanelHeader, View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-const Settings = (props) => {
+const ProfilesStory = (props) => {
     return (
         <View id={props.id}
-              activePanel={props.nav.panel}
-              history={props.nav.history}
+              activePanel={props.nav.activePanel}
+              history={props.nav.viewHistory}
               onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
-                <PanelHeader separator={false}>Настройки</PanelHeader>
+                <PanelHeader separator={false}>Профили</PanelHeader>
             </Panel>
         </View>
     );
 };
 
-export default Settings;
+export default ProfilesStory;
 

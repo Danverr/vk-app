@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
+import React from 'react';
+import {Panel, PanelHeader, View} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import api from '../../utils/api';
 import TextPost from '../../components/TextPost/TextPost'
@@ -58,6 +60,12 @@ const Calendar = (props) => {
             activePanel={props.nav.panel}
             history={props.nav.history}
             onSwipeBack={props.nav.goBack}
+const CalendarStory = (props) => {
+    return (
+        <View id={props.id}
+              activePanel={props.nav.activePanel}
+              history={props.nav.viewHistory}
+              onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
@@ -74,4 +82,4 @@ const Calendar = (props) => {
     );
 };
 
-export default Calendar;
+export default CalendarStory;
