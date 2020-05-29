@@ -3,9 +3,11 @@
     "",
     "\\src",
     "\\src\\panels",
-    "\\src\\panels\\checkIn",
+    "\\src\\panels\\feed",
+    "\\src\\panels\\feed\\components",
+    "\\src\\panels\\feed\\components\\DeleteBar",
     "\\src\\utils"
   ],
-  "SelectedNode": "\\src\\App.js",
+  "SelectedNode": "\\src\\panels\\feed\\components\\DeleteBar\\DeleteBar.module.css",
   "PreviewInSolutionExplorer": false
 }

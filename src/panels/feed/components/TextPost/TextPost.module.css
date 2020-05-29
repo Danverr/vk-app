@@ -17,36 +17,41 @@
 }
 
 .par {
+    margin-top: 16px;
     display: grid;
-    grid-template-columns: 1fr 5fr 42px;
-    grid-auto-columns: minmax(90px, 500px);
-    margin-bottom: 10px;
+    grid-template-columns: 1fr 15fr 1fr;
+    grid-template-rows: 40px 40px 40px;
 }
 
-.parName{
-    margin-left: 16px;
-    margin-right: 20px;
-    margin-bottom: 10px;
+.parName {
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    font-size: 80%;
 }
 
 .parProgress {
-    margin-top: 7px;
-    margin-right: 10px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
 }
 
-.parText{
-    font-size: 75%;
-}
-
-.emoji{
-    margin-top: -4px;
+.emoji {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
 }
 
 .settingIcon{
-    margin-right: -14px;
-    margin-top: -15px;
+    display: flex;
+
 }
 
 .title{
     margin-bottom: 6px;
 }
+
+
+
+

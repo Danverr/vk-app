@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
-import { Cell, CardGrid, Progress, ActionSheetItem, Avatar, Card, Text, Title, PanelHeaderButton, ActionSheet, Subhead, UsersStack } from '@vkontakte/vkui';
+import React from 'react';
+import { Cell, CardGrid, Progress, Avatar, Card, Text, Subhead } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
-import Icon24Dropdown from '@vkontakte/icons/dist/24/dropdown';
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import mood1 from '../../../../assets/emoji/mood/mood1.png'
@@ -28,7 +27,9 @@ const TextPost = (props) => {
     const user = props.postData.user;
     const unDate = props.postData.post.date;
 
-    const date = { day: getDate(new Date(unDate)), month: getMonth(new Date(unDate)), hour: getHours(new Date(unDate)), minute: getMinutes(new Date(unDate)) };
+    const date = {
+        day: getDate(new Date(unDate)), month: getMonth(new Date(unDate)) + 1, hour: getHours(new Date(unDate)), minute: getMinutes(new Date(unDate))
+    };
     const description = props.postData.post.title;
     const text = props.postData.post.note;
 
@@ -36,6 +37,7 @@ const TextPost = (props) => {
     const currentUser = props.postData.currentUser;
 
     const moodInt = Number.parseInt(props.postData.post.mood);
+// тк с сервака мне пока не удалось получить записи с интами, оставил парсинг
     const stressInt = Number.parseInt(props.postData.post.stress);
     const anxietyInt = Number.parseInt(props.postData.post.anxiety);
 
@@ -61,11 +63,8 @@ const TextPost = (props) => {
 
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
-                    indicator={(user.id == currentUser.id) ? <div className={s.settingIcon}>
-                        <PanelHeaderButton onClick={summon}>
-                            <Icon24MoreVertical /> </PanelHeaderButton>
-                    </div> : null}
-                >
+                    asideContent={(user.id === currentUser.id) ? 
+                        <Icon24MoreVertical onClick={summon} className={s.settingIcon} /> : null}>
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>
 
@@ -76,31 +75,37 @@ const TextPost = (props) => {
                     <Text weight='medium'>
                         {text}
                     </Text>
+
+                    <div className={s.par}>
+
+                        <Text weight='medium' className={s.parName}> Настроение </Text>
+                        <Progress value={mood} className={s.parProgress} />
+
+                        <div className={s.emoji} >
+                            <img src={emojiMood} >
+                            </img>
+                        </div>
+
+                        <Text weight='medium' className={s.parName}> Стресс </Text>
+                        <Progress value={stress} className={s.parProgress} />
+                        <div className={s.emoji} >
+                            <img src={emojiStress} >
+                            </img>
+                        </div>
+
+                        <Text weight='medium' className={s.parName}> Тревожность </Text>
+                        <Progress value={anxiety} className={s.parProgress} />
+                        <div className={s.emoji} >
+                            <img src={emojiAnxiety} >
+                            </img>
+                        </div>
+
+                    </div>
+
+
                 </div>
 
 
-                <div className={s.par}>
-                    <div className={s.parName}> <Text weight='medium' className={s.parText}> Настроение </Text> </div>
-                    <div className={s.parProgress}> <Progress value={mood} /> </div>
-                    <div className={s.emoji}>
-                        <img src={emojiMood}>
-                        </img>
-                    </div>
-
-                    <div className={s.parName}>  <Text weight='medium' className={s.parText}> Стресс </Text> </div>
-                    <div className={s.parProgress}>  <Progress value={stress} /> </div>
-                    <div className={s.emoji}>
-                        <img src={emojiStress}>
-                        </img>
-                    </div>
-
-                    <div className={s.parName}>  <Text weight='medium' className={s.parText}> Тревожность </Text> </div>
-                    <div className={s.parProgress}>  <Progress value={anxiety} /> </div>
-                    <div className={s.emoji}>
-                        <img src={emojiAnxiety}>
-                        </img>
-                    </div>
-                </div>
 
             </Card>
 

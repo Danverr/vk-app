@@ -47,13 +47,13 @@ const App = () => {
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
     useEffect(() => {
         window.addEventListener('popstate', nav.goBack);
-    }, []);
+    }, []); 
 
     return (
         <Root popout={loading}>
             <ConfigProvider isWebView={true}>
                 <Epic activeStory={nav.activeStory} tabbar={nav.navbar}>
-                    <FeedStory id="feed" nav={nav}/>
+                    <FeedStory id="feed" nav={nav} user={usersInfo}/>
                     <ProfilesStory id="profiles" nav={nav}/>
                     <CheckInStory id="checkIn" nav={nav}/>
                     <CalendarStory id="calendar" nav={nav}/>

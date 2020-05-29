@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import s from './DeleteBar.module.css'
 
-import Icon24Delete from '@vkontakte/icons/dist/24/delete';
-import { Snackbar, Text } from '@vkontakte/vkui';
+import { Snackbar } from '@vkontakte/vkui';
 import { setTimeout } from 'core-js';
 
 const Seconds = 5000;
@@ -14,22 +13,20 @@ const Clock = () => {
     const [timeLeft, setTimeLeft] = useState(Seconds);
 
     const recursion = () => {
-        if (timeLeft === 0) return;
-        setTimeout(() => { setTimeLeft(timeLeft - 125) }, 125);
+        if (!timeLeft) return;
+        setTimeout(() => { setTimeLeft(timeLeft - 10) }, 10);
     };
 
     return (
-        <div>
-            <svg className={s.circle}>
-                <circle
-                    cx="12" cy="12" r={R} stroke="rgb(63,138,224)" stroke-width="2" fill="transparent"
-                    style={{
-                        'stroke-dasharray': (2 * PI * R * (timeLeft / Seconds)).toString() + " 1000",
-                    }}
-                />
-            </svg>
+        <svg className={s.circle}>
+            <circle
+                cx="12" cy="12" r={R} stroke="rgb(63,138,224)" strokeWidth="2" fill="transparent"
+                style={{
+                    'strokeDasharray': (2 * PI * R * (timeLeft / Seconds)).toString() + " 1000",
+                }}
+            />
             {recursion()}
-        </div>
+        </svg>
     );
 };
 
@@ -37,7 +34,7 @@ const NumberTimer = () => {
     const [timeLeft, setTimeLeft] = useState(Seconds);
 
     const recursion = () => {
-        if (timeLeft === 0) return;
+        if (!timeLeft) return;
         setTimeout(() => { setTimeLeft(timeLeft - 1000) }, 1000);
     };
 
@@ -45,18 +42,6 @@ const NumberTimer = () => {
         <div className={s.timeLeft}>
             {timeLeft / 1000}
             {recursion()}
-            </div>
-        );
-}
-
-const Timer = () => {
-
-    // <div className={s.timeLeft}> {timeLeft / 1000} </div>
-
-    return (
-        <div>
-            <NumberTimer/>
-            <Clock/>
         </div>
     );
 };
@@ -69,11 +54,11 @@ const DeleteBar = (props) => {
             action="Отменить"
             onActionClick={props.reconstruction}
             duration={Seconds}
-            before={<Timer />}
+            before={<div> <NumberTimer /> <Clock /> </div>}
         >
             Удалено
         </Snackbar>
     )
-}
+};
 
 export default DeleteBar;
