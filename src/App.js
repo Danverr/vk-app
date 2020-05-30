@@ -49,6 +49,7 @@ const App = () => {
         window.addEventListener('popstate', nav.goBack);
     }, []);
 
+    console.log(usersInfo);
     return (
         <Root popout={loading}>
             <ConfigProvider isWebView={true}>
