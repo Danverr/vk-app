@@ -58,7 +58,7 @@ const App = () => {
                     <ProfilesStory id="profiles" nav={nav}/>
                     <CheckInStory id="checkIn" nav={nav}/>
                     <CalendarStory id="calendar" nav={nav}/>
-                    <SettingsStory id="settings" nav={nav}/>
+                    <SettingsStory id="settings" nav={nav} userToken = {userToken}/>
                 </Epic>
             </ConfigProvider>
         </Root>
