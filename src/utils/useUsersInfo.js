@@ -22,6 +22,8 @@ const useUsersInfo = (userToken) => {
             // Удаляем id текущего юзера
             friendsIdsPromise.data.splice(friendsIdsPromise.data.indexOf(currentUserInfo.id, 0), 1);
 
+            console.log(friendsIdsPromise.data);
+
             // Информация о друзьях
             const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
                 method: "users.get",
