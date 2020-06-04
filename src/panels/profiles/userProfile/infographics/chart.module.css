@@ -1,0 +1,41 @@
+.chartContainer {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.chartScroll {
+    overflow-x: auto;
+}
+
+:global(.recharts-cartesian-axis-tick-line) {
+    display: none;
+}
+
+.tickDate {
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+.tickMonth {
+    font-weight: 500;
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+.tooltipCard {
+    padding: 12px;
+}
+
+.tooltipCardDate {
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+.tooltipCardValue {
+    display: flex;
+    justify-content: center;
+}
+
+.tooltipCardValue > img {
+    margin-left: 6px;
+}

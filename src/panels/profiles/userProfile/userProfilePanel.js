@@ -1,53 +1,60 @@
-import React, {useState, useEffect, createRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
-import {Panel, PanelHeader, PanelHeaderBack, Cell, Button, Avatar, Div} from "@vkontakte/vkui";
+import {
+    Panel, PanelHeader, PanelHeaderBack,
+    Cell, Header, Avatar, Group
+} from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
-import FlareComponent from "flare-react";
+import lottie from "lottie-web";
 
-import petPlaceholder from "../../../assets/robot.flr";
-import petController from "./petController";
+import avatarAnim from "../../../assets/sticker.json";
+import Chart from "./infographics/chart";
+import api from "../../../utils/api";
 
 const UserProfilePanel = (props) => {
-    const [pet, setPet] = useState(null);
-    const petContainerRef = createRef();
+    const petContainerRef = useRef();
+    let [stats, setStats] = useState([]);
 
-    // Ищем фото пользователя
-    let photo = null;
-    if (props.userInfo.photo_50) photo = props.userInfo.photo_50;
-    else if (props.userInfo.photo_100) photo = props.userInfo.photo_100;
-    else if (props.userInfo.photo_200) photo = props.userInfo.photo_200;
-    else if (props.userInfo.photo_max_orig) photo = props.userInfo.photo_max_orig;
+    // Загрузка статистики пользователя
+    useEffect(() => {
+        if (props.userInfo == null) return;
+
+        api("GET", "/entries/stats/", {
+            userId: props.userInfo.id,
+        }).then((res) => {
+            setStats(res.data);
+        });
+    }, [props.userInfo]);
 
     // Устанавливаем размеры контейнера анимации
     useEffect(() => {
-        setPet(<FlareComponent
-            file={petPlaceholder}
-            controller={new petController()}
-            width={petContainerRef.current.clientWidth}
-            height={petContainerRef.current.clientHeight}
-            transparent={true}
-        />);
+        // Отрисовываем аватара
+        lottie.loadAnimation({
+            container: petContainerRef.current, // the dom element
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: avatarAnim, // the animation data
+        });
     }, []);
 
     return (
         <Panel id={props.id}>
-            <div className={styles.panelContainer}>
-                <PanelHeader separator={false}
-                             left={<PanelHeaderBack onClick={() => window.history.back()}/>}>
-                    Профиль
-                </PanelHeader>
-                <Cell before={<Avatar src={photo}/>}>
+            <PanelHeader separator={false}
+                         left={<PanelHeaderBack onClick={() => window.history.back()}/>}>
+                Профиль
+            </PanelHeader>
+
+            <Group>
+                <Cell before={<Avatar src={props.userInfo.photo_100}/>}>
                     {`${props.userInfo.first_name} ${props.userInfo.last_name}`}
                 </Cell>
-                <Div className={styles.contentContainer}>
-                    <div className={styles.petContainer} ref={petContainerRef}>
-                        {pet}
-                    </div>
-                    <Button size="xl" mode="secondary" onClick={() => props.setModal("stats")}>
-                        Статистика
-                    </Button>
-                </Div>
-            </div>
+                <div className={styles.petContainer} ref={petContainerRef}/>
+            </Group>
+
+            <Group header={<Header mode="secondary">Cтатистика</Header>}>
+                <Chart stats={stats.map(stat => ({val: stat.mood, date: stat.date}))}/>
+            </Group>
         </Panel>
     );
 };

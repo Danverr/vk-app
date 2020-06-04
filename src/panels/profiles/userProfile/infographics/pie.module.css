@@ -1,4 +1,4 @@
-.main { 
+.main {
     overflow-y: hidden;
 }
 
@@ -12,15 +12,9 @@
     font-size: 40px;
 }
 
-.block {
-    width: 100%;
-    height: 200px;
-    border: 2px solid white;
-}
-
 .info {
     width: 100%;
-    height: 100%; 
+    height: 100%;
     /* color: rgb(255, 0, 119); */
     font-size: 30px;
     /* background-color: deepskyblue; */
@@ -28,21 +22,21 @@
 }
 
 
-
 .grid {
     /* background-color: gold; */
     display: grid;
     grid-template-columns: 1fr 1fr;
-    
+
 }
 
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     width: 0px;
-    }    
+}
 
-:focus {outline:none !important;}
-
+:focus {
+    outline: none !important;
+}
 
 
 .outer:before {
@@ -50,11 +44,11 @@
     display: inline-block;
     height: 100%;
     vertical-align: middle;
-  }
-  
-  .inner {
+}
+
+.inner {
     display: inline-block;
     vertical-align: middle;
-  }
+}
   
     

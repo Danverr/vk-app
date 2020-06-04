@@ -1,16 +1,17 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import {Panel, PanelHeader, Group, CardGrid, Spinner} from "@vkontakte/vkui";
+import styles from "./chooseProfilePanel.module.css";
 import '@vkontakte/vkui/dist/vkui.css';
-import {Panel, PanelHeader, Group, CardGrid} from "@vkontakte/vkui";
 
-import ProfileCardPanel from "./profileCardPanel";
-import petPreview from "./../../../assets/robot.svg";
+import ProfileCard from "./profileCard";
+import petPreview from "./../../../assets/stickerPreview.png";
 
 const ChooseProfilePanel = (props) => {
     // Преобразовываем данные в карточки
     let profileCards = [];
     if (props.usersInfo) {
         profileCards = props.usersInfo.map((info, i) =>
-            (<ProfileCardPanel
+            (<ProfileCard
                 key={info.id}
                 cardName={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
                 userInfo={info}
@@ -33,8 +34,11 @@ const ChooseProfilePanel = (props) => {
     return (
         <Panel id={props.id}>
             <PanelHeader separator={false}>Профиль</PanelHeader>
-            <Group separator="hide">
-                {cardGrids}
+            <Group className={styles.cardGroup} separator="hide">
+                {
+                    // Ставим спиннер, пока данные о юзерах не будут загружены
+                    props.usersInfo ? cardGrids : <Spinner size="large"/>
+                }
             </Group>
         </Panel>
     );

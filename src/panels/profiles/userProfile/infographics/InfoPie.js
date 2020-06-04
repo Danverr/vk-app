@@ -4,7 +4,7 @@ import {
 } from "@vkontakte/vkui";
 import Pie from './Pie';
 
-import styles from './infoCss.module.css'
+import styles from './pie.module.css'
 
 
 

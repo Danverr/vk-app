@@ -1,22 +1,19 @@
-.panelContainer {
+:global(.Panel__in) {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 48px);
 }
 
 .contentContainer {
     display: flex;
+    flex: auto;
     padding-top: 0;
     flex-direction: column;
-    flex: auto;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .petContainer {
-    display: flex;
-    flex: auto;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin: auto 0;
 }
 
 .pet {

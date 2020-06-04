@@ -18,7 +18,7 @@ const defaultPanels = {
 };
 
 const useNav = () => {
-    const [isNavbarVis, setNavbarVis] = useState(true);
+    let [isNavbarVis] = useState(true);
     const [viewHistory] = useState(["feed"]);
     const [panelHistory] = useState({
         feed: [defaultPanels.feed],
@@ -32,7 +32,7 @@ const useNav = () => {
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
     // Функция возврата с экрана
-    function goBack() {
+    const goBack = () => {
         if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
             panelHistory[getActiveStory()].pop();
         } else { // Переход между историями
@@ -51,10 +51,10 @@ const useNav = () => {
         }
 
         setNav(getNav());
-    }
+    };
 
     // Функция для перехода на другой экран
-    function goTo(story, panel = null) {
+    const goTo = (story, panel = null) => {
         // Если переход на ту же историю
         // Если переход на ту же панель внутри истории
         if (getActiveStory() === story && (getActivePanel() === panel || panel === null)) return;
@@ -83,9 +83,9 @@ const useNav = () => {
         }
 
         setNav(getNav());
-    }
+    };
 
-    function clearStory(story, callback) {
+    const clearStory = (story, callback) => {
         if (viewHistory.includes(story)) {
             viewHistory.splice(viewHistory.indexOf(story), 1);
         }
@@ -93,53 +93,53 @@ const useNav = () => {
 
         callback();
         setNav(getNav());
-    }
+    };
 
-    function getNav() {
-        return {
-            activeStory: getActiveStory(),
-            activePanel: getActivePanel(),
-            panelHistory: panelHistory,
-            clearStory: clearStory,
-            goBack: goBack,
-            goTo: goTo,
-            setNavbarVis: setNavbarVis,
-            navbar: isNavbarVis ? (<Tabbar>
-                <TabbarItem
-                    onClick={() => goTo("feed")}
-                    selected={getActiveStory() === "feed"}
-                ><Icon28NewsfeedOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("profiles")}
-                    selected={getActiveStory() === "profiles"}
-                ><Icon28SmileOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("checkIn")}
-                    selected={getActiveStory() === "checkIn"}
-                ><Icon28AddCircleOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("calendar")}
-                    selected={getActiveStory() === "calendar"}
-                ><Icon28CalendarOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("settings")}
-                    selected={getActiveStory() === "settings"}
-                ><Icon28SettingsOutline/></TabbarItem>
-            </Tabbar>) : null,
-        };
-    }
+    const setNavbarVis = (vis) => {
+        isNavbarVis = vis;
+        setNav(getNav());
+    };
+
+    const getNav = () => ({
+        activeStory: getActiveStory(),
+        activePanel: getActivePanel(),
+        panelHistory: panelHistory,
+        clearStory: clearStory,
+        goBack: goBack,
+        goTo: goTo,
+        setNavbarVis: setNavbarVis,
+        navbar: isNavbarVis ? (<Tabbar>
+            <TabbarItem
+                onClick={() => goTo("feed")}
+                selected={getActiveStory() === "feed"}
+            ><Icon28NewsfeedOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("profiles")}
+                selected={getActiveStory() === "profiles"}
+            ><Icon28SmileOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("checkIn")}
+                selected={getActiveStory() === "checkIn"}
+            ><Icon28AddCircleOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("calendar")}
+                selected={getActiveStory() === "calendar"}
+            ><Icon28CalendarOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("settings")}
+                selected={getActiveStory() === "settings"}
+            ><Icon28SettingsOutline/></TabbarItem>
+        </Tabbar>) : null,
+    });
 
     // Упаковываем все функции
     let [nav, setNav] = useState(getNav());
-    useEffect(() => {
-        nav.isNavbarVis = isNavbarVis;
-    }, [isNavbarVis]);
 
     console.log(
         "View history: ", viewHistory,
         "\nCurrent panel history: ", panelHistory[getActiveStory()]
     );
-    return getNav();
+    return nav;
 };
 
 export default useNav;

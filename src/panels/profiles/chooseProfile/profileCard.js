@@ -1,9 +1,9 @@
 import React from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {Card, usePlatform, getClassName} from "@vkontakte/vkui";
-import styles from "./profileCardPanel.module.css";
+import styles from "./profileCard.module.css";
 
-const ProfileCardPanel = (props) => {
+const ProfileCard = (props) => {
     const platform = usePlatform();
     const headerWrap = getClassName("headerWrap", platform).split(" ");
 
@@ -21,5 +21,5 @@ const ProfileCardPanel = (props) => {
     )
 };
 
-export default ProfileCardPanel;
+export default ProfileCard;
 
