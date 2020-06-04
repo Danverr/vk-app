@@ -1,0 +1,21 @@
+<svg width="66" height="81" viewBox="0 0 66 81" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="33" cy="50" r="31" fill="#1B5678"/>
+<circle cx="33" cy="50" r="29" fill="#CDDBDC"/>
+<path d="M24.5556 61C14 61 14 73.6667 14 73.6667C14 73.6667 20.8611 80 33 80C45.1389 80 52 73.6667 52 73.6667C52 73.6667 52 61 41.4444 61H24.5556Z" fill="#1D5476"/>
+<path d="M25.4444 63C16 63 16 73.6667 16 73.6667C16 73.6667 22.1389 79 33 79C43.8611 79 50 73.6667 50 73.6667C50 73.6667 50 63 40.5556 63H25.4444Z" fill="white"/>
+<circle cx="10" cy="36" r="10" fill="#1B5678"/>
+<circle cx="10" cy="36" r="8" fill="white"/>
+<circle cx="56" cy="36" r="10" fill="#1B5678"/>
+<circle cx="56" cy="36" r="8" fill="white"/>
+<rect x="7" y="13" width="52" height="46" rx="18" fill="#1D5476"/>
+<rect x="9" y="15" width="48" height="42" rx="16" fill="white"/>
+<rect x="13" y="22" width="40" height="30" rx="12" fill="#1F5474"/>
+<rect x="15" y="24" width="36" height="26" rx="10" fill="#E1F4F0"/>
+<path d="M27 42.5V41.5C27 40.9477 27.4477 40.5 28 40.5H38C38.5523 40.5 39 40.9477 39 41.5V42.5C39 44 37.8 47 33 47C28.2 47 27 44 27 42.5Z" fill="#1C5274"/>
+<path d="M33 44C31 44 30 45.5 30 45.5C30 45.5 31.5 46 33 46C34.5 46 36 45.5 36 45.5C36 45.5 35 44 33 44Z" fill="#FBB9BA"/>
+<circle cx="24" cy="35" r="3" fill="#18577A"/>
+<circle cx="42" cy="35" r="3" fill="#18577A"/>
+<circle cx="33" cy="5" r="5" fill="#1D5476"/>
+<circle cx="33" cy="5" r="3" fill="#E1F4F0"/>
+<rect x="32" y="8" width="2" height="7" fill="#1D5476"/>
+</svg>
