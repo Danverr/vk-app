@@ -16,7 +16,7 @@ const useUsersInfo = (userToken) => {
 
             // ID друзей к которым есть доступ
             const friendsIdsPromise = await api("GET", "/statAccess/", {
-                userId: currentUserInfo.id,
+                toId: currentUserInfo.id,
             });
 
             // Удаляем id текущего юзера

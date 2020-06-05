@@ -9,16 +9,19 @@ import Icon24Education from '@vkontakte/icons/dist/24/education';
 
 import api from '../../utils/api'
 
+import CanAddGroup from './canAdd/canAddGroup'
+import AddedGroup from './added/addedGroup'
+
 const SettingsStory = (props) => {
-    var [search, setSearch] = useState('');
-    var [userFriends, setUserFriends] = useState(null);
+    var [canAdd, setCanAdd] = useState(null);
+    var [added, setAdded] = useState(null);
     var [waitToAdd, setWaitToAdd] = useState([]);
 
     useEffect(() => {
         if (!props.userToken) return;
 
         const fetchUserFriends = async () => {
-            const friendsPromise = await bridge.send("VKWebAppCallAPIMethod", {
+            const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
                 method: "friends.get",
                 params: {
                     access_token: props.userToken,
@@ -27,30 +30,44 @@ const SettingsStory = (props) => {
                     fields: "photo_50, photo_100"
                 }
             });
-            setUserFriends(friendsPromise.response);
+
+            const addedPromise = await api("GET", "/statAccess/", {
+                fromId: props.usersInfo[0].id,
+            });
+
+            const addedFriendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
+                method: "users.get",
+                params: {
+                    access_token: props.userToken,
+                    v: "5.103",
+                    user_ids: addedPromise.data.join(","),
+                    fields: "photo_50, photo_100"
+                }
+            });
+
+            let temp1 = [...friendsInfoPromise.response.items],
+                temp2 = [...addedPromise.data];
+            temp1 = temp1.filter((friend) => temp2.indexOf(friend.id) == -1);
+            temp2 = [...addedFriendsInfoPromise.response];
+
+            setCanAdd(temp1);
+            setAdded(temp2);
         }
         fetchUserFriends();
     }, [props.userToken]);
 
-    const searchFriends = () => {
-        const searchStr = search.toLowerCase();
-        if (!userFriends)
-            return userFriends;
-        return userFriends.items.filter(({ first_name, last_name }) => (`${first_name} ${last_name}`).toLowerCase().indexOf(searchStr) > -1);
-    }
-
     const postEdges = async () => {
-        if(!props.usersInfo) return;
+        if (!props.usersInfo) return;
 
         waitToAdd.map((friend) => {
             api("POST", "/statAccess/", {
                 fromId: props.usersInfo[0].id,
-                toId: friend
+                toId: friend.id
             });
         })
+        setCanAdd([...canAdd.filter((friend) => waitToAdd.indexOf(friend) == -1)]);
+        setAdded([...added, ...waitToAdd]);
     }
-
-    const searchedFriends = searchFriends();
 
     return (
         <View id={props.id}
@@ -74,38 +91,34 @@ const SettingsStory = (props) => {
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
                     Друзья
                 </PanelHeader>
-                <Group header={<Header mode="secondary"> добавить </Header>}>
-                    <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
-                    {
-                        searchedFriends && searchedFriends.length > 0 &&
-                        <List>
-                            {searchedFriends.map(friend =>
-                                <Cell
-                                    key={friend.id}
-                                    before={<Avatar size={48}
-                                        src={friend.photo_100} />}
-                                    asideContent={<Checkbox checked = {waitToAdd.indexOf(friend.id) > -1}
-                                        onChange={(e) => {
-                                        if (e.target.checked) {
-                                            let temp = [...waitToAdd];
-                                            temp.push(friend.id);
-                                            setWaitToAdd(temp);
-                                        }
-                                        else {
-                                            let temp = [...waitToAdd];
-                                            if (temp.indexOf(friend.id) > -1)
-                                                temp.splice(temp.indexOf(friend.id), 1);
-                                            setWaitToAdd(temp);
-                                        }
-                                    }} />}>
-                                    {`${friend.first_name} ${friend.last_name}`}
-                                </Cell>)}
-                        </List>
-                    }
-                </Group>
-                <Group header={<Header mode="secondary"> добавленные </Header>}>
-
-                </Group>
+                <AddedGroup
+                    added={added}
+                    canAdd={canAdd}
+                    usersInfo={props.usersInfo}
+                    remove={
+                        (friend) => {
+                            let temp = [...added];
+                            temp.splice(temp.indexOf(friend), 1);
+                            setCanAdd([...canAdd, friend]);
+                            setAdded(temp);
+                        }} />
+                <CanAddGroup
+                    added={added}
+                    canAdd={canAdd}
+                    waitToAdd={waitToAdd}
+                    add={
+                        (friend) => {
+                            let temp = [...waitToAdd];
+                            temp.push(friend);
+                            setWaitToAdd(temp);
+                        }}
+                    remove={
+                        (friend) => {
+                            let temp = [...waitToAdd];
+                            if (temp.indexOf(friend) > -1)
+                                temp.splice(temp.indexOf(friend), 1);
+                            setWaitToAdd(temp);
+                        }} />
                 <FixedLayout vertical="bottom">
                     <Separator wide />
                     <Button size="xl" after={<Counter> {waitToAdd.length} </Counter>} onClick={() => {
@@ -113,7 +126,7 @@ const SettingsStory = (props) => {
                         setWaitToAdd([]);
                         props.nav.goBack();
                     }}>
-                        Отправить
+                        Сохранить
                     </Button>
                 </FixedLayout>
             </Panel>
