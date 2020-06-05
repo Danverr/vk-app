@@ -19,10 +19,10 @@ const AddedGroup = (props) => {
     const searchedFriends = searchFriends();
     
     const deleteEdge = async (friend) => {
-        if (!props.usersInfo) return;
+        if (!props.userInfo) return;
 
         const res = await api("DELETE", "/statAccess/", {
-            fromId: props.usersInfo[0].id,
+            fromId: props.userInfo.id,
             toId: friend.id
         });
         props.remove(friend);

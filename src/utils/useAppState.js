@@ -95,7 +95,10 @@ function useAppState() {
         },
         checkIn: null,
         calendar: null,
-        settings: null,
+        settings: {
+            userInfo: userInfo,
+            userToken: userToken
+        },
     };
 }
 

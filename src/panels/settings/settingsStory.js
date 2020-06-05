@@ -18,13 +18,13 @@ const SettingsStory = (props) => {
     var [waitToAdd, setWaitToAdd] = useState([]);
 
     useEffect(() => {
-        if (!props.userToken) return;
+        if (!props.state.userToken) return;
 
         const fetchUserFriends = async () => {
             const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
                 method: "friends.get",
                 params: {
-                    access_token: props.userToken,
+                    access_token: props.state.userToken,
                     v: "5.103",
                     order: "name",
                     fields: "photo_50, photo_100"
@@ -32,13 +32,13 @@ const SettingsStory = (props) => {
             });
 
             const addedPromise = await api("GET", "/statAccess/", {
-                fromId: props.usersInfo[0].id,
+                fromId: props.state.userInfo.id,
             });
 
             const addedFriendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
                 method: "users.get",
                 params: {
-                    access_token: props.userToken,
+                    access_token: props.state.userToken,
                     v: "5.103",
                     user_ids: addedPromise.data.join(","),
                     fields: "photo_50, photo_100"
@@ -54,21 +54,21 @@ const SettingsStory = (props) => {
             setAdded(temp2);
         }
         fetchUserFriends();
-    }, [props.userToken]);
+    }, [props.state.userToken]);
 
     const postEdges = async () => {
-        if (!props.usersInfo) return;
+        if (!props.state.userInfo) return;
 
         waitToAdd.map((friend) => {
             api("POST", "/statAccess/", {
-                fromId: props.usersInfo[0].id,
+                fromId: props.state.userInfo.id,
                 toId: friend.id
             });
         })
         setCanAdd([...canAdd.filter((friend) => waitToAdd.indexOf(friend) == -1)]);
         setAdded([...added, ...waitToAdd]);
     }
-
+    
     return (
         <View id={props.id}
             activePanel={props.nav.activePanel}
@@ -94,7 +94,7 @@ const SettingsStory = (props) => {
                 <AddedGroup
                     added={added}
                     canAdd={canAdd}
-                    usersInfo={props.usersInfo}
+                    userInfo={props.state.userInfo}
                     remove={
                         (friend) => {
                             let temp = [...added];

@@ -21,16 +21,15 @@ const App = () => {
         window.addEventListener('popstate', nav.goBack);
     }, []);
 
-    console.log(usersInfo);
     return (
         <Root popout={state.rootPopup}>
             <ConfigProvider isWebView={true}>
                 <Epic activeStory={nav.activeStory} tabbar={nav.navbar}>
-                    <FeedStory id="feed" nav={nav}/>
-                    <ProfilesStory id="profiles" nav={nav}/>
-                    <CheckInStory id="checkIn" nav={nav}/>
-                    <CalendarStory id="calendar" nav={nav}/>
-                    <SettingsStory id="settings" nav={nav} usersInfo = {usersInfo} userToken = {userToken}/>
+                    <FeedStory id="feed" state={state.feed} nav={nav}/>
+                    <ProfilesStory id="profiles" state={state.profiles} nav={nav}/>
+                    <CheckInStory id="checkIn" state={state.checkIn} nav={nav}/>
+                    <CalendarStory id="calendar" state={state.calendar} nav={nav}/>
+                    <SettingsStory id="settings" state={state.settings} nav={nav}/>
                 </Epic>
             </ConfigProvider>
         </Root>
@@ -38,3 +37,4 @@ const App = () => {
 };
 
 export default App;
+
