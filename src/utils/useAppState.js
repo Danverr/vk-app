@@ -62,6 +62,8 @@ function useAppState() {
     };
 
     const fetchEntries = async () => {
+        if(!userInfo.id) return;
+        
         const entriesPromise = await api("GET", "/entries/", {
             userId: userInfo.id,
         });
@@ -82,7 +84,7 @@ function useAppState() {
 
     // Profiles
     const [activeUserProfile, setActiveUserProfile] = useState(null);
-
+    
     return {
         rootPopup: rootPopup,
 
@@ -94,7 +96,11 @@ function useAppState() {
             usersInfo: (userInfo && friendsInfo ? [userInfo, ...friendsInfo] : null)
         },
         checkIn: null,
-        calendar: null,
+        calendar: {
+            fetchEntries: fetchEntries,
+            userEntries: userEntries,
+            userInfo: userInfo
+        },
         settings: null,
     };
 }

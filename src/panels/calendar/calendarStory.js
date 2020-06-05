@@ -11,8 +11,12 @@ const CalendarStory = (props) => {
     var[curDate, setCurDate] = useState(null);
     var[userEntriesMap, setUserEntriesMap] = useState(new Object());
 
+    useEffect(() => {
+        props.state.fetchEntries();
+    }, [props.state.userInfo]);
+
     useEffect(() => {       
-        if (!props.usersInfo || !props.userEntries || !curDate)
+        if (!props.state.userInfo || !props.state.userEntries || !curDate)
             return;
             setEntriesField(<Spinner size="large" style={{ marginTop: 20 }} />);
 
@@ -21,16 +25,16 @@ const CalendarStory = (props) => {
             let day = ('0' + getDate(curDate)).slice(-2);
             
             if (userEntriesMap[year + "-" + month + "-" + day]) 
-                setEntriesField(<TextPost postData={{ user: props.usersInfo[0], post: userEntriesMap[year + "-" + month + "-" + day] }} />);
+                setEntriesField(<TextPost postData={{ user: props.state.userInfo, post: userEntriesMap[year + "-" + month + "-" + day] }} />);
             else
                 setEntriesField(null);
     },
-        [props.usersInfo[0], userEntriesMap, curDate]
+        [props.state.userInfo, userEntriesMap, curDate]
     );
 
     useEffect(() => {
         setCalendarField(<Spinner size="large" style={{ marginTop: 20 }} />);
-        if(!props.userEntries)
+        if(!props.state.userEntries)
             return;
         
             const getEntries = (entries) => {
@@ -38,10 +42,10 @@ const CalendarStory = (props) => {
                 entries.map(entry => { temp[entry.date.split(' ')[0]] = entry; });
                 return temp;
             }
-            setUserEntriesMap(getEntries(props.userEntries));
-            setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getEntries(props.userEntries)}/>);
+            setUserEntriesMap(getEntries(props.state.userEntries));
+            setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getEntries(props.state.userEntries)}/>);
         },
-        [props.userEntries]
+        [props.state.userEntries]
     );
 
     return (
