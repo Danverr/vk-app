@@ -2,10 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {Epic, Root, ConfigProvider, ScreenSpinner} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
+import useAppState from "./utils/useAppState";
 import useNav from "./utils/useNav";
-import useUserToken from "./utils/useUserToken";
-import useUsersInfo from "./utils/useUsersInfo";
-import useUserEntries from "./utils/useUserEntries";
 
 import ProfilesStory from './panels/profiles/profilesStory';
 import FeedStory from "./panels/feed/feedStory";
@@ -14,50 +12,24 @@ import CalendarStory from "./panels/calendar/calendarStory";
 import SettingsStory from "./panels/settings/settingsStory";
 
 const App = () => {
+    // Состояние и навигация приложения
+    const state = useAppState();
     const nav = useNav();
-    const userToken = useUserToken();
-    const usersInfo = useUsersInfo(userToken);
-    const userEntries = useUserEntries(usersInfo);
-    const [loading, setLoading] = useState(<ScreenSpinner/>);
-    const [answer, setAnswer] = useState({
-        userId: null,
-        mood: null,
-        stress: null,
-        anxiety: null,
-        title: "",
-        note: "",
-        isPublic: 0,
-    });
-
-    // Когда загрузили данные о юзерах, добавляем id в ответ
-    useEffect(() => {
-        if (usersInfo) {
-            answer.userId = usersInfo[0].id;
-            setAnswer(answer);
-        }
-    }, [usersInfo]);
-
-    // Когда загрузили записи, убираем спиннер загрузки
-    useEffect(() => {
-        if (userEntries && usersInfo) {
-            setLoading(null);
-        }
-    }, [userEntries, usersInfo]);
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
     useEffect(() => {
         window.addEventListener('popstate', nav.goBack);
-    }, []); 
+    }, []);
 
     return (
-        <Root popout={loading}>
+        <Root popout={state.rootPopup}>
             <ConfigProvider isWebView={true}>
                 <Epic activeStory={nav.activeStory} tabbar={nav.navbar}>
-                    <FeedStory id="feed" nav={nav} user={usersInfo}/>
-                    <ProfilesStory id="profiles" nav={nav}/>
-                    <CheckInStory id="checkIn" nav={nav}/>
-                    <CalendarStory id="calendar" nav={nav}/>
-                    <SettingsStory id="settings" nav={nav}/>
+                    <FeedStory id="feed" state={state.feed} nav={nav}/>
+                    <ProfilesStory id="profiles" state={state.profiles} nav={nav}/>
+                    <CheckInStory id="checkIn" state={state.checkIn} nav={nav}/>
+                    <CalendarStory id="calendar" state={state.calendar} nav={nav}/>
+                    <SettingsStory id="settings" state={state.settings} nav={nav}/>
                 </Epic>
             </ConfigProvider>
         </Root>
