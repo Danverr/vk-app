@@ -1,42 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack, Avatar, Checkbox, FixedLayout, Separator, Counter, Button, Search, List, Group, Header } from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Avatar, List, Cell, Group, Header } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import bridge from "@vkontakte/vk-bridge";
 
-import api from '../../../utils/api'
-
-const AddedGroup = (props) => {
-    var [search, setSearch] = useState('');
-    
-    const searchFriends = () => {
-        const searchStr = search.toLowerCase();
-
-        if (!props.added)
-            return props.added;
-        return props.added.filter(({ first_name, last_name }) => (`${first_name} ${last_name}`).toLowerCase().indexOf(searchStr) > -1);
-    }
-
-    const searchedFriends = searchFriends();
-    
-    const deleteEdge = async (friend) => {
-        if (!props.userInfo) return;
-
-        const res = await api("DELETE", "/statAccess/", {
-            fromId: props.userInfo.id,
-            toId: friend.id
-        });
-        props.remove(friend);
-    }
-
+const AddedGroup = (props) => { 
     return (
         <Group header={<Header mode="secondary"> добавленные </Header>}>
-            <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
-            {
-                searchedFriends && searchedFriends.length > 0 &&
+            {   props.added != null &&
                 <List>
-                    {searchedFriends.map(friend =>
+                    {props.added.map((friend) =>
                         <Cell removable
-                            onRemove={() => {deleteEdge(friend)}}
+                            onRemove={() => {props.deleteEdge(friend)}}
                             key={friend.id}
                             before={<Avatar size={48}
                             src={friend.photo_100} />}>

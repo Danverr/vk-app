@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import bridge from "@vkontakte/vk-bridge";
 
 import Icon24UserAdd from '@vkontakte/icons/dist/24/user_add';
 import Icon24Download from '@vkontakte/icons/dist/24/download';
 import Icon24Education from '@vkontakte/icons/dist/24/education';
 
-import api from '../../utils/api'
-import FriendsPanel from './friendsPanel';
+import FriendsPanelContent from './friendsPanelContent';
 
 const SettingsStory = (props) => { 
     return (
@@ -33,7 +31,7 @@ const SettingsStory = (props) => {
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
                     Друзья
                 </PanelHeader>
-                <FriendsPanel nav = {props.nav} state = {props.state}/>
+                <FriendsPanelContent nav = {props.nav} state = {props.state}/>
             </Panel>
         </View>
     );

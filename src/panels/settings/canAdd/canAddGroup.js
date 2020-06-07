@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack, Avatar, Checkbox, FixedLayout, Separator, Counter, Button, Search, List, Group, Header } from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Cell, Avatar, Search, List, Group, Header } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import bridge from "@vkontakte/vk-bridge";
-
-import api from '../../../utils/api'
 
 const CanAddGroup = (props) => {
     var [search, setSearch] = useState('');
@@ -26,11 +23,22 @@ const CanAddGroup = (props) => {
                 <List>
                     {searchedFriends.map(friend =>
                         <Cell selectable
+                            checked = {props.waitToAdd.find((waitFriend) => waitFriend.id == friend.id)}
                             onChange={(e) => {
-                                if (e.target.checked)
-                                    props.add(friend);
-                                else
-                                    props.remove(friend);
+                                if (e.target.checked){
+                                    props.setWaitToAdd((waitToAdd) => {
+                                        let temp = [...waitToAdd];
+                                        temp.push(friend);
+                                        return temp;
+                                    });
+                                }
+                                else{
+                                    props.setWaitToAdd((waitToAdd) => {
+                                        let temp = [...waitToAdd];
+                                        temp.splice(temp.indexOf(temp.find((waitFriend) => waitFriend.id == friend.id)), 1);
+                                        return temp;
+                                    });
+                                }
                             }}
                             key={friend.id}
                             before={<Avatar size={48}
