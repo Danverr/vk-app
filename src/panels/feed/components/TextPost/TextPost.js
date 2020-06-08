@@ -22,6 +22,7 @@ import anxiety2 from '../../../../assets/emoji/anxiety/anxiety2.png'
 import anxiety3 from '../../../../assets/emoji/anxiety/anxiety3.png'
 import anxiety4 from '../../../../assets/emoji/anxiety/anxiety4.png'
 import anxiety5 from '../../../../assets/emoji/anxiety/anxiety5.png'
+import DeleteBar from '../DeleteBar/DeleteBar';
 
 const TextPost = (props) => {
     const user = props.postData.user;
@@ -53,10 +54,6 @@ const TextPost = (props) => {
     const emojiStress = stresses[stressInt - 1];
     const emojiAnxiety = anxietys[anxietyInt - 1];
 
-    const summon = () => {
-        props.postData.func(props.postData.post);
-    };
-
     return (
         <CardGrid className={s.all}>
             <Card size="l" mode="shadow">
@@ -64,7 +61,7 @@ const TextPost = (props) => {
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
                     asideContent={(user.id === currentUser.id) ?
-                        <Icon24MoreVertical onClick={summon} className={s.settingIcon} /> : null}>
+                        <Icon24MoreVertical onClick={props.postData.func} className={s.settingIcon} data-post={props.postData.post.entryId} /> : null}>
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>
 

@@ -22,16 +22,16 @@ import { platform, IOS } from '@vkontakte/vkui';
 
 const osname = platform();
 
+const renderData = (post) => { return (!post.delete) ? < TextPost postData = { post } /> : null }
+
 const Feed = (props) => {
-    const [usersPosts, setUsersPosts] = useState(null);
     const [posts, setPosts] = useState(null);
     const [curPopout, setCurPopout] = useState(null);
     const [fetching, setFetching] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState('feed');
     const [postWasDeleted, setPostWasDeleted] = useState(null);
-    const [lastPost, setLastPost] = useState(null);
-    const [allPostsArray, setAllPostsArray] = useState(null);
+    const [displayPosts, setDisplayPosts] = useState(null);
 
     useEffect(() => {
         props.state.fetchFriendsInfo();
@@ -43,7 +43,26 @@ const Feed = (props) => {
 
     useEffect(() => {
         if (!props.state.entries || !props.state.usersInfo || props.state.usersInfo.length !== props.state.entries.length) return;
-        const temp = [];
+
+        //const createPost = () => {
+        //    api("POST", "/entries/", {
+        //        userId: "505643430",
+        //        mood: "3",
+        //        stress: "2",
+        //        anxiety: "3",
+        //        isPublic: "1",
+        //        title: "Обычный день, чо",
+        //        note: "Привет, Даня!",
+        //    });
+        //};
+        //createPost();
+
+
+        if (postWasDeleted) {
+            finallyDeletePost(postWasDeleted.props.id);
+            setPostWasDeleted(null);
+        }
+        console.log(postWasDeleted);
         const vita = [];
         props.state.usersInfo.map((user, i) => {
             if ((mode == 'feed') || (mode == 'diary' && user === props.state.userInfo)) {
@@ -51,40 +70,56 @@ const Feed = (props) => {
                     const obj = {
                         user: user, post: post, currentUser: props.state.usersInfo[0], func: changeLastPost,
                     }
-                    temp.push(<TextPost postData={obj} />);
                     vita.push(obj);
                 });
             }
         });
-        setAllPostsArray(vita);
-        setPosts(temp);
+        setPosts(vita);
+        setDisplayPosts(vita.map(renderData));
     }, [props.state.entries]);
 
-    useEffect(() => {
-        if (!lastPost) return;
+    const finallyDeletePost = (id) => {
+        api("DELETE", "/entries/", { entryId: id });
+    };
+
+    
+
+    const deletePost = (id) => {
         debugger;
-        setCurPopout(<ActionSheet onClose={() => { setCurPopout(null); }}>
+        const vita = [];
+
+        for (const i in posts) {
+            const obj = Object.assign({}, posts[i]);
+            if (obj.post.entryId === id) {
+                obj.delete = 1;
+            }
+            vita.push(obj);
+        }
+
+        setPosts(vita);
+        setDisplayPosts(vita.map(renderData));
+
+        const summon = () => { finallyDeletePost(id); }
+        
+
+        setPostWasDeleted(
+            <DeleteBar reconstruction={() => { setPostWasDeleted(null); }} goDeletePost={summon} id={id} />
+        );
+    }
+
+    const changeLastPost = (e) => {
+        const id = Number.parseInt(e.currentTarget.dataset.post);
+        const summon = () => { deletePost(id) };
+        debugger;
+        setCurPopout(<ActionSheet onClose={() => { setCurPopout(null); }} >
             <ActionSheetItem onClick={() => { alert("YES!") }} autoclose>
                 Редактировать пост
                 </ActionSheetItem>
-            <ActionSheetItem /*onClick={deletePost}*/ autoclose mode="destructive">
+            <ActionSheetItem onClick={summon} autoclose mode="destructive">
                 Удалить пост
                 </ActionSheetItem>
             {osname === IOS && <ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}
         </ActionSheet>);
-    }, [lastPost]);
-
-    const changeLastPost = (post) => {
-        debugger;
-
-
-        if (!lastPost) {
-            setLastPost({ flag: 0, post: post });
-        } else {
-            setLastPost({ flag: !lastPost.flag, post: post })
-        }
-
-
     }
 
     const toggleContext = () => {
@@ -110,12 +145,12 @@ const Feed = (props) => {
             onSwipeBack={props.nav.goBack}
         >
             <Panel id='main'>
-                {console.log(lastPost)}
                 <PanelHeader separator={false}>
                     <PanelHeaderContent onClick={toggleContext} aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
+                {console.log(posts)}
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext} >
                     <List>
                         <Cell before={<Icon28Newsfeed />} data-mode='feed' onClick={select} asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}>
@@ -127,8 +162,9 @@ const Feed = (props) => {
                     </List>
                 </PanelHeaderContext>
                 <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
-                    {posts}
+                    {displayPosts}
                 </PullToRefresh>
+                {postWasDeleted}
             </Panel>
         </View>
     )
