@@ -46,11 +46,8 @@ const FriendsPanelContent = (props) => {
 
         //ребро успешно удалено
         if (deleteEdgePromise.status == 204) {
-            let temp = [...added];
-            temp.splice(temp.indexOf(temp.find((addedFriend) => addedFriend.id == friend.id)), 1);
-            setAdded(temp);
-            temp = [...canAdd, friend];
-            setCanAdd(temp.sort((a, b) => {
+            setAdded(added.filter((addedFriend) => addedFriend.id != friend.id));
+            setCanAdd(([...canAdd, friend]).sort((a, b) => {
                 if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))
                     return -1;
                 else if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))

@@ -27,16 +27,12 @@ const CanAddGroup = (props) => {
                             onChange={(e) => {
                                 if (e.target.checked){
                                     props.setWaitToAdd((waitToAdd) => {
-                                        let temp = [...waitToAdd];
-                                        temp.push(friend);
-                                        return temp;
+                                        return [...waitToAdd, friend];
                                     });
                                 }
                                 else{
                                     props.setWaitToAdd((waitToAdd) => {
-                                        let temp = [...waitToAdd];
-                                        temp.splice(temp.indexOf(temp.find((waitFriend) => waitFriend.id == friend.id)), 1);
-                                        return temp;
+                                        return waitToAdd.filter((waitFriend) => waitFriend.id != friend.id);
                                     });
                                 }
                             }}
