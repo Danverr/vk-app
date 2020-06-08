@@ -37,7 +37,7 @@ const TextPost = (props) => {
     const currentUser = props.postData.currentUser;
 
     const moodInt = Number.parseInt(props.postData.post.mood);
-// тк с сервака мне пока не удалось получить записи с интами, оставил парсинг
+    // тк с сервака мне пока не удалось получить записи с интами, оставил парсинг
     const stressInt = Number.parseInt(props.postData.post.stress);
     const anxietyInt = Number.parseInt(props.postData.post.anxiety);
 
@@ -63,7 +63,7 @@ const TextPost = (props) => {
 
                 <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
                     before={<Avatar size={40} src={userAva} />}
-                    asideContent={(user.id === currentUser.id) ? 
+                    asideContent={(user.id === currentUser.id) ?
                         <Icon24MoreVertical onClick={summon} className={s.settingIcon} /> : null}>
                     {`${user.first_name} ${user.last_name}`}
                 </Cell>
@@ -76,34 +76,39 @@ const TextPost = (props) => {
                         {text}
                     </Text>
 
-                    <div className={s.par}>
-
-                        <Text weight='medium' className={s.parName}> Настроение </Text>
-                        <Progress value={mood} className={s.parProgress} />
-
-                        <div className={s.emoji} >
-                            <img src={emojiMood} >
+                    <div className={s.emojiTegsField}>
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiMood} className={s.emoji}>
                             </img>
+                            <Text className={s.emojiTegText}>
+                                Настроение
+                            </Text>
                         </div>
 
-                        <Text weight='medium' className={s.parName}> Стресс </Text>
-                        <Progress value={stress} className={s.parProgress} />
-                        <div className={s.emoji} >
-                            <img src={emojiStress} >
+
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiStress} className={s.emoji}>
                             </img>
+                            <Text className={s.emojiTegText}>
+                                Стресс
+                            </Text>
                         </div>
 
-                        <Text weight='medium' className={s.parName}> Тревожность </Text>
-                        <Progress value={anxiety} className={s.parProgress} />
-                        <div className={s.emoji} >
-                            <img src={emojiAnxiety} >
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiAnxiety} className={s.emoji}>
                             </img>
+                            <Text className={s.emojiTegText}>
+                                Тревожность
+                            </Text>
                         </div>
+
+                     
 
                     </div>
 
 
                 </div>
+
 
 
 
@@ -114,3 +119,4 @@ const TextPost = (props) => {
 }
 
 export default TextPost;
+

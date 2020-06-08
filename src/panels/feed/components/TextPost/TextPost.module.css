@@ -16,42 +16,43 @@
     margin-top: 6px;
 }
 
-.par {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 15fr 1fr;
-    grid-template-rows: 40px 40px 40px;
-}
-
-.parName {
-    margin-right: 16px;
-    display: flex;
-    align-items: center;
-    font-size: 80%;
-}
-
-.parProgress {
-    background-color: white;
-    display: flex;
-    align-items: center;
-    margin-right: 5px;
-}
-
-.emoji {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-}
-
 .settingIcon{
     display: flex;
-
 }
 
 .title{
     margin-bottom: 6px;
 }
 
+.emojiTegContainer {
+    margin-right: 8px;
+    margin-top: 8px;
+    display: inline-flex;
+    border: 1px solid rgb(144,148,153);
+    width: auto;
+    flex-direction: row;
+    border-radius: 50px;
+    height: 25px;
+}
 
+.emoji {
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-top: 2px;
+    width: 20px;
+    height: 20px;
+}
 
+.emojiTegText {
+    font-size: 85%;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: rgb(144,148,153);
+    margin-right: 5px;
+}
 
+.emojiTegsField{
+    flex-wrap: wrap;
+    margin-top: 10px;
+    display: flex;
+}

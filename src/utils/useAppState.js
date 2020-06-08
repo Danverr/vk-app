@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ScreenSpinner} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
+import DeleteBar from '../panels/feed/components/DeleteBar/DeleteBar';
 
 const APP_ID = 7424071;
 
@@ -10,7 +11,9 @@ function useAppState() {
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [friendsInfo, setFriendsInfo] = useState(null);
-    const [rootPopup, setRootPopup] = useState(<ScreenSpinner/>);
+    const [rootPopup, setRootPopup] = useState(<ScreenSpinner />);
+
+    const [allEntries, setAllEntries] = useState(null);
 
     const fetchUserToken = () => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -38,6 +41,8 @@ function useAppState() {
     };
 
     const fetchFriendsInfo = async () => {
+        if (!userInfo || !userToken) return;
+
         // ID друзей к которым есть доступ
         const friendsIdsPromise = await api("GET", "/statAccess/", {
             toId: userInfo.id,
@@ -62,11 +67,30 @@ function useAppState() {
     };
 
     const fetchEntries = async () => {
+        if (!userInfo) return;
+
         const entriesPromise = await api("GET", "/entries/", {
             userId: userInfo.id,
         });
 
         setUserEntries(entriesPromise.data);
+    };
+
+    const fetchAllEntries = async () => {
+        if (!userInfo || !userToken || !friendsInfo) return;
+
+        const fetchUsersEntries = async (promises) => {
+            const result = await Promise.all(promises);
+            setAllEntries(result);
+        };
+
+        const allUsers = [userInfo, ...friendsInfo];
+        const postsPromises = [];
+        allUsers.map((user, i) => {
+            postsPromises.push(api("GET", "/entries/", { userId: user.id }));
+        })
+
+        fetchUsersEntries(postsPromises);
     };
 
     useEffect(() => {
@@ -86,7 +110,15 @@ function useAppState() {
     return {
         rootPopup: rootPopup,
 
-        feed: null,
+        feed: {
+            fetchFriendsInfo: fetchFriendsInfo,
+            userInfo: userInfo,
+            userToken: userToken,
+            fetchEntries: fetchAllEntries,
+            entries: allEntries,
+            friendsInfo: friendsInfo,
+            usersInfo: (userInfo && friendsInfo ? [userInfo, ...friendsInfo] : null)
+        },
         profiles: {
             fetchFriendsInfo: fetchFriendsInfo,
             activeUserProfile: activeUserProfile,

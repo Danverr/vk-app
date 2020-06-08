@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import s from './DeleteBar.module.css'
 
 import { Snackbar } from '@vkontakte/vkui';
@@ -14,7 +14,7 @@ const Clock = () => {
 
     const recursion = () => {
         if (!timeLeft) return;
-        setTimeout(() => { setTimeLeft(timeLeft - 10) }, 10);
+        setTimeout(() => { setTimeLeft(timeLeft - 10) }, 8);
     };
 
     return (
@@ -54,7 +54,7 @@ const DeleteBar = (props) => {
             action="Отменить"
             onActionClick={props.reconstruction}
             duration={Seconds}
-            before={<div> <NumberTimer /> <Clock /> </div>}
+            before={<div> <NumberTimer/> <Clock /> </div>}
         >
             Удалено
         </Snackbar>
@@ -62,3 +62,4 @@ const DeleteBar = (props) => {
 };
 
 export default DeleteBar;
+

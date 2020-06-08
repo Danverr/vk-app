@@ -25,7 +25,7 @@ const App = () => {
         <Root popout={state.rootPopup}>
             <ConfigProvider isWebView={true}>
                 <Epic activeStory={nav.activeStory} tabbar={nav.navbar}>
-                    <FeedStory id="feed" state={state.feed} nav={nav}/>
+                    <FeedStory id="feed" state={state.feed} nav={nav} />
                     <ProfilesStory id="profiles" state={state.profiles} nav={nav}/>
                     <CheckInStory id="checkIn" state={state.checkIn} nav={nav}/>
                     <CalendarStory id="calendar" state={state.calendar} nav={nav}/>
