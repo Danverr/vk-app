@@ -38,6 +38,7 @@
     "eruda-dom": "^2.0.0",
     "flare-react": "^1.0.7",
     "flickity": "^2.2.1",
+    "js-csvparser": "^1.5.0",
     "lottie-web": "^5.6.10",
     "nivo": "^0.31.0",
     "prop-types": "^15.7.2",
