@@ -56,3 +56,30 @@
     margin-top: 10px;
     display: flex;
 }
+
+.parametrText {
+    margin-right: 8px;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+.parametrProgres{
+    display: grid;
+    grid-template-rows: 1fr 5px 1fr;
+}
+
+.parametrEmoji {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    margin-left: auto;
+}
+
+
+.parametresField {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 9fr 31px;
+    grid-template-rows: 40px 40px 40px;
+}
