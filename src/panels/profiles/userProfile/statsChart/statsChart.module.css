@@ -1,6 +1,5 @@
 .chartContainer {
     padding-top: 0;
-    padding-bottom: 0;
 }
 
 .chartScroll {
@@ -11,11 +10,13 @@
     display: none;
 }
 
+/* Subhead regular */
 .tickDate {
     font-size: 14px;
     opacity: 0.5;
 }
 
+/* Subhead medium */
 .tickMonth {
     font-weight: 500;
     font-size: 14px;
@@ -26,16 +27,22 @@
     padding: 12px;
 }
 
-.tooltipCardDate {
-    font-size: 12px;
+.tooltipCard :global(.Card__in) {
+    display: flex;
+    align-items: center;
+}
+
+.tooltipCaption {
     opacity: 0.5;
 }
 
-.tooltipCardValue {
+.tooltipText {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
 }
 
-.tooltipCardValue > img {
-    margin-left: 6px;
+.tooltipCard img {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
 }

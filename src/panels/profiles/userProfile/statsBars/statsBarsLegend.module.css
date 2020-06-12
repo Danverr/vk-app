@@ -1,0 +1,8 @@
+.legendContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.legendContainer button {
+    padding: 0;
+}

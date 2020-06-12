@@ -5,12 +5,21 @@ import api from "./api";
 
 const APP_ID = 7424071;
 
-function useAppState() {
+const useAppState = () => {
     const [userEntries, setUserEntries] = useState(null);
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [friendsInfo, setFriendsInfo] = useState(null);
     const [rootPopup, setRootPopup] = useState(<ScreenSpinner/>);
+
+    const now = () => {
+        if (!userInfo) return null;
+
+        const date = new Date();
+        date.setHours(date.getUTCHours() + userInfo.timezone);
+
+        return date;
+    };
 
     const fetchUserToken = () => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -61,9 +70,14 @@ function useAppState() {
         setFriendsInfo(friendsInfoPromise.response);
     };
 
-    const fetchEntries = async () => {
+    const fetchEntries = async (timezone) => {
         const entriesPromise = await api("GET", "/entries/", {
             userId: userInfo.id,
+        });
+
+        entriesPromise.data.map((entry) => {
+            entry.date = new Date(entry.date);
+            entry.date.setHours(entry.date.getHours() + timezone);
         });
 
         setUserEntries(entriesPromise.data);
@@ -91,6 +105,8 @@ function useAppState() {
             fetchFriendsInfo: fetchFriendsInfo,
             activeUserProfile: activeUserProfile,
             setActiveUserProfile: setActiveUserProfile,
+            now: now,
+            timezone: (userInfo ? userInfo.timezone : null),
             usersInfo: (userInfo && friendsInfo ? [userInfo, ...friendsInfo] : null)
         },
         checkIn: null,

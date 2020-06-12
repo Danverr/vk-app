@@ -3,6 +3,10 @@
     flex-direction: column;
 }
 
+.loadingSpinner {
+    margin-top: 20px;
+}
+
 .contentContainer {
     display: flex;
     flex: auto;
@@ -12,11 +16,6 @@
     align-items: center;
 }
 
-.petContainer {
-    margin: auto 0;
-}
-
-.pet {
-    height: 50%;
-    max-height: 75vw;
+.avatarCell {
+    margin-bottom: 8px;
 }

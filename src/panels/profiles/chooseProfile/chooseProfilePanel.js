@@ -1,24 +1,24 @@
 import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, Group, CardGrid, Spinner} from "@vkontakte/vkui";
+import {Panel, PanelHeader, Group, CardGrid, Spinner, Header, Card} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import '@vkontakte/vkui/dist/vkui.css';
 
-import ProfileCard from "./profileCard";
-import petPreview from "./../../../assets/stickerPreview.png";
+import avatarPreview from "./../../../assets/stickerPreview.png";
 
 const ChooseProfilePanel = (props) => {
     // Преобразовываем данные в карточки
     let profileCards = [];
     if (props.usersInfo) {
         profileCards = props.usersInfo.map((info, i) =>
-            (<ProfileCard
-                key={info.id}
-                cardName={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
-                userInfo={info}
-                petPreview={petPreview}
-                setActiveUserProfile={props.setActiveUserProfile}
-                goTo={props.goTo}
-            />)
+            <Card key={info.id} size="m" mode="shadow" onClick={() => {
+                props.goToUserProfile();
+                props.setActiveUserProfile(info);
+            }}>
+                <Header level="3" weight="medium">
+                    {i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
+                </Header>
+                <img className={styles.avatarPreview} src={avatarPreview}/>
+            </Card>
         );
     }
 

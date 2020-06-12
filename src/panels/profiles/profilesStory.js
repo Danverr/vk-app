@@ -8,7 +8,7 @@ import UserProfilePanel from "./userProfile/userProfilePanel";
 const ProfilesStory = (props) => {
     useEffect(() => {
         props.state.fetchFriendsInfo();
-    }, []);
+    }, [props.userInfo]);
 
     return (
         <View
@@ -21,12 +21,14 @@ const ProfilesStory = (props) => {
             <ChooseProfilePanel
                 id="chooseProfile"
                 setActiveUserProfile={props.state.setActiveUserProfile}
-                goTo={() => props.nav.goTo(props.id, "userProfile")}
+                goToUserProfile={() => props.nav.goTo(props.id, "userProfile")}
                 usersInfo={props.state.usersInfo}
             />
 
             <UserProfilePanel
                 id="userProfile"
+                now={props.state.now}
+                timezone={props.state.timezone}
                 userInfo={props.state.activeUserProfile}
             />
 

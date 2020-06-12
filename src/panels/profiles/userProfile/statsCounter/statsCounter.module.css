@@ -1,0 +1,35 @@
+.flexContainer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding-top: 0;
+}
+
+.flexGroup {
+    display: flex;
+    align-items: center;
+}
+
+:global(.recharts-surface) {
+    overflow: visible;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    padding-left: 8px;
+}
+
+.textContainer :global(.Title) {
+    margin-bottom: 6px;
+    font-size: 32px;
+}
+
+.textContainer :global(.Subhead) {
+    opacity: 0.5;
+}
+
+/* Subhead regular */
+.pieLabel {
+    font-size: 14px;
+}
