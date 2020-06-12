@@ -1,33 +1,27 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Cell, CardGrid, Progress, Avatar, Card, Text, Subhead, InfoRow } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
-import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import emojiList from '../../../../assets/emoji/emojiList.js';
 
 const TextPost = (props) => {
     const [odd, setOdd] = useState(0);
-    const user = props.postData.user;
-    const unDate = props.postData.post.date;
 
-    const date = {
-        day: getDate(new Date(unDate)),
-        month: getMonth(new Date(unDate)) + 1,
-        hour: getHours(new Date(unDate)),
-        minute: getMinutes(new Date(unDate))
-    };
+    const dat = props.postData;;
+    const user = dat.user;
 
-    const description = props.postData.post.title;
-    const text = props.postData.post.note;
+    const dateField = dat.post.dateField;
+    const description = dat.post.title;
+    const text = dat.post.note;
 
     const userAva = user.photo_100;
-    const currentUser = props.postData.currentUser;
+    const currentUser = dat.currentUser;
 
-    const moodInt = Number.parseInt(props.postData.post.mood);
-    const stressInt = Number.parseInt(props.postData.post.stress);
-    const anxietyInt = Number.parseInt(props.postData.post.anxiety);
+    const moodInt = Number.parseInt(dat.post.mood);
+    const stressInt = Number.parseInt(dat.post.stress);
+    const anxietyInt = Number.parseInt(dat.post.anxiety);
 
     const mood = moodInt * 20;
     const stress = stressInt * 20;
@@ -38,8 +32,8 @@ const TextPost = (props) => {
     const emojiAnxiety = emojiList.anxiety[anxietyInt - 1];
 
     const summon = () => {
-        const equal = { flag: odd, post: props.postData.post };
-        props.postData.setLastPost(equal);
+        const equal = { flag: odd, post: dat.post };
+        dat.setLastPost(equal);
         setOdd(!odd);
     }
 
@@ -47,37 +41,37 @@ const TextPost = (props) => {
         <CardGrid className={s.all}>
             <Card size="l" mode="shadow">
 
-                <Cell className={s.reference} description={<Text> {date.day} {date.month} {date.hour}:{date.minute} </Text>}
+                <Cell className={s.reference} description={<Text> {dateField} </Text>}
                     before={<Avatar size={40} src={userAva} />}
                     asideContent={(user.id === currentUser.id) ?
-                        <Icon24MoreVertical onClick={summon} className={s.settingIcon} data-post={props.postData.post.entryId} /> : null}>
+                        <Icon24MoreVertical onClick={summon} className={s.settingIcon} data-post={dat.post.entryId} /> : null}>
                     {<Text> {user.first_name} {user.last_name} </Text>}
                 </Cell>
 
-                <div className={s.content}>
-                    <Subhead weight='semibold' className={s.title}>
+                {(description !== "" || text !== "") ? <div className={s.content}>
+                    <Subhead weight='bold' className={s.title}>
                         {description}
                     </Subhead>
-                    <Text weight='medium'>
+                    <Text weight='regular'>
                         {text}
                     </Text>
 
-                </div>
+                </div> : null}
+
 
                 <div className={s.parametresField}>
-
                     <div className={s.parametrText}>
                         <div></div>
-                        <Text weight='medium' style={{ 'fontSize': '90%' }}> Настроение </Text>
+                        <Text weight='regular' style={{ 'fontSize': '85%' }}> Настроение </Text>
                         <div></div>
                     </div>
                     <div className={s.parametrProgres}> <div></div> <Progress value={mood} /> <div></div> </div>
-                    <div className={s.parametrEmoji}> <div></div> <img src={emojiMood}/> < div ></div> </div>
+                    <div className={s.parametrEmoji}> <div></div> <img src={emojiMood} /> < div ></div> </div>
 
 
                     <div className={s.parametrText}>
                         <div></div>
-                        <Text weight='medium' style={{ 'fontSize': '90%' }}> Стресс </Text>
+                        <Text weight='regular' style={{ 'fontSize': '85%' }}> Стресс </Text>
                         <div></div>
                     </div>
                     <div className={s.parametrProgres}> <div></div> <Progress value={stress} /> <div></div> </div>
@@ -86,13 +80,12 @@ const TextPost = (props) => {
 
                     <div className={s.parametrText}>
                         <div></div>
-                        <Text weight='medium' style={{ 'fontSize': '90%' }}> Тревожность </Text>
+                        <Text weight='regular' style={{ 'fontSize': '85%' }}> Тревожность </Text>
                         <div></div>
                     </div>
                     <div className={s.parametrProgres}> <div></div> <Progress value={anxiety} /> <div></div> </div>
 
                     <div className={s.parametrEmoji}> <div></div> <img src={emojiAnxiety} /> < div ></div> </div>
-
                 </div>
 
 

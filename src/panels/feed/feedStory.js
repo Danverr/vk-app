@@ -11,7 +11,6 @@ import TextPost from './components/TextPost/TextPost.js';
 import DeleteBar from './components/DeleteBar/DeleteBar.js';
 
 import api from '../../utils/api'
-import { Array } from 'core-js';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';
@@ -22,31 +21,19 @@ import { platform, IOS } from '@vkontakte/vkui';
 
 const osname = platform();
 
-const createPost = () => {
+const createPost = async () => {
     api("POST", "/entries/", {
         userId: "505643430",
-        mood: "3",
-        stress: "2",
-        anxiety: "3",
+        mood: "5",
+        stress: "1",
+        anxiety: "1",
         isPublic: "1",
-        title: "Обычный день, чо",
-        note: "Привет, Даня!",
+        title: "День норм",
+        note: "",
     });
 };
 
 const renderData = (post) => { return (!post.delete) ? < TextPost postData={post} /> : null }
-
-const cmp = (left, right) => {
-    const l = new Date(left.post.date);
-    const r = new Date(right.post.date);
-    if (l < r) {
-        return 1;
-    }
-    if (l > r) {
-        return -1;
-    }
-    return 0;
-}
 
 const Action = (props) => {
     const deletePost = () => {
@@ -94,27 +81,17 @@ const Feed = (props) => {
     }, [props.state.friendsInfo, mode, fetching]);
 
     useEffect(() => {
-        if (!props.state.entries || !props.state.usersInfo || props.state.usersInfo.length !== props.state.entries.length) return;
-        if (postWasDeleted) finallyDeletePost(lastPost);
-        const vita = [];
-        props.state.usersInfo.map((user, i) => {
-            if ((mode == 'feed') || (mode == 'diary' && user === props.state.userInfo)) {
-                props.state.entries[i].data.map((post, j) => {
-                    const obj = {
-                        user: user,
-                        post: post,
-                        currentUser: props.state.usersInfo[0],
-                        setLastPost: setLastPost,
-                        lastPost: lastPost,
-                    }
-                    vita.push(obj);
-                });
+        if (!props.state.entries) return;
+        const newPosts = [];
+        props.state.entries.map((e, i) => {
+            if (mode === "feed" || (mode === "diary" && e.user === props.state.userInfo)) {
+                const currentPost = Object.assign({}, e);
+                currentPost.setLastPost = setLastPost;
+                newPosts.push(currentPost);
             }
         });
-        vita.sort(cmp);
-        setPosts(vita);
-        setDisplayPosts(vita.map(renderData));
-        //createPost();
+        setPosts(newPosts);
+        setDisplayPosts(newPosts.map(renderData));
     }, [props.state.entries]);
 
     useEffect(() => {
@@ -138,7 +115,7 @@ const Feed = (props) => {
     const finallyDeletePost = (post) => {
         if (!post) return;
         setPostWasDeleted(null);
-        api("DELETE", "/entries/", { entryId: post.post.entryId });
+        props.state.deleteEntrie(post.post.entryId);
     };
 
     const toggleContext = () => {
@@ -146,12 +123,20 @@ const Feed = (props) => {
     };
 
     const select = (e) => {
+        if (e === mode) {
+            toggleContext();
+            return;
+        }
         setDisplayPosts(null);
         setMode(e);
         toggleContext();
     };
 
     const onRefresh = () => {
+        if (postWasDeleted) {
+            setPostWasDeleted(null);
+            finallyDeletePost(lastPost);
+        }
         setFetching(1);
         setTimeout(() => { setFetching(null) }, 1000);
     };

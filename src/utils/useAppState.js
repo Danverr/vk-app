@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ScreenSpinner} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
-import DeleteBar from '../panels/feed/components/DeleteBar/DeleteBar';
+import { getDateDescription, setf } from './chrono.js'
 
 const APP_ID = 7424071;
 
@@ -13,7 +13,8 @@ function useAppState() {
     const [friendsInfo, setFriendsInfo] = useState(null);
     const [rootPopup, setRootPopup] = useState(<ScreenSpinner />);
 
-    const [allEntries, setAllEntries] = useState(null);
+    const [entriesPromises, setEntriesPromises] = useState(null);
+    const [allUsersEntries, setAllUsersEntries] = useState(null);
 
     const fetchUserToken = () => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -38,6 +39,10 @@ function useAppState() {
         let userInfo = await bridge.send('VKWebAppGetUserInfo');
         userInfo["isCurrentUser"] = true;
         setUserInfo(userInfo);
+    };
+
+    const deleteEntrie = (id) => {
+        api("DELETE", "/entries/", { entryId: id });
     };
 
     const fetchFriendsInfo = async () => {
@@ -81,7 +86,7 @@ function useAppState() {
 
         const fetchUsersEntries = async (promises) => {
             const result = await Promise.all(promises);
-            setAllEntries(result);
+            setEntriesPromises(result);
         };
 
         const allUsers = [userInfo, ...friendsInfo];
@@ -92,6 +97,40 @@ function useAppState() {
 
         fetchUsersEntries(postsPromises);
     };
+
+    useEffect(() => {
+        if (!entriesPromises || !userInfo || (1 + friendsInfo.length !== entriesPromises.length)) return;
+        if (!entriesPromises[0].data) return;
+        const newPosts = [];
+        const now = new Date();
+        const allUsers = [userInfo, ...friendsInfo];
+        allUsers.map((user, i) => {
+            entriesPromises[i].data.map((post, j) => {
+                const postDate = new Date(post.date);
+                postDate.setHours(postDate.getHours() + userInfo.timezone);
+                post.dateField = getDateDescription(postDate, now);
+                const obj = {
+                    user: user,
+                    post: post,
+                    currentUser: userInfo,
+                }
+                newPosts.push(obj);
+            })
+        })
+        const cmp = (left, right) => {
+            const l = new Date(left.post.date);
+            const r = new Date(right.post.date);
+            if (l < r) {
+                return 1;
+            }
+            if (l > r) {
+                return -1;
+            }
+            return 0;
+        }
+        newPosts.sort(cmp);
+        setAllUsersEntries(newPosts);
+    }, [entriesPromises]);
 
     useEffect(() => {
         const initAppState = async () => {
@@ -111,11 +150,12 @@ function useAppState() {
         rootPopup: rootPopup,
 
         feed: {
+            deleteEntrie: deleteEntrie,
             fetchFriendsInfo: fetchFriendsInfo,
             userInfo: userInfo,
             userToken: userToken,
             fetchEntries: fetchAllEntries,
-            entries: allEntries,
+            entries: allUsersEntries,
             friendsInfo: friendsInfo,
             usersInfo: (userInfo && friendsInfo ? [userInfo, ...friendsInfo] : null)
         },

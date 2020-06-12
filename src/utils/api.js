@@ -5,7 +5,7 @@ const instance = axios.create({
     baseURL: "https://vk-app-server.herokuapp.com/",
     responseType: "json",
     timeout: 10000,
-    headers: {
+    headers: {  
         "X-VK-SIGN": window.location.search,
     },
 });

@@ -14,7 +14,7 @@ const Clock = () => {
 
     const recursion = () => {
         if (!timeLeft) return;
-        setTimeout(() => { setTimeLeft(timeLeft - 10) }, 7.5);
+        setTimeout(() => { setTimeLeft(timeLeft - 40) }, 40);
     };
 
     return (
@@ -62,7 +62,7 @@ const DeleteBar = (props) => {
             duration={Seconds}
             before={<Clock/>}
         >
-            Удалено
+            Пост удалён
         </Snackbar>
     )
 };
