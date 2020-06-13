@@ -4,7 +4,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import Navigation from './Navigation'
 import Weekdays from './Weekdays';
 import TileGroup from './TileGroup'
-import './Calendar.css';
+
 import { getPreviousMonthStart, getNextMonthStart, getMonth, getYear } from '@wojtekmaj/date-utils';
 
 const Calendar = (props) => {

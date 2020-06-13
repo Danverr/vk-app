@@ -2,6 +2,7 @@ import React from 'react';
 import { Text } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import { getDate } from '@wojtekmaj/date-utils';
+import s from './Calendar.module.css';
 
 const Tile = (props) => {
     const {
@@ -33,10 +34,10 @@ const Tile = (props) => {
     }
 
     return (
-        <div className='tile' onClick={() => { props.onClickTile(props.date) }}>
-            <div className='border' style={borderStyle}>
-                <div className='container' style = {containerStyle}>
-                    <div className='circle' style = {circleStyle}> {(props.date != null) ? getDate(props.date) : null} </div>
+        <div className={s.tile} onClick={() => { props.onClickTile(props.date) }}>
+            <div className={s.border} style={borderStyle}>
+                <div className={s.container} style = {containerStyle}>
+                    <div className={s.circle} style = {circleStyle}> {(props.date != null) ? getDate(props.date) : null} </div>
                 </div>
             </div>
         </div>

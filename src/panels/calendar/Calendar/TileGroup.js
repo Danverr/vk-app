@@ -3,6 +3,7 @@ import { Text } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import { getDate, getYear, getMonth, getMonthStart, getNextDayStart, getNextMonthStart } from '@wojtekmaj/date-utils';
 import Tile from './Tile'
+import s from './Calendar.module.css';
 
 const TileGroup = (props) => {
     let[activeTile, setActiveTile] = useState(new Date());
@@ -32,7 +33,7 @@ const TileGroup = (props) => {
     }
 
     return (
-        <div className = 'tile-group'>
+        <div className = {s.tileGroup}>
             {Tiles}
         </div>
     );
