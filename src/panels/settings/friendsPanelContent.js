@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Div, FixedLayout, Counter, Button,  } from '@vkontakte/vkui';
+import { Div, FixedLayout, Counter, Button, PanelHeader, PanelHeaderBack } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import api from '../../utils/api'

@@ -1,46 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack, File, FormLayout, Input } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Icon24UserAdd from '@vkontakte/icons/dist/24/user_add';
-import Icon24Download from '@vkontakte/icons/dist/24/download';
 import Icon24Education from '@vkontakte/icons/dist/24/education';
-import Icon24Document from '@vkontakte/icons/dist/24/document';
+import Icon24Upload from '@vkontakte/icons/dist/24/upload';
+
 import FriendsPanelContent from './friendsPanelContent';
+import DaylioPanelContent from './daylioPanelContent';
 import api from '../../utils/api';
 
 const SettingsStory = (props) => {
-    const fileInputRef = useRef(null);
-
-    const importEntries = async (files) => {
-        let reader = new FileReader();
-        reader.readAsText(files[0]);
-
-        reader.onload = () => {
-            if (!props.state.userInfo)
-                return;
-            const csvparse = require('js-csvparser');
-            const entries = csvparse(reader.result).data;
-            const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
-
-            entries.map(async (entry) => {
-                let mood = moods.indexOf(entry[4]) + 1;
-                if (mood >= 1 && mood <= 5) {
-                    await api("POST", "/entries/", {
-                        userId: props.state.userInfo.id,
-                        mood: mood,
-                        stress: mood,
-                        anxiety: mood,
-                        isPublic: 1,
-                        title: "",
-                        note: entry[6],
-                        date: `${entry[0]} ${entry[3]}:00`
-                    });
-                }
-            });
-        };
-    }
-
     return (
         <View id={props.id}
             activePanel={props.nav.activePanel}
@@ -56,9 +26,7 @@ const SettingsStory = (props) => {
                 <Cell asideContent={<Switch />}>
                     Уведомления о здоровье друзей
                 </Cell>
-                <FormLayout>
-                    <File top="Импортировать записи из Daylio" before={<Icon24Document />} controlSize="l" getRef={fileInputRef} accept={".csv"} onChange={() => { importEntries(fileInputRef.current.files); }} />
-                </FormLayout>
+                <CellButton before={<Icon24Upload />} onClick={() => { props.nav.goTo(props.id, "daylio"); }}> Импортировать записи из Daylio </CellButton>
                 <CellButton before={<Icon24Education />}> Пройти обучение </CellButton>
             </Panel>
             <Panel id="friends">
@@ -66,6 +34,12 @@ const SettingsStory = (props) => {
                     Друзья
                 </PanelHeader>
                 <FriendsPanelContent nav={props.nav} state={props.state} />
+            </Panel>
+            <Panel id="daylio">    
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
+                    Импорт
+                </PanelHeader>      
+                <DaylioPanelContent nav={props.nav} state={props.state} />
             </Panel>
         </View>
     );

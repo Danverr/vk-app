@@ -1,0 +1,27 @@
+.circle {
+    transform: scale(-1, 1) rotate(-90deg);
+    height: 90px;
+    width: 90px;
+    position:absolute;
+    margin: auto;
+}
+
+.dialog {
+    color: rgb(63,138,224);
+    font-size: 16px;
+    justify-self: center;
+    align-self: center;
+}
+
+.timeLeft {
+    color: rgb(63,138,224);
+    font-size: 24px;
+    justify-self: center;
+    align-self: center;
+}
+
+.beforeContent{
+    width: 90px;
+    height: 90px;
+    display: grid;
+}
