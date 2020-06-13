@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
@@ -6,9 +6,8 @@ import Icon24UserAdd from '@vkontakte/icons/dist/24/user_add';
 import Icon24Education from '@vkontakte/icons/dist/24/education';
 import Icon24Upload from '@vkontakte/icons/dist/24/upload';
 
-import FriendsPanelContent from './friendsPanelContent';
-import DaylioPanelContent from './daylioPanelContent';
-import api from '../../utils/api';
+import FriendsPanelContent from './friendsPanelContent/friendsPanelContent';
+import DaylioPanelContent from './daylioPanelContent/daylioPanelContent';
 
 const SettingsStory = (props) => {
     return (

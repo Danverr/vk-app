@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Div, FixedLayout, Counter, Button, PanelHeader, PanelHeaderBack } from '@vkontakte/vkui';
+import { Div, FixedLayout, Counter, Button } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import api from '../../utils/api'
+import api from '../../../utils/api'
 
-import CanAddGroup from './canAdd/canAddGroup'
-import AddedGroup from './added/addedGroup'
+import CanAddGroup from '../canAdd/canAddGroup'
+import AddedGroup from '../added/addedGroup'
 
 const FriendsPanelContent = (props) => {
     var [canAdd, setCanAdd] = useState(null);

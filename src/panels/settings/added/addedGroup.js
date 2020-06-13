@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Avatar, List, Cell, Group, Header } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 

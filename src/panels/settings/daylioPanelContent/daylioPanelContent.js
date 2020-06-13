@@ -1,36 +1,24 @@
 import React, { useState, useRef } from 'react';
-import { PanelHeader, PanelHeaderBack, File, FormLayout, Text } from '@vkontakte/vkui';
+import { File, FormLayout } from '@vkontakte/vkui';
 
 import '@vkontakte/vkui/dist/vkui.css';
-import s from './spinner.module.css'
+import s from './daylioPanelContent.module.css'
 
+import LoadSpinner from '../loadSpinner/loadSpinner'
 import Icon24Upload from '@vkontakte/icons/dist/24/upload';
 
-import api from '../../utils/api'
+import { platform, IOS } from '@vkontakte/vkui';
+
+import api from '../../../utils/api'
+
+const osname = platform();
 
 const DaylioPanelContent = (props) => {
     const [progress, setProgress] = useState(null);
     const fileInputRef = useRef(null);
 
     const changeProgress = (a, b) => {
-        const PI = Math.PI;
-        const R = 40;
-        setProgress(
-            <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-            <div className={s.beforeContent}>
-                <Text className={s.timeLeft} weight='medium'> {`${Math.ceil(a / b * 100)}%`} </Text>
-                <svg className={s.circle}>
-                    <circle
-                        cx="45" cy="45" r={R} stroke="rgb(63,138,224)" strokeWidth="6" fill="transparent"
-                        style={{
-                            'strokeDasharray': (2 * PI * R * (a / b)).toString() + " 1000",
-                        }}
-                    />
-                </svg>        
-            </div>
-            <Text className={s.dialog} weight='medium'> {(a == b) && "Загрузка завершена"} </Text>
-            </div>
-        );
+        setProgress(<LoadSpinner a = {a} b = {b}/>);
     }
 
     const importEntries = async (files) => {
@@ -70,7 +58,7 @@ const DaylioPanelContent = (props) => {
     }
 
     return (
-        <div style={{ height: 'calc(100vh - var(--tabbar_height) - var(--panelheader_height_android))', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className = {((osname === IOS) ? s.iosContainer : s.androidContainer)}>
             <div/>
             {progress}
             <FormLayout>

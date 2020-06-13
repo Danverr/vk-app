@@ -1,0 +1,14 @@
+.androidContainer{
+    height: calc(100vh - var(--tabbar_height) - var(--panelheader_height_android));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+.iosContainer{
+    height: calc(100vh - var(--tabbar_height) - var(--panelheader_height_ios));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
