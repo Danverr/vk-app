@@ -48,13 +48,16 @@
 .container{
     height: 100%;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 50%;
     background: white;
+    position: relative;
 }  
 .circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
     justify-content: center;

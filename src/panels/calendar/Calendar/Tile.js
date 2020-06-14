@@ -27,8 +27,8 @@ const Tile = (props) => {
     }
     if (props.active){
         borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
-        circleStyle.height = '100%';
-        circleStyle.width = '100%';
+        circleStyle.height = '22px';
+        circleStyle.width = '22px';
         borderStyle.height = '20px';
         borderStyle.width = '20px';
     }
