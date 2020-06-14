@@ -24,8 +24,11 @@ const CalendarStory = (props) => {
             let month = ('0' + getMonthHuman(curDate).toString()).slice(-2);
             let day = ('0' + getDate(curDate)).slice(-2);
             
-            if (userEntriesMap[year + "-" + month + "-" + day]) 
-                setEntriesField(<TextPost postData={{ user: props.state.userInfo, post: userEntriesMap[year + "-" + month + "-" + day] }} />);
+            if (userEntriesMap[year + "-" + month + "-" + day]) {
+                let temp = [];
+                userEntriesMap[year + "-" + month + "-" + day].map((entries) => {temp.push(<TextPost postData={{ user: props.state.userInfo, post: entries }} />);});
+                setEntriesField(temp);
+            }
             else
                 setEntriesField(null);
     },
@@ -39,11 +42,31 @@ const CalendarStory = (props) => {
         
             const getEntries = (entries) => {
                 let temp = {};
-                entries.map(entry => { temp[entry.date.split(' ')[0]] = entry; });
+                entries.map(
+                    (entry) => { 
+                        let now = entry.date.split(' ')[0];
+                        if(temp[now] == null)
+                            temp[now] = [entry];
+                        else temp[now] = [...temp[now], entry];
+                    }
+                );
                 return temp;
             }
-            setUserEntriesMap(getEntries(props.state.userEntries));
-            setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} userPosts = {getEntries(props.state.userEntries)}/>);
+            let result = getEntries(props.state.userEntries);
+            setUserEntriesMap(result);
+            var daysColorsMap = {};
+            for (var day in result) {
+                let mood = 0, stress = 0, anxiety = 0;
+                result[day].map((entry) => {mood += entry.mood; stress += entry.stress; anxiety += entry.anxiety;});
+                mood /= result[day].length;
+                stress /= result[day].length;
+                anxiety /= result[day].length;
+                mood = Math.floor(mood + 0.5);
+                stress = Math.floor(stress + 0.5);
+                anxiety = Math.floor(anxiety + 0.5);
+                daysColorsMap[day] = {mood: mood, stress: stress, anxiety: anxiety};
+            }
+            setCalendarField(<Calendar onClickTile = {(date) => {setCurDate(date)}} daysColors = {daysColorsMap}/>);
         },
         [props.state.userEntries]
     );

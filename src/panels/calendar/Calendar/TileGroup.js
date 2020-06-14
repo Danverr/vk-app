@@ -20,11 +20,11 @@ const TileGroup = (props) => {
         let curDateStr = year + "-" + month + "-" + day;
 
         let curTileProps = {};
-
-        if (props.userPosts != null && props.userPosts[curDateStr] != null) {
-            curTileProps.mood = props.userPosts[curDateStr].mood - 1;
-            curTileProps.stress = props.userPosts[curDateStr].stress - 1;
-            curTileProps.anxiety = props.userPosts[curDateStr].anxiety - 1;
+        console.log(props.daysColors);
+        if (props.daysColors != null && props.daysColors[curDateStr] != null) {
+            curTileProps.mood = props.daysColors[curDateStr].mood - 1;
+            curTileProps.stress = props.daysColors[curDateStr].stress - 1;
+            curTileProps.anxiety = props.daysColors[curDateStr].anxiety - 1;
         }
         if(activeTile.toString() == cur.toString())
             curTileProps.active = true;

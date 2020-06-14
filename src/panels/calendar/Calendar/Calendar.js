@@ -14,7 +14,7 @@ const Calendar = (props) => {
         <div>
             <Navigation NavLabel = {months[getMonth(curDate)] + ' ' + getYear(curDate)} onClickPrev = {() => setCurDate(getPreviousMonthStart(curDate))} onClickNext = {() => {setCurDate(getNextMonthStart(curDate))}}/>
             <Weekdays/>
-            <TileGroup onClickTile = {props.onClickTile} curDate = {curDate} userPosts = {props.userPosts}/>
+            <TileGroup onClickTile = {props.onClickTile} curDate = {curDate} daysColors = {props.daysColors}/>
         </div>
     );
 }
