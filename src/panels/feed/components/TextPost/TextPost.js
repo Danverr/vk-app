@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { Cell, CardGrid, Progress, Avatar, Card, Text, Subhead, InfoRow } from '@vkontakte/vkui';
+import React, { useState } from 'react';
+import { Cell, CardGrid, Progress, Avatar, Card, Text, Subhead } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import emojiList from '../../../../assets/emoji/emojiList.js';
 
 const TextPost = (props) => {
-    const [odd, setOdd] = useState(0);
 
     const dat = props.postData;;
     const user = dat.user;
@@ -31,12 +30,6 @@ const TextPost = (props) => {
     const emojiStress = emojiList.stress[stressInt - 1];
     const emojiAnxiety = emojiList.anxiety[anxietyInt - 1];
 
-    const summon = () => {
-        const equal = { flag: odd, post: dat.post };
-        dat.setLastPost(equal);
-        setOdd(!odd);
-    }
-
     return (
         <CardGrid className={s.all}>
             <Card size="l" mode="shadow">
@@ -44,7 +37,7 @@ const TextPost = (props) => {
                 <Cell className={s.reference} description={<Text> {dateField} </Text>}
                     before={<Avatar size={40} src={userAva} />}
                     asideContent={(user.id === currentUser.id) ?
-                        <Icon24MoreVertical onClick={summon} className={s.settingIcon} data-post={dat.post.entryId} /> : null}>
+                        <Icon24MoreVertical onClick={() => { dat.onSettingClick(dat.post) }} className={s.settingIcon} data-post={dat.post.entryId} /> : null}>
                     {<Text> {user.first_name} {user.last_name} </Text>}
                 </Cell>
 
@@ -73,9 +66,8 @@ const TextPost = (props) => {
                         <div></div>
                         <Text weight='regular' style={{ 'fontSize': '85%' }}> Стресс </Text>
                         <div></div>
-                    </div>
+                    </div>  
                     <div className={s.parametrProgres}> <div></div> <Progress value={stress} /> <div></div> </div>
-
                     <div className={s.parametrEmoji}> <div></div> <img src={emojiStress} /> <div></div> </div>
 
                     <div className={s.parametrText}>
@@ -84,7 +76,6 @@ const TextPost = (props) => {
                         <div></div>
                     </div>
                     <div className={s.parametrProgres}> <div></div> <Progress value={anxiety} /> <div></div> </div>
-
                     <div className={s.parametrEmoji}> <div></div> <img src={emojiAnxiety} /> < div ></div> </div>
                 </div>
 

@@ -11,6 +11,9 @@ export const getDateDescription = (a, b) => {
     if (diff < 60) return "только что";
     if (diff < 60 * 60) {
         const m = Math.floor(diff / 60);
+        if (11 <= m && m <= 20) {
+            return String(m) + " минут назад";
+        }
         const mod = m % 10;
         if (mod === 1)
             return String(m) + " минуту назад";

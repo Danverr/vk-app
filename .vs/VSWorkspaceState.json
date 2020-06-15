@@ -9,6 +9,6 @@
     "\\src\\panels\\feed\\components\\TextPost",
     "\\src\\utils"
   ],
-  "SelectedNode": "\\src\\panels\\feed\\components\\TextPost\\TextPost.module.css",
+  "SelectedNode": "\\src\\utils\\chrono.js",
   "PreviewInSolutionExplorer": false
 }

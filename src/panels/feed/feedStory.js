@@ -1,15 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 
 import {
-    Panel, PanelHeader, Group, Spinner, View, ActionSheet, ActionSheetItem,
-    PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent, Snackbar, Text
+    Panel, PanelHeader, View, ActionSheet, ActionSheetItem, PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent, Text
 } from '@vkontakte/vkui';
 
-import s from './feedStory.module.css'
 import TextPost from './components/TextPost/TextPost.js';
-
 import DeleteBar from './components/DeleteBar/DeleteBar.js';
-
 import api from '../../utils/api'
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
@@ -18,8 +15,6 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 import { platform, IOS } from '@vkontakte/vkui';
-
-const osname = platform();
 
 const createPost = async () => {
     api("POST", "/entries/", {
@@ -33,44 +28,40 @@ const createPost = async () => {
     });
 };
 
+const localState = {};
+
+const setPosts = (posts) => {
+    localState.posts = posts;
+}
+
+const deletePost = (post) => {
+    localState.posts[localState.posts.findIndex((e) => (e.post.entryId === localState.lastPost.entryId))].delete = 1;
+}
+
+const reconstructionPost = (post) => {
+    localState.posts[localState.posts.findIndex((e) => (e.post.entryId === localState.lastPost.entryId))].delete = 0;
+}
+
+const osname = platform();
 const renderData = (post) => { return (!post.delete) ? < TextPost postData={post} /> : null }
 
 const Action = (props) => {
-    const deletePost = () => {
-        const newPosts = [...props.posts];
-        newPosts[newPosts.findIndex((obj) => (obj.post.entryId === props.lastPost.post.entryId))].delete = 1;
-        props.setPosts(newPosts);
-        props.setDisplayPosts(newPosts.map(renderData));
-        props.setPostWasDeleted(<DeleteBar
-            posts={props.posts}
-            setPosts={props.setPosts}
-            setDisplayPosts={props.setDisplayPosts}
-            finallyDeletePost={props.finallyDeletePost}
-            lastPost={props.lastPost}
-            renderData={renderData}
-            setLastPost={props.setLastPost}
-            setPostWasDeleted={props.setPostWasDeleted}
-        />)
-    };
-
     return (
         <ActionSheet onClose={props.onClose} >
             <ActionSheetItem onClick={() => { alert("YES!") }} autoclose> <Text> Редактировать пост </Text> </ActionSheetItem>
-            <ActionSheetItem onClick={deletePost} autoclose mode="destructive"> <Text> Удалить пост </Text>  </ActionSheetItem>
+            <ActionSheetItem onClick={props.prevDeletePost} autoclose mode="destructive"> <Text> Удалить пост </Text>  </ActionSheetItem>
             {osname === IOS && <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
         </ActionSheet>
     );
 }
 
 const Feed = (props) => {
-    const [posts, setPosts] = useState(null);
     const [curPopout, setCurPopout] = useState(null);
     const [fetching, setFetching] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState('feed');
     const [postWasDeleted, setPostWasDeleted] = useState(null);
     const [displayPosts, setDisplayPosts] = useState(null);
-    const [lastPost, setLastPost] = useState(null);
 
     useEffect(() => {
         props.state.fetchFriendsInfo();
@@ -85,37 +76,51 @@ const Feed = (props) => {
         const newPosts = [];
         props.state.entries.map((e, i) => {
             if (mode === "feed" || (mode === "diary" && e.user === props.state.userInfo)) {
-                const currentPost = Object.assign({}, e);
-                currentPost.setLastPost = setLastPost;
+                const currentPost = { ...e, onSettingClick: onSettingClick };
+                if (localState.postWasDeleted && currentPost.post.entryId === localState.lastPost.entryId) {
+                    currentPost.delete = 1;
+                }
                 newPosts.push(currentPost);
             }
         });
         setPosts(newPosts);
         setDisplayPosts(newPosts.map(renderData));
+        setFetching(null);
     }, [props.state.entries]);
 
-    useEffect(() => {
-        if (!lastPost) return;
-        if (postWasDeleted) {
-            finallyDeletePost(postWasDeleted.props.lastPost);
-            setPostWasDeleted(null);
+    const reconstructionPostOnFeed = () => {
+        localState.postWasDeleted = 0;
+        reconstructionPost(localState.lastPost);
+        setPostWasDeleted(null);
+        setDisplayPosts(localState.posts.map(renderData));
+    };
+
+    const prevDeletePost = () => {
+        localState.postWasDeleted = 1;
+        deletePost(localState.lastPost);
+        setPostWasDeleted(< DeleteBar
+            reconstructionPostOnFeed={reconstructionPostOnFeed}
+            finallyDeletePost={finallyDeletePost}
+        />);
+        setDisplayPosts(localState.posts.map(renderData));
+    }
+
+    const onSettingClick = (post) => {
+        if (localState.postWasDeleted) {
+            finallyDeletePost();
         }
+        localState.lastPost = post;
         setCurPopout(<Action
             onClose={() => { setCurPopout(null); }}
-            posts={posts}
-            setPosts={setPosts}
-            setDisplayPosts={setDisplayPosts}
-            lastPost={lastPost}
-            setPostWasDeleted={setPostWasDeleted}
-            finallyDeletePost={finallyDeletePost}
-            setLastPost={setLastPost}
+            prevDeletePost={prevDeletePost}
         />);
-    }, [lastPost]);
+    }
 
-    const finallyDeletePost = (post) => {
-        if (!post) return;
+    const finallyDeletePost = () => {
+        if (!localState.lastPost) return;
+        localState.postWasDeleted = 0;
         setPostWasDeleted(null);
-        props.state.deleteEntrie(post.post.entryId);
+        props.state.deleteEntrie(localState.lastPost.entryId);
     };
 
     const toggleContext = () => {
@@ -133,12 +138,7 @@ const Feed = (props) => {
     };
 
     const onRefresh = () => {
-        if (postWasDeleted) {
-            setPostWasDeleted(null);
-            finallyDeletePost(lastPost);
-        }
         setFetching(1);
-        setTimeout(() => { setFetching(null) }, 1000);
     };
 
     return (

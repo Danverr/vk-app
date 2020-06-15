@@ -1,24 +1,9 @@
-.deleteIcon {
-    color: rgb(360,70, 90);
-}
-
-.circle {
-    transform: scale(-1, 1) rotate(-90deg);
-    height: 24px;
-    width: 24px;
-    position:absolute;
-    margin: auto;
-}
-
-.timeLeft {
+.value {
     color: rgb(63,138,224);
-    justify-self: center;
-    align-self: center;
 }
 
-.beforeContent{
-    width: 24px;
-    height: 24px;
-    display: grid;
+.beforeContent {
+    display: flex;
+    justify-content: center;
 }
 

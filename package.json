@@ -44,6 +44,8 @@
     "prop-types": "^15.7.2",
     "qs": "^6.9.4",
     "react": "^16.13.1",
+    "react-animations": "^1.0.0",
+    "react-countdown-circle-timer": "^2.2.0",
     "react-dom": "^16.9.0",
     "react-flickity-component": "^3.5.0",
     "recharts": "^1.8.5"

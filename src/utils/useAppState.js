@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ScreenSpinner} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
-import { getDateDescription, setf } from './chrono.js'
+import { getDateDescription } from './chrono.js'
 
 const APP_ID = 7424071;
 
@@ -83,6 +83,7 @@ function useAppState() {
 
     const fetchAllEntries = async () => {
         if (!userInfo || !userToken || !friendsInfo) return;
+        // загружаем промисы записей
 
         const fetchUsersEntries = async (promises) => {
             const result = await Promise.all(promises);
@@ -101,6 +102,7 @@ function useAppState() {
     useEffect(() => {
         if (!entriesPromises || !userInfo || (1 + friendsInfo.length !== entriesPromises.length)) return;
         if (!entriesPromises[0].data) return;
+        //получаем записи из промисов 
         const newPosts = [];
         const now = new Date();
         const allUsers = [userInfo, ...friendsInfo];
