@@ -16,7 +16,7 @@ const CanAddGroup = (props) => {
     const searchedFriends = searchFriends();
 
     return (
-        <Group header={<Header mode="secondary"> добавить </Header>}>
+        <Group header={<Header mode="secondary"> предоставить доступ </Header>}>
             <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
             {
                 searchedFriends && searchedFriends.length > 0 &&
@@ -42,6 +42,7 @@ const CanAddGroup = (props) => {
                         >
                             {`${friend.first_name} ${friend.last_name}`}
                         </Cell>)}
+                    <div style = {{height: '68px'}}/>
                 </List>
             }
         </Group>

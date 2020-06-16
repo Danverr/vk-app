@@ -1,10 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { File, FormLayout } from '@vkontakte/vkui';
-
+import s from './importEntriesPanel.module.css'
 import '@vkontakte/vkui/dist/vkui.css';
-import s from './daylioPanelContent.module.css'
 
-import LoadSpinner from '../loadSpinner/loadSpinner'
+import LoadSpinner from './loadSpinner/loadSpinner'
 import Icon24Upload from '@vkontakte/icons/dist/24/upload';
 
 import { platform, IOS } from '@vkontakte/vkui';
@@ -13,12 +12,12 @@ import api from '../../../utils/api'
 
 const osname = platform();
 
-const DaylioPanelContent = (props) => {
-    const [progress, setProgress] = useState(null);
+const Daylio = (props) => {
+    const [progress, setProgress] = useState(<LoadSpinner a={0} b={1} />);
     const fileInputRef = useRef(null);
 
     const changeProgress = (a, b) => {
-        setProgress(<LoadSpinner a = {a} b = {b}/>);
+        setProgress(<LoadSpinner a={a} b={b} />);
     }
 
     const importEntries = async (files) => {
@@ -31,7 +30,7 @@ const DaylioPanelContent = (props) => {
         reader.onload = async () => {
             if (!props.state.userInfo)
                 return;
-            
+
             const csvparse = require('js-csvparser');
             const entries = csvparse(reader.result).data;
             const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
@@ -45,7 +44,7 @@ const DaylioPanelContent = (props) => {
                         mood: mood,
                         stress: 6 - mood,
                         anxiety: 6 - mood,
-                        isPublic: 1,
+                        isPublic: 0,
                         title: "",
                         note: entry[6],
                         date: `${entry[0]} ${entry[3]}:00`
@@ -58,8 +57,8 @@ const DaylioPanelContent = (props) => {
     }
 
     return (
-        <div className = {((osname === IOS) ? s.iosContainer : s.androidContainer)}>
-            <div/>
+        <div className={((osname === IOS) ? s.iosContainer : s.androidContainer)}>
+            <div />
             {progress}
             <FormLayout>
                 <File top="Для импорта данных из Daylio загрузите CSV таблицу с данными. Ее можно найти тут: Больше → Экспорт записей → CSV" before={<Icon24Upload />} controlSize="xl" getRef={fileInputRef} accept={".csv"} onChange={() => { importEntries(fileInputRef.current.files); }}>
@@ -69,4 +68,4 @@ const DaylioPanelContent = (props) => {
         </div>
     );
 }
-export default DaylioPanelContent;
+export default Daylio;

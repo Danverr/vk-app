@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Div, FixedLayout, Counter, Button } from '@vkontakte/vkui';
+import { Div, FixedLayout, Counter, Button, Panel, PanelHeader, PanelHeaderBack } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import api from '../../../utils/api'
 
-import CanAddGroup from '../canAdd/canAddGroup'
-import AddedGroup from '../added/addedGroup'
+import CanAddGroup from './canAddGroup/canAddGroup'
+import AddedGroup from './addedGroup/addedGroup'
 
-const FriendsPanelContent = (props) => {
+const FriendsPanel = (props) => {
     var [canAdd, setCanAdd] = useState(null);
     var [added, setAdded] = useState(null);
     var [waitToAdd, setWaitToAdd] = useState([]);
@@ -58,14 +58,17 @@ const FriendsPanelContent = (props) => {
     }
 
     return (
-        <div>
+        <Panel id={props.id}>
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
+                Друзья
+                </PanelHeader>
             <AddedGroup
                 added={added}
                 deleteEdge={deleteEdge}
             />
             <CanAddGroup
                 canAdd={canAdd}
-                waitToAdd = {waitToAdd}
+                waitToAdd={waitToAdd}
                 setWaitToAdd={setWaitToAdd}
             />
             <FixedLayout vertical="bottom">
@@ -79,7 +82,7 @@ const FriendsPanelContent = (props) => {
                     </Button>
                 </Div>
             </FixedLayout>
-        </div>
+        </Panel>
     );
 }
-export default FriendsPanelContent;
+export default FriendsPanel;

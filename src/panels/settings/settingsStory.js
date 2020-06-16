@@ -1,13 +1,14 @@
 import React from 'react';
-import { Panel, PanelHeader, View, Cell, Switch, CellButton, PanelHeaderBack } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Cell, CellButton, Separator, List } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import Icon24UserAdd from '@vkontakte/icons/dist/24/user_add';
-import Icon24Education from '@vkontakte/icons/dist/24/education';
-import Icon24Upload from '@vkontakte/icons/dist/24/upload';
+import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
+import Icon28PrivacyOutline from '@vkontakte/icons/dist/28/privacy_outline';
+import Icon28UploadOutline from '@vkontakte/icons/dist/28/upload_outline';
 
-import FriendsPanelContent from './friendsPanelContent/friendsPanelContent';
-import DaylioPanelContent from './daylioPanelContent/daylioPanelContent';
+import NotificationsPanel from './notificationsPanel/notificationsPanel'
+import FriendsPanel from './friendsPanel/friendsPanel';
+import ImportEntriesPanel from './importEntriesPanel/importEntriesPanel';
 
 const SettingsStory = (props) => {
     return (
@@ -18,28 +19,21 @@ const SettingsStory = (props) => {
         >
             <Panel id="main">
                 <PanelHeader separator={false} >Настройки</PanelHeader>
-                <CellButton before={<Icon24UserAdd />} onClick={() => { props.nav.goTo(props.id, "friends"); }}> Добавить из списка друзей </CellButton>
-                <Cell asideContent={<Switch />}>
-                    Напоминания о создании записи
-                </Cell>
-                <Cell asideContent={<Switch />}>
-                    Уведомления о здоровье друзей
-                </Cell>
-                <CellButton before={<Icon24Upload />} onClick={() => { props.nav.goTo(props.id, "daylio"); }}> Импортировать записи из Daylio </CellButton>
-                <CellButton before={<Icon24Education />}> Пройти обучение </CellButton>
+                <List>
+                    <Cell expandable before={<Icon28Notifications />} onClick={() => { props.nav.goTo(props.id, "notifications"); }}> Уведомления </Cell>
+                    <Cell expandable before={<Icon28PrivacyOutline />} onClick={() => { props.nav.goTo(props.id, "friends"); }}> Доступ к статистике </Cell>
+                    <Cell expandable before={<Icon28UploadOutline />} onClick={() => { props.nav.goTo(props.id, "daylio"); }}> Импорт записей </Cell>
+                </List>
+                <Separator />
+                <List>
+                    <Cell onClick={() => { console.log("ok") }}> Сбросить подсказки </Cell>
+                    <Cell onClick={() => { console.log("ok") }}> Поделиться приложением </Cell>
+                </List>
+                <CellButton> Перейти в группу </CellButton>
             </Panel>
-            <Panel id="friends">
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
-                    Друзья
-                </PanelHeader>
-                <FriendsPanelContent nav={props.nav} state={props.state} />
-            </Panel>
-            <Panel id="daylio">    
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
-                    Импорт
-                </PanelHeader>      
-                <DaylioPanelContent nav={props.nav} state={props.state} />
-            </Panel>
+            <NotificationsPanel id = "notifications" nav={props.nav} state={props.state}/>
+            <FriendsPanel id = "friends" nav={props.nav} state={props.state} />
+            <ImportEntriesPanel id = "daylio" nav={props.nav} state={props.state} />
         </View>
     );
 };
