@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 import {
@@ -13,6 +12,8 @@ import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import './feedStory.css'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import { platform, IOS } from '@vkontakte/vkui';
 
@@ -43,7 +44,11 @@ const reconstructionPost = (post) => {
 }
 
 const osname = platform();
-const renderData = (post) => { return (!post.delete) ? < TextPost postData={post} /> : null }
+const renderData = (post) => {
+    return (!post.delete) ?
+        <TextPost postData={post} />
+        : null
+}
 
 const Action = (props) => {
     return (
@@ -58,6 +63,7 @@ const Action = (props) => {
 const Feed = (props) => {
     const [curPopout, setCurPopout] = useState(null);
     const [fetching, setFetching] = useState(null);
+    const [wasUpdated, setWasUpdated] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState('feed');
     const [postWasDeleted, setPostWasDeleted] = useState(null);
@@ -69,7 +75,7 @@ const Feed = (props) => {
 
     useEffect(() => {
         props.state.fetchEntries();
-    }, [props.state.friendsInfo, mode, fetching]);
+    }, [props.state.friendsInfo, mode, wasUpdated]);
 
     useEffect(() => {
         if (!props.state.entries) return;
@@ -137,8 +143,9 @@ const Feed = (props) => {
         toggleContext();
     };
 
-    const onRefresh = () => {
+    const toggleRefresh = () => {
         setFetching(1);
+        setWasUpdated(!wasUpdated);
     };
 
     return (
@@ -166,11 +173,19 @@ const Feed = (props) => {
                             onClick={() => { select('diary') }}
                             asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}>
                             Мой дневник
-                        </Cell>
+                        </Cell> 
                     </List>
                 </PanelHeaderContext>
-                <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
-                    {displayPosts}
+                {console.log("Я рендерюсь!")}
+                <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
+
+                    <ReactCSSTransitionGroup
+                        transitionName="example"
+                        transitionEnterTimeout={500}
+                        transitionLeaveTimeout={300}>
+                        {displayPosts}
+                    </ReactCSSTransitionGroup>
+
                 </PullToRefresh>
                 {postWasDeleted}
             </Panel>

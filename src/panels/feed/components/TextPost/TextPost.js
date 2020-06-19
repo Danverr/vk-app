@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Cell, CardGrid, Progress, Avatar, Card, Text, Subhead } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import emojiList from '../../../../assets/emoji/emojiList.js';
 
@@ -66,7 +67,7 @@ const TextPost = (props) => {
                         <div></div>
                         <Text weight='regular' style={{ 'fontSize': '85%' }}> Стресс </Text>
                         <div></div>
-                    </div>  
+                    </div>
                     <div className={s.parametrProgres}> <div></div> <Progress value={stress} /> <div></div> </div>
                     <div className={s.parametrEmoji}> <div></div> <img src={emojiStress} /> <div></div> </div>
 
@@ -81,8 +82,7 @@ const TextPost = (props) => {
 
 
             </Card>
-
-        </CardGrid>
+            </CardGrid>
     );
 }
 
