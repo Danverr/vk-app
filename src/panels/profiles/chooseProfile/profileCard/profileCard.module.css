@@ -1,0 +1,14 @@
+:global(.Div) :global(.Cell__in) {
+    padding: 0;
+}
+
+.chartContainer {
+}
+
+.chartName {
+    color: var(--text_tertiary);
+}
+
+.avatarCell {
+    margin-bottom: 8px;
+}

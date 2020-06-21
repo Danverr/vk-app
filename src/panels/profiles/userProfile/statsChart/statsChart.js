@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useMemo} from 'react';
 import {Card, Div, Placeholder, Text, Caption} from '@vkontakte/vkui';
-import {AreaChart, Area, XAxis, YAxis, Tooltip} from 'recharts';
+import {AreaChart, Area, XAxis, YAxis, Tooltip, Line} from 'recharts';
 import emoji from "../../../../assets/emoji/emojiList";
 import styles from "./statsChart.module.css";
 
@@ -134,13 +134,13 @@ const StatsChart = (props) => {
         for (const param in props.stats)
             data[param] = getChartData(props.stats[param], props.now(), param);
         return data;
-    }, [props.stats]);
+    }, [props.stats, props.now]);
 
     // Если записей нет, вернем Placeholder
     if (props.stats[props.activeParam].length == 0) {
         return (
             <Placeholder header="Недостаточно записей">
-                Для отображения статистики нужно иметь хотя бы одну запись
+                Для статистики нужна хотя бы одна запись
             </Placeholder>
         );
     }
@@ -156,7 +156,7 @@ const StatsChart = (props) => {
                         </linearGradient>
                     </defs>
                     <Area connectNulls={true} dot={true} type="monotoneX" dataKey="val"
-                          stroke={chartColors[props.activeParam]} fill="url(#color)"/>
+                          stroke={chartColors[props.activeParam]} strokeWidth={2} fill="url(#color)"/>
                     <XAxis height={40} dataKey="date" reversed={true}
                            tick={<AxisTick curDate={props.now()}/>}
                            interval={0} axisLine={false} tickMargin={12}/>

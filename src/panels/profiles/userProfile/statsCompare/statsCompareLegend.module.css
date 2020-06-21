@@ -1,0 +1,31 @@
+.legendContainer {
+    display: grid;
+    width: 100%;
+    padding-bottom: 4px;
+    justify-content: center;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: 1fr 32px 1fr;
+}
+
+.legendMeanContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.legendMeanContainer h3 {
+    margin-right: 4px;
+}
+
+.legendMeanContainer img {
+    width: 24px;
+    height: 24px;
+}
+
+.legendDates {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.5;
+}

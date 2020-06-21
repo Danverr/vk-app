@@ -5,10 +5,3 @@
 .cardGroup :global(.Header__content) {
     margin: 0 auto;
 }
-
-.avatarPreview {
-    display: block;
-    width: 50%;
-    margin: 0 auto;
-    padding: 12px 0 24px;
-}

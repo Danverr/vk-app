@@ -70,6 +70,7 @@ const getCounterData = (rawStats, lastDate, param) => {
 const StatsCounter = (props) => {
     const colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
     if (props.activeParam == "mood") colors.reverse();
+
     const interval = 30; // Кол-во предыдущих дней, за которые считаем статы
 
     const lastDate = props.now();
@@ -95,7 +96,7 @@ const StatsCounter = (props) => {
     if (props.stats[props.activeParam].length == 0) {
         return (
             <Placeholder header="Недостаточно записей">
-                Для отображения счетчика нужно иметь хотя бы одну запись за последние {interval} дней
+                Для счетчика нужна хотя бы одна запись за последние {interval} дней
             </Placeholder>
         );
     }

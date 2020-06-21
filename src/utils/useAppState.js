@@ -49,7 +49,7 @@ const useAppState = () => {
     const fetchFriendsInfo = async () => {
         // ID друзей к которым есть доступ
         const friendsIdsPromise = await api("GET", "/statAccess/", {
-            toId: userInfo.id,
+            type: "fromId",
         });
 
         // Информация о друзьях

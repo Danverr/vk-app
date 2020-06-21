@@ -4,41 +4,41 @@ import styles from "./chooseProfilePanel.module.css";
 import '@vkontakte/vkui/dist/vkui.css';
 
 import avatarPreview from "./../../../assets/stickerPreview.png";
+import ProfileCard from "./profileCard/profileCard";
+import api from "../../../utils/api";
 
 const ChooseProfilePanel = (props) => {
+    const defaultStats = {
+        mood: [],
+        stress: [],
+        anxiety: [],
+    };
+
     // Преобразовываем данные в карточки
     let profileCards = [];
     if (props.usersInfo) {
         profileCards = props.usersInfo.map((info, i) =>
-            <Card key={info.id} size="m" mode="shadow" onClick={() => {
-                props.goToUserProfile();
-                props.setActiveUserProfile(info);
-            }}>
-                <Header level="3" weight="medium">
-                    {i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
-                </Header>
-                <img className={styles.avatarPreview} src={avatarPreview}/>
-            </Card>
+            <ProfileCard
+                key={info.id}
+                info={info}
+                stats={props.stats ? props.stats[info.id].meanByDays : defaultStats}
+                name={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
+                goToUserProfile={props.goToUserProfile}
+                setActiveUserProfile={props.setActiveUserProfile}
+            />
         );
-    }
-
-    // Объединяем карты в группы
-    let cardGrids = [];
-    for (let i = 0; i < profileCards.length; i += 2) {
-        cardGrids.push(<CardGrid key={i}>{[
-            profileCards[i],
-            i + 1 < profileCards.length ? profileCards[i + 1] : null,
-        ]}</CardGrid>);
     }
 
     return (
         <Panel id={props.id}>
             <PanelHeader separator={false}>Профиль</PanelHeader>
             <Group className={styles.cardGroup} separator="hide">
-                {
-                    // Ставим спиннер, пока данные о юзерах не будут загружены
-                    props.usersInfo ? cardGrids : <Spinner size="large"/>
-                }
+                <CardGrid>
+                    {
+                        // Ставим спиннер, пока данные о юзерах не будут загружены
+                        props.usersInfo && props.stats ? profileCards : <Spinner size="large"/>
+                    }
+                </CardGrid>
             </Group>
         </Panel>
     );

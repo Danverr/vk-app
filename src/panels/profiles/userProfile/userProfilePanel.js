@@ -1,120 +1,100 @@
 import React, {useState, useEffect} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
-import {Panel, PanelHeader, PanelHeaderBack, Spinner, Cell, Header, Avatar, Group, Separator} from "@vkontakte/vkui";
+import {
+    Panel, PanelHeader, PanelHeaderBack, PanelHeaderContext, PanelHeaderContent,
+    Cell, Header, Avatar, Group, List, Spinner, usePlatform, getClassName,
+} from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
-import api from "../../../utils/api";
+import emoji from "../../../assets/emoji/emojiList";
+
+import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import StatsChart from "./statsChart/statsChart";
 import StatsCounter from "./statsCounter/statsCounter";
-import StatsBars from "./statsBars/statsBars";
-import ParamSelector from "./paramSelector/paramSelector";
-
-// Меняем несколько записей за день на одну с их средним значением
-// Среди всех принятых stats
-const getMeanByDays = (stats) => {
-    let meanStats = [];
-    let date = null;
-    let sum = 0;
-    let count = 0;
-
-    for (let stat of stats) {
-        if (!date || date.getTime() != stat.date.getTime()) {
-            if (date) {
-                // Cчитаем среднее и округляем до сотых
-                meanStats.push({
-                    val: +(sum / count).toFixed(2),
-                    date: date
-                });
-
-                sum = 0;
-                count = 0;
-            }
-
-            date = stat.date;
-        }
-
-        sum += stat.val;
-        count++;
-    }
-
-    if (date) {
-        meanStats.push({
-            val: +(sum / count).toFixed(2),
-            date: date
-        });
-    }
-
-    return meanStats;
-};
-
-const formatStats = (data, timezone) => {
-    // Инициализируем переменную
-    let allStats = {
-        mood: [],
-        stress: [],
-        anxiety: []
-    };
-
-    // Группируем статы по параметрам
-    for (const stat of data) {
-        // Переводим строки в Date с нулевым временем
-        stat.date = new Date(stat.date);
-        stat.date.setHours(stat.date.getHours() + timezone);
-        stat.date.setHours(0, 0, 0, 0);
-
-        for (const param in allStats) {
-            allStats[param].push({
-                id: stat.entryId,
-                val: stat[param],
-                date: stat.date
-            });
-        }
-    }
-
-    let meanByDaysStats = {};
-
-    for (const param in allStats) {
-        // В конце должны быть новые записи
-        allStats[param].reverse();
-
-        meanByDaysStats[param] = getMeanByDays(allStats[param]);
-    }
-
-    return {
-        all: allStats,
-        meanByDays: meanByDaysStats
-    };
-};
+import StatsCompare from "./statsCompare/statsCompare";
+import api from "../../../utils/api";
 
 const UserProfilePanel = (props) => {
-    const [activeParam, setActiveParam] = useState("mood");
     let [stats, setStats] = useState(null);
+    const [contextOpened, setContextOpened] = useState(false);
+    const [activeParam, setActiveParam] = useState("mood");
+    const platform = usePlatform();
+    const iconClasses = `${getClassName("Icon", platform)} Icon--28 ${styles.contextIcon}`;
+    const params = [
+        {
+            name: "mood",
+            content: "Настроение",
+            icon: emoji.mood[0],
+        },
+        {
+            name: "stress",
+            content: "Стресс",
+            icon: emoji.stress[4],
+        },
+        {
+            name: "anxiety",
+            content: "Тревожность",
+            icon: emoji.anxiety[4],
+        },
+    ];
 
     // Загрузка статистики пользователя
     useEffect(() => {
         if (props.userInfo == null) return;
 
         api("GET", "/entries/stats/", {
-            userId: props.userInfo.id,
+            users: props.userInfo.id,
         }).then((res) => {
-            setStats(formatStats(res.data, props.timezone));
+            setStats(props.formatStats(res.data[props.userInfo.id]));
         });
     }, [props.userInfo]);
 
+    const toggleContext = () => {
+        setContextOpened(!contextOpened);
+    };
+
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false}
-                         left={<PanelHeaderBack onClick={() => window.history.back()}/>}>
-                Профиль
+            <PanelHeader
+                separator={false}
+                left={<PanelHeaderBack onClick={() => window.history.back()}/>}
+            >
+                <PanelHeaderContent
+                    aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}
+                    onClick={toggleContext}
+                >
+                    Профиль
+                </PanelHeaderContent>
             </PanelHeader>
+
+            <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
+                <List>
+                    {
+                        params.map((param) =>
+                            <Cell
+                                before={<div className={iconClasses}><img src={param.icon} className={iconClasses}/>
+                                </div>}
+                                asideContent={activeParam == param.name ? <Icon24Done fill="var(--accent)"/> : null}
+                                onClick={() => {
+                                    setActiveParam(param.name);
+                                    toggleContext();
+                                }}
+                            >
+                                {param.content}
+                            </Cell>
+                        )
+                    }
+                </List>
+            </PanelHeaderContext>
             {
-                !stats ? <Spinner className={styles.loadingSpinner} size="large"/> :
+                stats == null ? <Spinner size="large" className={styles.loadingSpinner}/> :
+
                     <>
                         <Group>
                             <Cell className={styles.avatarCell} before={<Avatar src={props.userInfo.photo_100}/>}>
                                 {`${props.userInfo.first_name} ${props.userInfo.last_name}`}
                             </Cell>
-                            <ParamSelector activeParam={activeParam} setActiveParam={setActiveParam}/>
                         </Group>
 
                         <Group header={<Header mode="secondary">Cтатистика по дням</Header>}>
@@ -126,7 +106,7 @@ const UserProfilePanel = (props) => {
                         </Group>
 
                         <Group header={<Header mode="secondary">Cравнение недель</Header>}>
-                            <StatsBars
+                            <StatsCompare
                                 stats={stats.meanByDays}
                                 activeParam={activeParam}
                                 now={props.now}

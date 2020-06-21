@@ -16,6 +16,11 @@
     align-items: center;
 }
 
+.contextIcon {
+    width: 28px;
+    height: 28px;
+}
+
 .avatarCell {
     margin-bottom: 8px;
 }

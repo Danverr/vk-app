@@ -1,3 +1,5 @@
+import thinkingFace from "./other/thinkingFace.png";
+
 import mood1 from './mood/mood1.png';
 import mood2 from './mood/mood2.png';
 import mood3 from './mood/mood3.png';
@@ -17,6 +19,7 @@ import anxiety4 from './anxiety/anxiety4.png';
 import anxiety5 from './anxiety/anxiety5.png';
 
 export default {
+    placeholder: thinkingFace,
     mood: [mood1, mood2, mood3, mood4, mood5],
     anxiety: [anxiety1, anxiety2, anxiety3, anxiety4, anxiety5],
     stress: [stress1, stress2, stress3, stress4, stress5]

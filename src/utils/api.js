@@ -2,7 +2,8 @@ import axios from "axios";
 import qs from "qs";
 
 const instance = axios.create({
-    baseURL: "https://vk-app-server.herokuapp.com/",
+    // baseURL: "https://vk-app-server.herokuapp.com/",
+    baseURL: "https://vk-app-server/",
     responseType: "json",
     timeout: 10000,
     headers: {
