@@ -13,14 +13,14 @@
 /* Subhead regular */
 .tickDate {
     font-size: 14px;
-    opacity: 0.5;
+    fill: var(--text_secondary);
 }
 
 /* Subhead medium */
 .tickMonth {
-    font-weight: 500;
     font-size: 14px;
-    opacity: 0.5;
+    text-transform: capitalize;
+    fill: var(--text_tertiary);
 }
 
 .tooltipCard {
@@ -33,11 +33,13 @@
 }
 
 .tooltipCaption {
-    opacity: 0.5;
+    margin-top: 2px;
+    color: var(--text_secondary);
 }
 
 .tooltipText {
     display: flex;
+    text-transform: capitalize;
     flex-direction: column;
 }
 

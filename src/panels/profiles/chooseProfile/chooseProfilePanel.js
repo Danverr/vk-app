@@ -1,11 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, Group, CardGrid, Spinner, Header, Card} from "@vkontakte/vkui";
+import React from 'react';
+import {Panel, PanelHeader, Group, CardGrid, Spinner} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import '@vkontakte/vkui/dist/vkui.css';
 
-import avatarPreview from "./../../../assets/stickerPreview.png";
 import ProfileCard from "./profileCard/profileCard";
-import api from "../../../utils/api";
 
 const ChooseProfilePanel = (props) => {
     const defaultStats = {

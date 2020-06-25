@@ -5,7 +5,7 @@ import {
     Cell, Header, Avatar, Group, List, Spinner, usePlatform, getClassName,
 } from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
-import emoji from "../../../assets/emoji/emojiList";
+import emoji from "../../../utils/getEmoji";
 
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -15,10 +15,47 @@ import StatsCounter from "./statsCounter/statsCounter";
 import StatsCompare from "./statsCompare/statsCompare";
 import api from "../../../utils/api";
 
+let localState = {
+    userId: null,
+    stats: null,
+    activeParam: "mood"
+};
+
 const UserProfilePanel = (props) => {
-    let [stats, setStats] = useState(null);
+    const {formatStats, userInfo} = props;
+    if (userInfo && userInfo.id !== localState.userId) {
+        localState = {
+            userId: null,
+            stats: null,
+            activeParam: "mood",
+            contextOpened: false
+        };
+    }
+
+    let [stats, setStats] = useState(localState.stats);
+    const [activeParam, setActiveParam] = useState(localState.activeParam);
     const [contextOpened, setContextOpened] = useState(false);
-    const [activeParam, setActiveParam] = useState("mood");
+
+    // Обновляем локальный стейт
+    useEffect(() => {
+        localState = {
+            userId: userInfo.id,
+            stats: stats,
+            activeParam: activeParam
+        };
+    }, [stats, activeParam, userInfo, contextOpened]);
+
+    // Загрузка статистики пользователя
+    useEffect(() => {
+        if (userInfo === null) return;
+
+        api("GET", "/entries/stats/", {
+            users: userInfo.id,
+        }).then((res) => {
+            setStats(formatStats(res.data[userInfo.id]));
+        });
+    }, [userInfo, formatStats]);
+
     const platform = usePlatform();
     const iconClasses = `${getClassName("Icon", platform)} Icon--28 ${styles.contextIcon}`;
     const params = [
@@ -38,17 +75,6 @@ const UserProfilePanel = (props) => {
             icon: emoji.anxiety[4],
         },
     ];
-
-    // Загрузка статистики пользователя
-    useEffect(() => {
-        if (props.userInfo == null) return;
-
-        api("GET", "/entries/stats/", {
-            users: props.userInfo.id,
-        }).then((res) => {
-            setStats(props.formatStats(res.data[props.userInfo.id]));
-        });
-    }, [props.userInfo]);
 
     const toggleContext = () => {
         setContextOpened(!contextOpened);
@@ -73,12 +99,14 @@ const UserProfilePanel = (props) => {
                     {
                         params.map((param) =>
                             <Cell
-                                before={<div className={iconClasses}><img src={param.icon} className={iconClasses}/>
+                                key={param.name}
+                                before={<div className={iconClasses}>
+                                    <img src={param.icon} className={iconClasses} alt=""/>
                                 </div>}
-                                asideContent={activeParam == param.name ? <Icon24Done fill="var(--accent)"/> : null}
+                                asideContent={activeParam === param.name ? <Icon24Done fill="var(--accent)"/> : null}
                                 onClick={() => {
-                                    setActiveParam(param.name);
                                     toggleContext();
+                                    setActiveParam(param.name);
                                 }}
                             >
                                 {param.content}
@@ -88,37 +116,25 @@ const UserProfilePanel = (props) => {
                 </List>
             </PanelHeaderContext>
             {
-                stats == null ? <Spinner size="large" className={styles.loadingSpinner}/> :
+                stats === null ? <Spinner size="large" className={styles.loadingSpinner}/> :
 
                     <>
                         <Group>
-                            <Cell className={styles.avatarCell} before={<Avatar src={props.userInfo.photo_100}/>}>
-                                {`${props.userInfo.first_name} ${props.userInfo.last_name}`}
+                            <Cell className={styles.avatarCell} before={<Avatar src={userInfo.photo_100}/>}>
+                                {`${userInfo.first_name} ${userInfo.last_name}`}
                             </Cell>
                         </Group>
 
                         <Group header={<Header mode="secondary">Cтатистика по дням</Header>}>
-                            <StatsChart
-                                stats={stats.meanByDays}
-                                activeParam={activeParam}
-                                now={props.now}
-                            />
+                            <StatsChart stats={stats.meanByDays} activeParam={activeParam}/>
                         </Group>
 
                         <Group header={<Header mode="secondary">Cравнение недель</Header>}>
-                            <StatsCompare
-                                stats={stats.meanByDays}
-                                activeParam={activeParam}
-                                now={props.now}
-                            />
+                            <StatsCompare stats={stats.meanByDays} activeParam={activeParam}/>
                         </Group>
 
                         <Group header={<Header mode="secondary">Счетчик</Header>}>
-                            <StatsCounter
-                                stats={stats.all}
-                                activeParam={activeParam}
-                                now={props.now}
-                            />
+                            <StatsCounter stats={stats.all} activeParam={activeParam}/>
                         </Group>
                     </>
             }

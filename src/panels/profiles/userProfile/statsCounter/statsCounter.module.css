@@ -26,7 +26,7 @@
 }
 
 .textContainer :global(.Subhead) {
-    opacity: 0.5;
+    color: var(--text_secondary);
 }
 
 /* Subhead regular */

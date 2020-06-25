@@ -1,30 +1,26 @@
 import React from 'react';
 import styles from "./statsCompareLegend.module.css";
 import {Subhead, Title} from "@vkontakte/vkui";
-import emoji from "../../../../assets/emoji/emojiList";
+import emoji from "../../../../utils/getEmoji";
+import moment from 'moment';
+import momentLocale from "moment/locale/ru";
 
-const dateFormatter = (date, now) => {
-    const months = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+moment.locale("ru", momentLocale);
 
-    // Границы недели в датах
-    const startDate = new Date(date.getTime());
-    const endDate = new Date(date.getTime());
-    endDate.setDate(endDate.getDate() + 6);
-
-    // Границы недели в строках
-    const start = `${startDate.getDate()} ${months[startDate.getMonth()]}`;
-    const end = `${endDate.getDate()} ${months[endDate.getMonth()]}`;
+const dateFormatter = (date) => {
+    const startDate = moment(date);
+    const endDate = moment(date).add(6, "days");
 
     let years = "";
-    if (startDate.getFullYear() != endDate.getFullYear()) {
-        years = `${startDate.getFullYear()} - ${endDate.getFullYear()}`;
-    } else if (startDate.getFullYear() != now().getFullYear()) {
-        years = `${startDate.getFullYear()}`;
+    if (!startDate.isSame(endDate, "year")) {
+        years = `${startDate.year()} - ${endDate.year()}`;
+    } else if (!startDate.isSame(moment(), "year")) {
+        years = startDate.format("YYYY");
     }
 
     return (
         <div className={styles.legendDates}>
-            <Subhead weight="regular">{`${start} - ${end}`}</Subhead>
+            <Subhead weight="regular">{`${startDate.format("D MMM")} - ${endDate.format("D MMM")}`}</Subhead>
             <Subhead weight="regular">{years}</Subhead>
         </div>
     );
@@ -33,7 +29,7 @@ const dateFormatter = (date, now) => {
 const getWeekMean = (data, activeParam) => {
     let mean = "????";
     let meanEmoji = emoji.placeholder;
-    const dataKeys = data == undefined ? [] : Object.keys(data);
+    const dataKeys = data === undefined ? [] : Object.keys(data);
 
     if (dataKeys.length) {
         mean = dataKeys.reduce((sum, key) => sum + data[key], 0) / dataKeys.length;
@@ -43,29 +39,27 @@ const getWeekMean = (data, activeParam) => {
 
     return (
         <div className={styles.legendMeanContainer}>
-            <Title level="3" weight="regular">{mean}</Title>
-            <img src={meanEmoji}/>
+            <Title level="3" weight="medium">{mean}</Title>
+            <img src={meanEmoji} alt=""/>
         </div>
     );
 };
 
 const StatsCompareLegend = (props) => {
     const {selectedWeekDate} = props;
-    const prevWeekDate = new Date(selectedWeekDate.getTime());
-    prevWeekDate.setDate(prevWeekDate.getDate() - 7);
-
+    const prevWeekDate = moment(selectedWeekDate).subtract(1, "week");
     const data = props.weeksData[props.activeParam];
 
     return (
         <div className={styles.legendContainer}>
 
-            {getWeekMean(data[prevWeekDate.getTime()], props.activeParam)}
+            {getWeekMean(data[prevWeekDate.valueOf()], props.activeParam)}
             <div/>
-            {getWeekMean(data[selectedWeekDate.getTime()], props.activeParam)}
+            {getWeekMean(data[selectedWeekDate.valueOf()], props.activeParam)}
 
-            {dateFormatter(prevWeekDate, props.now)}
+            {dateFormatter(prevWeekDate)}
             <div/>
-            {dateFormatter(selectedWeekDate, props.now)}
+            {dateFormatter(selectedWeekDate)}
 
         </div>
     );

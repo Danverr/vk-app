@@ -2,8 +2,8 @@ import axios from "axios";
 import qs from "qs";
 
 const instance = axios.create({
-    // baseURL: "https://vk-app-server.herokuapp.com/",
-    baseURL: "https://vk-app-server/",
+    baseURL: "https://vk-app-server.herokuapp.com/",
+    //baseURL: "https://vk-app-server/",
     responseType: "json",
     timeout: 10000,
     headers: {
@@ -21,7 +21,8 @@ const api = async (method, url, data) => {
         data: method !== "GET" ? qs.stringify(data) : null,
     })
         .catch(error => {
-            console.log("Axios error: ", error);
+            if (error.response) console.error(error.response.data);
+            else console.error(error);
         });
 };
 

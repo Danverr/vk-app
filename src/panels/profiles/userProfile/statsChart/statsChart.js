@@ -1,26 +1,29 @@
 import React, {useRef, useEffect, useMemo} from 'react';
 import {Card, Div, Placeholder, Text, Caption} from '@vkontakte/vkui';
-import {AreaChart, Area, XAxis, YAxis, Tooltip, Line} from 'recharts';
-import emoji from "../../../../assets/emoji/emojiList";
+import {AreaChart, Area, XAxis, YAxis, Tooltip} from 'recharts';
+import moment from 'moment';
+import momentLocale from 'moment/locale/ru';
+
+import emoji from "../../../../utils/getEmoji";
 import styles from "./statsChart.module.css";
+import getColors from "../../../../utils/getColors";
+
+moment.locale("ru", momentLocale);
 
 const TooltipCard = (props) => {
-    const months = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
-
     if (props.active && props.payload.length) {
         let {date, val} = props.payload[0].payload;
-        date = new Date(date);
 
         return (
             <Card className={styles.tooltipCard} mode='shadow' size="s">
-                <img src={props.emoji[Math.round(val) - 1]}/>
+                <img src={props.emoji[Math.round(val) - 1]} alt=""/>
 
                 <div className={styles.tooltipText}>
-                    <Text weight="regular">
+                    <Text weight="medium">
                         Среднее: {val}
                     </Text>
                     <Caption level="2" weight="regular" className={styles.tooltipCaption}>
-                        {date.getDate()} {months[date.getMonth()]} {date.getFullYear()}
+                        {moment(date).locale("ru").format("D MMMM YYYY")}
                     </Caption>
                 </div>
             </Card>
@@ -31,22 +34,21 @@ const TooltipCard = (props) => {
 };
 
 const AxisTick = (props) => {
-    const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-    const date = new Date(props.payload.value);
+    const date = moment(props.payload.value);
     let anchor = "middle";
-    let monthText = "";
+    let dateFormat = "";
 
-    if (props.index == 0) {
+    if (props.index === 0) {
         anchor = "end";
-    } else if (props.index == props.visibleTicksCount - 1) {
+    } else if (props.index === props.visibleTicksCount - 1) {
         anchor = "start";
     }
 
-    if (date.getDate() == 1) {
-        monthText = `${months[date.getMonth()]}`;
+    if (date.date() === 1) {
+        dateFormat += "MMM";
 
-        if (date.getFullYear() != props.curDate.getFullYear()) {
-            monthText += ` ${date.getFullYear()}`;
+        if (!date.isSame(props.curDate, "year")) {
+            dateFormat += " YYYY";
         }
     }
 
@@ -54,48 +56,45 @@ const AxisTick = (props) => {
         <g transform={`translate(${props.x},${props.y})`}>
             {/* Subhead regular */}
             <text className={styles.tickDate} x={0} y={0} dy={0} textAnchor={anchor}>
-                {date.getDate()}
+                {date.date()}
             </text>
 
             {/* Subhead medium */}
             <text className={styles.tickMonth} x={0} y={0} dy={24} textAnchor={anchor}>
-                {monthText}
+                {dateFormat.length ? date.format(dateFormat) : ""}
             </text>
         </g>
     );
 };
 
-const getChartColors = (stats, count, param) => {
-    const colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
-    if (param == "mood") colors.reverse();
-    let mean = 0;
+const getChartColors = (stats, daysAgo, param) => {
+    const colors = getColors(param);
+    const start = moment().startOf("day").subtract(daysAgo, "days");
+    const lastStats = stats.filter(stat => stat.date.isAfter(start));
 
-    // Cчитаем сумму
-    for (let i = stats.length - 1; i >= Math.max(0, stats.length - count); i--) {
-        mean += stats[i].val;
+    if (lastStats.length) {
+        const mean = lastStats.reduce((sum, item) => sum + item.val, 0) / lastStats.length;
+        return colors[Math.round(mean) - 1];
+    } else {
+        return "var(--default_chart_color)";
     }
-
-    // Считаем среднее
-    mean /= stats.length - Math.max(0, stats.length - count);
-
-    return colors[Math.round(mean) - 1];
 };
 
-const getChartData = (stats, curDate) => {
+const getChartData = (stats) => {
     let data = [];
-    curDate.setHours(0, 0, 0, 0);
+    const curDate = moment().startOf("day");
     let i = stats.length - 1;
 
     // Проходимся по датам
     while (1) {
         let d = {
-            date: curDate.toString(),
+            date: curDate.format(),
             val: null,
         };
 
         // Если текущая дата такая же, как и дата у самой новой записи в stats
         // То ставим значение из записи, иначе null
-        if (i >= 0 && stats[i].date.getTime() == curDate.getTime()) {
+        if (i >= 0 && stats[i].date.isSame(curDate)) {
             d.val = stats[i].val;
             i--;
         }
@@ -103,41 +102,44 @@ const getChartData = (stats, curDate) => {
         data.push(d);
 
         // Чтобы закончили на начале месяца с последней записью
-        if (i < 0 && curDate.getDate() == 1) break;
-        curDate.setDate(curDate.getDate() - 1);
+        if (i < 0 && curDate.date() === 1) break;
+        curDate.subtract(1, "day");
     }
 
     return data;
 };
 
 const StatsChart = (props) => {
-    const chartScrollRef = useRef();
+    const chartScrollRef = useRef(null);
+    const {stats} = props;
 
     // Меняем скролл, чтобы график начинался с конца и прокручивался влево
     useEffect(() => {
-        if (chartScrollRef.current) {
+        if (chartScrollRef && chartScrollRef.current) {
             chartScrollRef.current.scrollLeft = chartScrollRef.current.scrollWidth;
         }
-    });
+    }, []);
 
     // Выбираем цвет для графика исходя из последних записей
     const chartColors = useMemo(() => {
         let chartColors = {};
-        for (const param in props.stats)
-            chartColors[param] = getChartColors(props.stats[param], 3, param);
+        for (const param in stats)
+            chartColors[param] = getChartColors(stats[param], 7, param);
         return chartColors;
-    }, [props.stats]);
+    }, [stats]);
+
+    const activeColor = chartColors[props.activeParam];
 
     // Получаем данные для графика из стат
     const data = useMemo(() => {
         let data = {};
-        for (const param in props.stats)
-            data[param] = getChartData(props.stats[param], props.now(), param);
+        for (const param in stats)
+            data[param] = getChartData(stats[param]);
         return data;
-    }, [props.stats, props.now]);
+    }, [stats]);
 
     // Если записей нет, вернем Placeholder
-    if (props.stats[props.activeParam].length == 0) {
+    if (stats[props.activeParam].length === 0) {
         return (
             <Placeholder header="Недостаточно записей">
                 Для статистики нужна хотя бы одна запись
@@ -151,23 +153,34 @@ const StatsChart = (props) => {
                 <AreaChart data={data[props.activeParam]} width={data[props.activeParam].length * 32} height={300}>
                     <defs>
                         <linearGradient id="color" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={chartColors[props.activeParam]} stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor={chartColors[props.activeParam]} stopOpacity={0}/>
+                            <stop offset="5%" stopColor={activeColor} stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor={activeColor} stopOpacity={0}/>
                         </linearGradient>
                     </defs>
-                    <Area connectNulls={true} dot={true} type="monotoneX" dataKey="val"
-                          stroke={chartColors[props.activeParam]} strokeWidth={2} fill="url(#color)"/>
-                    <XAxis height={40} dataKey="date" reversed={true}
-                           tick={<AxisTick curDate={props.now()}/>}
-                           interval={0} axisLine={false} tickMargin={12}/>
+                    <Area
+                        animationDuration={1000} connectNulls={true} type="monotoneX" dataKey="val"
+                        stroke={activeColor} strokeWidth={2} fill="url(#color)"
+                        dot={true} activeDot={{strokeWidth: 3, r: 6}}
+                    />
+                    <XAxis
+                        height={40} dataKey="date" reversed={true}
+                        tick={<AxisTick/>} interval={0} axisLine={false} tickMargin={12}
+                    />
                     <YAxis dataKey="val" hide={true} domain={[0, 6]}/>
-                    <Tooltip content={<TooltipCard emoji={emoji[props.activeParam]}/>}/>
+                    <Tooltip
+                        content={<TooltipCard emoji={emoji[props.activeParam]}/>}
+                        cursor={false} coordinate={{x: 100, y: 140}}
+                    />
                 </AreaChart>
             </div>
         </Div>
     )
 };
 
-export default StatsChart;
+const areEqual = (prevProps, nextProps) => {
+    return prevProps.activeParam === nextProps.activeParam && prevProps.stats === nextProps.stats;
+};
+
+export default React.memo(StatsChart, areEqual);
 
 

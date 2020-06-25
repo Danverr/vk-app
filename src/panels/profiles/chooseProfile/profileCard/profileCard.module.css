@@ -3,10 +3,12 @@
 }
 
 .chartContainer {
+    margin-bottom: 8px;
 }
 
 .chartName {
-    color: var(--text_tertiary);
+    margin-bottom: 8px;
+    color: var(--text_secondary);
 }
 
 .avatarCell {

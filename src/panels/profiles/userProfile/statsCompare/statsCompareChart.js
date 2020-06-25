@@ -1,38 +1,37 @@
 import React from "react";
 import styles from "./statsCompareChart.module.css";
 import {Button, Subhead} from "@vkontakte/vkui";
+import getColors from "../../../../utils/getColors";
+import moment from "moment";
 
 import Icon24BrowserBack from '@vkontakte/icons/dist/24/browser_back';
 import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
 
 const StatsCompareChart = (props) => {
     const {weeksData, activeParam, selectedWeekDate, setSelectedWeekDate} = props;
-
-    const colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
-    if (activeParam == "mood") colors.reverse();
-
-    const days = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
-    const weeksDataKeys = Object.keys(weeksData[activeParam]);
+    const colors = getColors(activeParam);
     const baseLen = 20;
     let chartRows = [];
 
+    const weeksDataKeys = Object.keys(weeksData[activeParam]);
+    const lastWeekDate = moment(parseInt(weeksDataKeys[weeksDataKeys.length - 1]));
+
     // Считаем конец прошлой недели
-    const prevWeekDate = new Date(selectedWeekDate.getTime());
-    prevWeekDate.setDate(prevWeekDate.getDate() - 7);
+    const prevWeekDate = selectedWeekDate.clone().subtract(1, "week");
 
     const getLineStyle = (date, day) => {
         let lineStyle = {};
 
         // Определяем выравнивание
-        if (date == selectedWeekDate) {
+        if (date.isSame(selectedWeekDate)) {
             lineStyle.margin = "auto auto auto 0";
         } else {
             lineStyle.margin = "auto 0 auto auto";
         }
 
         // Определяем размеры и цвет
-        if (date.getTime() in weeksData[activeParam] && day in weeksData[activeParam][date.getTime()]) {
-            const val = weeksData[activeParam][date.getTime()][day];
+        if (date.valueOf() in weeksData[activeParam] && day in weeksData[activeParam][date.valueOf()]) {
+            const val = weeksData[activeParam][date.valueOf()][day];
             lineStyle.width = baseLen * val + "%";
             lineStyle.background = colors[Math.round(val) - 1];
         } else {
@@ -42,20 +41,16 @@ const StatsCompareChart = (props) => {
         return lineStyle;
     };
 
-    // Смещаем текущую неделю на offset дней
-    const setSelectedWeekDateOffset = (offset) => {
-        const newWeekDate = new Date(selectedWeekDate.getTime());
-        newWeekDate.setDate(newWeekDate.getDate() + offset);
-        setSelectedWeekDate(newWeekDate);
-    };
-
-    for (const day of days) {
-        chartRows.push(
-            <>
-                <div className={styles.chartLine} style={getLineStyle(prevWeekDate, day)}/>
-                <Subhead weight="medium" className={styles.chartLabel}>{day}</Subhead>
-                <div className={styles.chartLine} style={getLineStyle(selectedWeekDate, day)}/>
-            </>
+    for (let day = 0; day < 7; day++) {
+        chartRows.push(<div
+            key={`${day}LinePrev`} className={styles.chartLine} style={getLineStyle(prevWeekDate, day)}
+        />);
+        chartRows.push(<Subhead
+            key={`${day}Title`} weight="regular"
+            className={styles.chartLabel}>{moment().startOf("week").add(day, "days").format("dd")}
+        </Subhead>);
+        chartRows.push(<div
+            key={`${day}LineCur`} className={styles.chartLine} style={getLineStyle(selectedWeekDate, day)}/>
         );
     }
 
@@ -63,8 +58,8 @@ const StatsCompareChart = (props) => {
         <div className={styles.chartContainer}>
             <Button
                 mode="tertiary" style={{paddingLeft: 0}}
-                onClick={() => setSelectedWeekDateOffset(-7)}
-                disabled={selectedWeekDate.getTime() == weeksDataKeys[weeksDataKeys.length - 1]}
+                onClick={() => setSelectedWeekDate(selectedWeekDate.clone().subtract(1, "week"))}
+                disabled={selectedWeekDate.isSame(lastWeekDate, "week")}
             >
                 <Icon24BrowserBack/>
             </Button>
@@ -73,8 +68,8 @@ const StatsCompareChart = (props) => {
 
             <Button
                 mode="tertiary" style={{paddingRight: 0}}
-                onClick={() => setSelectedWeekDateOffset(7)}
-                disabled={selectedWeekDate.getTime() >= props.curWeekStart}
+                onClick={() => setSelectedWeekDate(selectedWeekDate.clone().add(1, "week"))}
+                disabled={selectedWeekDate.isSame(moment(), "week")}
             >
                 <Icon24BrowserForward/>
             </Button>

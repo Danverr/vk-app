@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Epic, Root, ConfigProvider, ScreenSpinner} from '@vkontakte/vkui';
+import React, {useEffect} from 'react';
+import {Epic, Root, ConfigProvider} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import useAppState from "./utils/useAppState";
@@ -15,21 +15,22 @@ const App = () => {
     // Состояние и навигация приложения
     const state = useAppState();
     const nav = useNav();
+    const {goBack} = nav;
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
     useEffect(() => {
-        window.addEventListener('popstate', nav.goBack);
-    }, []);
+        window.addEventListener('popstate', goBack);
+    }, [goBack]);
 
     return (
         <ConfigProvider isWebView={true}>
             <Root activeView="Epic" popout={state.rootPopup}>
                 <Epic id="Epic" activeStory={nav.activeStory} tabbar={nav.navbar}>
-                    <FeedStory id="feed" state={state.feed} nav={nav}/>
-                    <ProfilesStory id="profiles" state={state.profiles} nav={nav}/>
-                    <CheckInStory id="checkIn" state={state.checkIn} nav={nav}/>
-                    <CalendarStory id="calendar" state={state.calendar} nav={nav}/>
-                    <SettingsStory id="settings" state={state.settings} nav={nav}/>
+                    <FeedStory id="feed" state={state} nav={nav}/>
+                    <ProfilesStory id="profiles" state={state} nav={nav}/>
+                    <CheckInStory id="checkIn" state={state} nav={nav}/>
+                    <CalendarStory id="calendar" state={state} nav={nav}/>
+                    <SettingsStory id="settings" state={state} nav={nav}/>
                 </Epic>
             </Root>
         </ConfigProvider>

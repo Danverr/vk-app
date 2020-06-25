@@ -13,11 +13,11 @@
 
 .chartLabel {
     margin: auto 8px;
-    opacity: 0.5;
+    color: var(--text_tertiary);
 }
 
 .chartLine {
     height: 8px;
-    transition: width 300ms ease-in-out, background-color 300ms ease-in-out;
+    transition: width 300ms ease, background-color 300ms ease;
     border-radius: 4px;
 }

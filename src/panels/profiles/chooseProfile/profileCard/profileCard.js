@@ -1,11 +1,31 @@
 import React from 'react';
-import {Avatar, Card, Cell, Div, Placeholder, Subhead} from "@vkontakte/vkui";
+import {Avatar, Card, Cell, Div, Group, Placeholder, Subhead} from "@vkontakte/vkui";
 import styles from "./profileCard.module.css";
 import {Line, LineChart, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import getColors from "../../../../utils/getColors";
 
-const Chart = (data, param) => {
-    const colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
-    if (param == "Настроение") colors.reverse();
+const areChartsEqual = (prevProps, nextProps) => {
+    let areEqual = true;
+
+    if (prevProps.param === nextProps.param && prevProps.data.length === nextProps.data.length) {
+        for (let i = 0; i < prevProps.data.length; i++) {
+            const prevData = prevProps.data[i];
+            const nextData = nextProps.data[i];
+
+            if (!prevData.date.isSame(nextData.date) || prevData.val !== nextData.val) {
+                areEqual = false;
+                break;
+            }
+        }
+    } else {
+        areEqual = false;
+    }
+
+    return areEqual;
+};
+
+const Chart = React.memo(({data, param, title}) => {
+    const colors = getColors(param);
 
     if (!data || data.length < 2) {
         return null;
@@ -15,33 +35,30 @@ const Chart = (data, param) => {
     const color = colors[Math.round(mean) - 1];
 
     return (
-        <div className={styles.chartContainer}>
+        <Group className={styles.chartContainer}>
 
             <Subhead weight="regular" className={styles.chartName}>
-                {param}
+                {title}
             </Subhead>
 
             <ResponsiveContainer width="100%" height={64}>
                 <LineChart data={data}>
-                    <Line connectNulls={true} type="monotoneX" dataKey="val" stroke={color} strokeWidth={2}/>
+                    <Line
+                        animationDuration={1000} type="monotoneX" dataKey="val" dot={true} connectNulls={true}
+                        stroke={color} strokeWidth={2}
+                    />
                     <XAxis dataKey="date" hide={true}/>
-                    <YAxis dataKey="val" hide={true} domain={[0, 6]}/>
+                    <YAxis dataKey="val" hide={true} domain={[1, 5]}/>
                 </LineChart>
             </ResponsiveContainer>
 
-        </div>
+        </Group>
     );
-};
+}, areChartsEqual);
 
 const ProfileCard = (props) => {
-    const charts = [
-        Chart(props.stats.mood, "Настроение"),
-        Chart(props.stats.stress, "Стресс"),
-        Chart(props.stats.anxiety, "Тревожность")
-    ];
-
     return (
-        <Card key={props.info.id} size="l" mode="shadow" onClick={() => {
+        <Card size="l" mode="shadow" onClick={() => {
             props.goToUserProfile();
             props.setActiveUserProfile(props.info);
         }}>
@@ -52,10 +69,19 @@ const ProfileCard = (props) => {
                 </Cell>
 
                 {
-                    charts.reduce((sum, item) => sum + (item == null), 0) != charts.length ? charts :
+                    Object.values(props.stats).find(stats => stats.length < 2) !== undefined ?
+
                         <Placeholder header="Недостаточно записей">
                             Для краткой статистики нужно хотя бы 2 записи за последние 7 дней
                         </Placeholder>
+
+                        :
+
+                        <>
+                            <Chart data={props.stats.mood} param={"mood"} title={"Настроение"}/>
+                            <Chart data={props.stats.stress} param={"stress"} title={"Стресс"}/>
+                            <Chart data={props.stats.anxiety} param={"anxiety"} title={"Тревожность"}/>
+                        </>
                 }
 
             </Div>

@@ -15,6 +15,7 @@
 
 .legendMeanContainer h3 {
     margin-right: 4px;
+    color: var(--text_primary);
 }
 
 .legendMeanContainer img {
@@ -27,5 +28,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 0.5;
+    text-transform: capitalize;
+    text-align: center;
+    color: var(--text_secondary);
 }

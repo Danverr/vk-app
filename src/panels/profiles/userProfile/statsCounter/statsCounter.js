@@ -1,9 +1,11 @@
 import React, {useMemo} from 'react';
 import {Div, Title, Subhead, Placeholder} from "@vkontakte/vkui";
 import {PieChart, Pie, Cell} from 'recharts';
+import getColors from "../../../../utils/getColors";
 import styles from "./statsCounter.module.css";
+import moment from 'moment';
 
-const pieLabel = ({cx, cy, midAngle, innerRadius, outerRadius, percent, fill}) => {
+const pieLabel = ({cx, cy, midAngle, outerRadius, percent, fill}) => {
     const RADIAN = Math.PI / 180;
     const radius = outerRadius + 8;
 
@@ -27,7 +29,7 @@ const pieLabel = ({cx, cy, midAngle, innerRadius, outerRadius, percent, fill}) =
 const getMean = (rawStats, lastDate) => {
     // Оставляем только записи за последние interval дней
     const stats = rawStats.filter((item) => {
-        return item.date.getTime() > lastDate.getTime();
+        return item.date.valueOf() > lastDate.valueOf();
     });
 
     // Считаем среднее значение
@@ -46,7 +48,7 @@ const getCounterData = (rawStats, lastDate, param) => {
 
     // Оставляем только записи за последние interval дней
     const stats = rawStats.filter((item) => {
-        return item.date.getTime() > lastDate.getTime();
+        return item.date.isAfter(lastDate);
     });
 
     // Считаем сколько каждой оценки было
@@ -59,7 +61,7 @@ const getCounterData = (rawStats, lastDate, param) => {
     }
 
     // Сначала должны идти высокие показатели если это настроение
-    if (param == "mood") data.reverse();
+    if (param === "mood") data.reverse();
 
     // Делаем корректные индексы
     data = data.filter(() => true);
@@ -68,13 +70,9 @@ const getCounterData = (rawStats, lastDate, param) => {
 };
 
 const StatsCounter = (props) => {
-    const colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
-    if (props.activeParam == "mood") colors.reverse();
-
+    const colors = getColors(props.activeParam);
     const interval = 30; // Кол-во предыдущих дней, за которые считаем статы
-
-    const lastDate = props.now();
-    lastDate.setDate(lastDate.getDate() - interval);
+    const lastDate = moment().startOf("day").subtract(interval, "days");
 
     // Считаем среднее
     const mean = useMemo(() => {
@@ -82,7 +80,7 @@ const StatsCounter = (props) => {
         for (const param in props.stats)
             mean[param] = getMean(props.stats[param], lastDate);
         return mean;
-    }, [props.stats]);
+    }, [props.stats, lastDate]);
 
     // Получаем данные для графика из стат
     const data = useMemo(() => {
@@ -90,10 +88,10 @@ const StatsCounter = (props) => {
         for (const param in props.stats)
             data[param] = getCounterData(props.stats[param], lastDate, param);
         return data;
-    }, [props.stats]);
+    }, [props.stats, lastDate]);
 
     // Если за последние interval дней записей нет, вернем Placeholder
-    if (props.stats[props.activeParam].length == 0) {
+    if (props.stats[props.activeParam].length === 0) {
         return (
             <Placeholder header="Недостаточно записей">
                 Для счетчика нужна хотя бы одна запись за последние {interval} дней
@@ -105,10 +103,12 @@ const StatsCounter = (props) => {
         <Div className={styles.flexContainer}>
             <div className={styles.flexGroup}>
                 <PieChart width={75} height={200}>
-                    <Pie data={data[props.activeParam]} dataKey="val" nameKey="name"
-                         cx="100%" cy="50%" outerRadius="200%"
-                         label={pieLabel} labelLine={false}
-                         startAngle={90} endAngle={270}
+                    <Pie
+                        isAnimationActive={false}
+                        data={data[props.activeParam]} dataKey="val" nameKey="name"
+                        cx="100%" cy="50%" outerRadius="200%"
+                        label={pieLabel} labelLine={false}
+                        startAngle={90} endAngle={270}
                     >
                         {
                             data[props.activeParam].map((item, index) => (
