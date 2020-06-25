@@ -1,5 +1,6 @@
 import React from 'react';
 import { Panel, PanelHeader, View, Cell, CellButton, Separator, List } from '@vkontakte/vkui';
+import bridge from "@vkontakte/vk-bridge";
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
@@ -27,7 +28,7 @@ const SettingsStory = (props) => {
                 <Separator />
                 <List>
                     <Cell onClick={() => { console.log("ok") }}> Сбросить подсказки </Cell>
-                    <Cell onClick={() => { console.log("ok") }}> Поделиться приложением </Cell>
+                    <Cell onClick={() => { bridge.send("VKWebAppShare", {}); }}> Поделиться приложением </Cell>
                 </List>
                 <CellButton> Перейти в группу </CellButton>
             </Panel>

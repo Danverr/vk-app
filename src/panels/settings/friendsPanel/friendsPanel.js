@@ -28,12 +28,18 @@ const FriendsPanel = (props) => {
 
     const postEdges = async () => {
         if (!props.state.userInfo) return;
+        var posted = [];
         for (var friend of waitToAdd) {
-            await api("POST", "/statAccess/", {
+            const postPromise = await api("POST", "/statAccess/", {
                 fromId: props.state.userInfo.id,
                 toId: friend.id
             });
+            if(postPromise.status == 201)
+                posted = [friend, ...posted];
         }
+        setWaitToAdd(waitToAdd.filter((friend) => !posted.find((curFriend) => curFriend.id == friend.id)));
+        setAdded([...posted, ...added]);
+        setCanAdd(canAdd.filter((friend) => !posted.find((curFriend) => curFriend.id == friend.id)));
     }
 
     const deleteEdge = async (friend) => {
@@ -45,7 +51,7 @@ const FriendsPanel = (props) => {
         });
 
         //ребро успешно удалено
-        if (deleteEdgePromise.status == 204) {
+        if (deleteEdgePromise.status == 200) {
             setAdded(added.filter((addedFriend) => addedFriend.id != friend.id));
             setCanAdd(([...canAdd, friend]).sort((a, b) => {
                 if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))
@@ -75,8 +81,6 @@ const FriendsPanel = (props) => {
                 <Div>
                     <Button size="xl" after={<Counter> {waitToAdd.length} </Counter>} onClick={() => {
                         postEdges();
-                        setWaitToAdd([]);
-                        props.nav.goBack();
                     }}>
                         Сохранить
                     </Button>

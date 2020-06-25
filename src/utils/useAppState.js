@@ -56,7 +56,7 @@ function useAppState() {
     const fetchToEdgesInfo = async () => {
         // ID друзей к которым есть доступ
         const friendsIdsPromise = await api("GET", "/statAccess/", {
-            toId: userInfo.id,
+            type: "fromId"
         });
 
         // Информация о друзьях
@@ -80,7 +80,7 @@ function useAppState() {
     const fetchFromEdgesInfo = async () => {
         // ID друзей к которым есть доступ
         const friendsIdsPromise = await api("GET", "/statAccess/", {
-            fromId: userInfo.id,
+            type: "toId"
         });
 
         // Информация о друзьях
