@@ -1,0 +1,26 @@
+:global(.Panel__in) {
+    display: flex;
+    flex-direction: column;
+}
+
+.loadingSpinner {
+    margin-top: 20px;
+}
+
+.contentContainer {
+    display: flex;
+    flex: auto;
+    padding-top: 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.contextIcon {
+    width: 28px;
+    height: 28px;
+}
+
+.avatarCell {
+    margin-bottom: 8px;
+}

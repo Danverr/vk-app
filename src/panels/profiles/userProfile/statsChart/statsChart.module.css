@@ -1,0 +1,50 @@
+.chartContainer {
+    padding-top: 0;
+}
+
+.chartScroll {
+    overflow-x: auto;
+}
+
+:global(.recharts-cartesian-axis-tick-line) {
+    display: none;
+}
+
+/* Subhead regular */
+.tickDate {
+    font-size: 14px;
+    fill: var(--text_secondary);
+}
+
+/* Subhead medium */
+.tickMonth {
+    font-size: 14px;
+    text-transform: capitalize;
+    fill: var(--text_tertiary);
+}
+
+.tooltipCard {
+    padding: 12px;
+}
+
+.tooltipCard :global(.Card__in) {
+    display: flex;
+    align-items: center;
+}
+
+.tooltipCaption {
+    margin-top: 2px;
+    color: var(--text_secondary);
+}
+
+.tooltipText {
+    display: flex;
+    text-transform: capitalize;
+    flex-direction: column;
+}
+
+.tooltipCard img {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+}
