@@ -1,43 +1,40 @@
-import {
-    Panel, PanelHeader, PanelHeaderBack, Cell, Div,
-    FormLayout, FormLayoutGroup, Input, Textarea, Switch, Button, ScreenSpinner
-} from "@vkontakte/vkui";
-import React, {useState, useEffect} from "react";
+import {Cell, Div, FormLayout, FormLayoutGroup, Input, Textarea, Switch, Button, ScreenSpinner} from "@vkontakte/vkui";
+import React, {useState} from "react";
 import api from "../../../utils/api";
 
 import QuestionCard from "../questionCard/questionCard";
-import style from "../checkInStory.module.css";
 
 const SubmitPanel = (props) => {
-    const [isChecked, setCheck] = useState(props.answer.isPublic);
-    const [titleText, setTitleText] = useState(props.answer.title);
-    const [noteText, setNoteText] = useState(props.answer.note);
+    const {answer, setAnswer} = props;
+    const [isChecked, setCheck] = useState(answer.isPublic);
+    const [titleText, setTitleText] = useState(answer.title);
+    const [noteText, setNoteText] = useState(answer.note);
     const [formMessage, setFormMessage] = useState({text: " ", status: "default"});
 
     // Обрабатываем изменения в поле заголовка
     const handleTitle = (event, name) => {
         props.answer.title = event.target.value;
-        props.setAnswer(props.answer);
+        setAnswer(answer);
         setTitleText(event.target.value);
     };
 
     // Обрабатываем изменения в поле текста записки
     const handleNote = (event) => {
-        props.answer.note = event.target.value;
-        props.setAnswer(props.answer);
+        answer.note = event.target.value;
+        setAnswer(answer);
         setNoteText(event.target.value);
     };
 
     // Переключаем доступ друзей к записи
     const switchPublic = (event) => {
-        props.answer.isPublic = event.target.checked ? 1 : 0;
-        props.setAnswer(props.answer);
+        answer.isPublic = event.target.checked ? 1 : 0;
+        setAnswer(answer);
         setCheck(event.target.checked);
     };
 
     // Проверяем и отправляем данные
     const saveAnswer = () => {
-        if (!props.answer.mood || !props.answer.stress || !props.answer.anxiety) {
+        if (!answer.mood || !answer.stress || !answer.anxiety) {
             setFormMessage({
                 text: "Настроение, тревожность или стресс не указаны!",
                 status: "error"
@@ -45,24 +42,30 @@ const SubmitPanel = (props) => {
         } else {
             props.setLoading(<ScreenSpinner/>);
 
-            api("POST", "/entries/", props.answer)
-                .then(() => { // Успех
-                    props.setAnswer({
-                        userId: null,
-                        mood: null,
-                        stress: null,
-                        anxiety: null,
-                        title: "",
-                        note: "",
-                        isPublic: 0,
-                    });
+            api("POST", "/entries/", {
+                entries: JSON.stringify([answer])
+            })
+                .then((res) => {
+                    const status = res.response ? res.response.status : res.status;
 
-                    props.nav.goTo("feed");
-                }, (error) => setFormMessage({ // Ошибка
-                        text: error,
-                        status: "error"
+                    if (status >= 300) { // Ошибка
+                        setFormMessage({
+                            text: "Упс! Что-то пошло не так. Попробуйте еще раз",
+                            status: "error"
+                        });
+                    } else { // Успех
+                        setAnswer({
+                            mood: null,
+                            stress: null,
+                            anxiety: null,
+                            title: "",
+                            note: "",
+                            isPublic: 0,
+                        });
+
+                        props.nav.goTo("feed");
                     }
-                ))
+                })
                 .finally(() => { // Выполнить в любом случае
                     props.setLoading(null);
                 });

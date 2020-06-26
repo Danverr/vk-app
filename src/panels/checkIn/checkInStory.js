@@ -23,9 +23,23 @@ const getBullets = (index = testSlideData.length) => {
     return (<div className={style.bulletsContainer}>{bullets}</div>);
 };
 
+let localState = {
+    mood: null,
+    stress: null,
+    anxiety: null,
+    title: "",
+    note: "",
+    isPublic: 0
+};
+
 const CheckInStory = (props) => {
+    const [answer, setAnswer] = useState(localState);
     const [loading, setLoading] = useState(null);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+    useEffect(() => {
+        localState = answer;
+    }, [answer]);
 
     useEffect(() => {
         props.nav.setNavbarVis(false);
@@ -36,13 +50,12 @@ const CheckInStory = (props) => {
 
     return (
         <View id={props.id}
-              popout={loading}
               activePanel={props.nav.activePanel}
-              history={props.nav.panelHistory[props.id]}
+              history={props.nav.viewHistory}
               onSwipeBack={props.nav.goBack}
+              popout={loading}
         >
             <Panel id="main">
-
                 <PanelHeader
                     separator={false}
                     left={<PanelHeaderBack onClick={() => {
@@ -59,18 +72,20 @@ const CheckInStory = (props) => {
                     align="center"
                     onChange={slideIndex => setActiveSlideIndex(slideIndex)}
                 >
-                    {testSlideData.map((slideData, i) => {
-                        return (<TestSlide
-                            key={i}
-                            goToNext={() => setActiveSlideIndex(i + 1)}
-                            answer={props.answer}
-                            setAnswer={props.setAnswer}
-                            slideData={slideData}
-                        />);
-                    })}
+                    {
+                        testSlideData.map((slideData, i) => {
+                            return (<TestSlide
+                                key={i}
+                                goToNext={() => setActiveSlideIndex(i + 1)}
+                                answer={answer}
+                                setAnswer={setAnswer}
+                                slideData={slideData}
+                            />);
+                        })
+                    }
                     <SubmitPanel
-                        answer={props.answer}
-                        setAnswer={props.setAnswer}
+                        answer={answer}
+                        setAnswer={setAnswer}
                         nav={props.nav}
                         setLoading={setLoading}
                     />

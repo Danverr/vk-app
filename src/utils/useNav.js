@@ -11,15 +11,16 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 // Панели по умолчанию для каждого view
 const defaultPanels = {
     feed: "main",
-    profiles: "main",
+    profiles: "chooseProfile",
     checkIn: "main",
     calendar: "main",
     settings: "main",
 };
 
 const useNav = () => {
-    const [isNavbarVis, setNavbarVis] = useState(true);
-    const [storyHistory] = useState(["feed"]);
+    let [scrollHistory] = useState({});
+    let [isNavbarVis] = useState(true);
+    const [viewHistory] = useState(["feed"]);
     const [panelHistory] = useState({
         feed: [defaultPanels.feed],
         profiles: [defaultPanels.profiles],
@@ -28,115 +29,140 @@ const useNav = () => {
         settings: [defaultPanels.settings],
     });
 
-    const getActiveStory = () => storyHistory[storyHistory.length - 1];
+    const getActiveStory = () => viewHistory[viewHistory.length - 1];
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
+    const getScrollName = () => `${getActiveStory()}__${getActivePanel()}`;
+    const saveScroll = () => scrollHistory[getScrollName()] = document.scrollingElement.scrollTop;
+    const setSavedScroll = () => {
+        const name = getScrollName();
+        const scrollTop = name in scrollHistory ? scrollHistory[name] : 0;
+        document.scrollingElement.scrollTop = Math.min(scrollTop, document.scrollingElement.scrollHeight);
+    };
+
+    useEffect(() => {
+        setSavedScroll();
+    });
+
     // Функция возврата с экрана
-    function goBack() {
+    const goBack = () => {
+        // Сохраняем позицию скролла перед уходом
+        saveScroll();
+
         if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
+            saveScroll();
             panelHistory[getActiveStory()].pop();
         } else { // Переход между историями
-            if (storyHistory.length === 1) {
+            if (viewHistory.length === 1) {
                 // Отправляем bridge на закрытие сервиса.
                 bridge.send("VKWebAppClose", {"status": "success"});
             } else {
-                storyHistory.pop();
+                viewHistory.pop();
             }
 
             // Убираем iOS Swipe Back
             // Таким образом VKUI свайп не будет конфликтовать со свайпом нативного клиента
-            if (storyHistory.length === 1) {
+            if (viewHistory.length === 1) {
                 bridge.send('VKWebAppDisableSwipeBack');
             }
         }
 
         setNav(getNav());
-    }
+    };
 
     // Функция для перехода на другой экран
-    function goTo(story, panel = null) {
+    const goTo = (story, panel = null) => {
         // Если переход на ту же историю
         // Если переход на ту же панель внутри истории
         if (getActiveStory() === story && (getActivePanel() === panel || panel === null)) return;
 
-        // Создаём новую запись в истории браузера
-        window.history.pushState([story, panel], panel);
+        // Сохраняем позицию скролла перед уходом
+        saveScroll();
 
         if (panel === null) {
             // Возвращаем iOS Swipe Back
-            if (storyHistory.length === 1) {
+            if (viewHistory.length === 1) {
                 bridge.send('VKWebAppEnableSwipeBack');
             }
 
             // Если история есть в стеке, вынимаем ее
-            if (storyHistory.includes(story)) {
-                storyHistory.splice(storyHistory.indexOf(story), 1);
+            if (viewHistory.includes(story)) {
+                viewHistory.splice(viewHistory.indexOf(story), 1);
+            } else {
+                // Создаём новую запись в истории браузера
+                window.history.pushState([story, panel], panel);
             }
 
             // Добавляем в стек историю
-            storyHistory.push(story);
+            viewHistory.push(story);
         } else {
+            // Создаём новую запись в истории браузера
+            window.history.pushState([story, panel], panel);
+
             panelHistory[getActiveStory()].push(panel);
         }
 
         setNav(getNav());
-    }
+    };
 
-    function clearStoryHistory(story, callback) {
-        if (storyHistory.includes(story)) {
-            storyHistory.splice(storyHistory.indexOf(story), 1);
+    const clearStory = (story, callback) => {
+        if (viewHistory.includes(story)) {
+            viewHistory.splice(viewHistory.indexOf(story), 1);
         }
         panelHistory[story] = [defaultPanels[story]];
 
         callback();
         setNav(getNav());
-    }
+    };
 
-    function getNav() {
-        return {
-            activeStory: getActiveStory(),
-            activePanel: getActivePanel(),
-            panelHistory: panelHistory,
-            clearStoryHistory: clearStoryHistory,
-            goBack: goBack,
-            goTo: goTo,
-            setNavbarVis: setNavbarVis,
-            navbar: isNavbarVis ? (<Tabbar>
-                <TabbarItem
-                    onClick={() => goTo("feed")}
-                    selected={getActiveStory() === "feed"}
-                ><Icon28NewsfeedOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("profiles")}
-                    selected={getActiveStory() === "profiles"}
-                ><Icon28SmileOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("checkIn")}
-                    selected={getActiveStory() === "checkIn"}
-                ><Icon28AddCircleOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("calendar")}
-                    selected={getActiveStory() === "calendar"}
-                ><Icon28CalendarOutline/></TabbarItem>
-                <TabbarItem
-                    onClick={() => goTo("settings")}
-                    selected={getActiveStory() === "settings"}
-                ><Icon28SettingsOutline/></TabbarItem>
-            </Tabbar>) : null,
-        };
-    }
+    const setNavbarVis = (vis) => {
+        isNavbarVis = vis;
+        setNav(getNav());
+    };
+
+    const getNav = () => ({
+        activeStory: getActiveStory(),
+        activePanel: getActivePanel(),
+        panelHistory: panelHistory,
+        clearStory: clearStory,
+        goBack: goBack,
+        goTo: goTo,
+        setNavbarVis: setNavbarVis,
+        navbar: isNavbarVis ? (<Tabbar>
+            <TabbarItem
+                onClick={() => goTo("feed")}
+                selected={getActiveStory() === "feed"}
+            ><Icon28NewsfeedOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("profiles")}
+                selected={getActiveStory() === "profiles"}
+            ><Icon28SmileOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("checkIn")}
+                selected={getActiveStory() === "checkIn"}
+            ><Icon28AddCircleOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("calendar")}
+                selected={getActiveStory() === "calendar"}
+            ><Icon28CalendarOutline/></TabbarItem>
+            <TabbarItem
+                onClick={() => goTo("settings")}
+                selected={getActiveStory() === "settings"}
+            ><Icon28SettingsOutline/></TabbarItem>
+        </Tabbar>) : null,
+    });
 
     // Упаковываем все функции
     let [nav, setNav] = useState(getNav());
-    useEffect(() => {
-        nav.isNavbarVis = isNavbarVis;
-    }, [isNavbarVis]);
 
-    console.log(
-        "Story history: ", storyHistory,
-        "\nCurrent panel history: ", panelHistory[getActiveStory()]
-    );
-    return getNav();
+    // Логи
+    console.group("Navigation");
+    console.log("View history: ", viewHistory);
+    console.log("Current panel history: ", panelHistory[getActiveStory()]);
+    console.log("Scroll history: ", scrollHistory);
+    console.groupEnd();
+
+    return nav;
 };
 
 export default useNav;

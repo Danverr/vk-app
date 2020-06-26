@@ -1,0 +1,34 @@
+.legendContainer {
+    display: grid;
+    width: 100%;
+    padding-bottom: 4px;
+    justify-content: center;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: 1fr 32px 1fr;
+}
+
+.legendMeanContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.legendMeanContainer h3 {
+    margin-right: 4px;
+    color: var(--text_primary);
+}
+
+.legendMeanContainer img {
+    width: 24px;
+    height: 24px;
+}
+
+.legendDates {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    text-align: center;
+    color: var(--text_secondary);
+}

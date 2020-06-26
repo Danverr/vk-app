@@ -1,0 +1,73 @@
+.navigation{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    margin-bottom: 16px;
+}
+.navItem{
+    flex-grow: 1;
+    text-align: center;
+}
+.navButton{
+    border: 0;
+    outline: none;
+    background: white;
+}
+.weekdays{
+    color: grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+.weekday{
+    flex-grow: 1;
+    text-align: center;
+}
+.tileGroup{
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+.tile{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.border{
+    margin: 0;
+    height: 24px;
+    width: 24px;
+    padding: 4px;
+    border-radius: 50%;
+  }
+.container{
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background: white;
+    position: relative;
+}  
+.circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: 12px;
+    font-family: monospace;
+    border-radius: 50%;
+    height: 0%;
+    width: 0%;
+    transition-property: height, width;
+    transition-duration: 0.3s;
+}
+  
