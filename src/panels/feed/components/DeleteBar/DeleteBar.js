@@ -13,13 +13,14 @@ const renderTime = ({ remainingTime }) => {
     );
 };
 
+
 const DeleteBar = (props) => {
     return (
         <Snackbar
             layout="horizontal"
-            onClose={props.finallyDeletePost}
+            onClose={props.onClose}
             action="Отменить"
-            onActionClick={props.reconstructionPostOnFeed}
+            onActionClick={props.cancelDelete}
             duration={5000}
             before={<CountdownCircleTimer
                 size={24}
