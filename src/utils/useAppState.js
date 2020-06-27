@@ -3,6 +3,7 @@ import {ScreenSpinner} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
 import { getDateDescription } from './chrono.js'
+import DeleteBar from '../panels/feed/components/DeleteBar/DeleteBar';
 
 const APP_ID = 7424071;
 
@@ -41,16 +42,23 @@ function useAppState() {
         setUserInfo(userInfo);
     };
 
-    const deleteEntrie = (id) => {
-        api("DELETE", "/entries/", { entryId: id });
+    const deleteEntry = (id) => {
+        return api("DELETE", "/entries/", { entryId: id });
     };
+
+    const createEntry = (post) => {
+        return api("POST", "/entries/", {
+            entries: JSON.stringify(
+                [post]),
+        });
+    }
 
     const fetchFriendsInfo = async () => {
         if (!userInfo || !userToken) return;
 
         // ID друзей к которым есть доступ
         const friendsIdsPromise = await api("GET", "/statAccess/", {
-            toId: userInfo.id,
+            type: 'fromId'
         });
 
         // Информация о друзьях
@@ -81,56 +89,42 @@ function useAppState() {
         setUserEntries(entriesPromise.data);
     };
 
-    const fetchAllEntries = async () => {
+    const fetchAllEntries = () => {
         if (!userInfo || !userToken || !friendsInfo) return;
         // загружаем промисы записей
 
-        const fetchUsersEntries = async (promises) => {
-            const result = await Promise.all(promises);
-            setEntriesPromises(result);
-        };
+        const ids = [];
+        ids.push(userInfo.id);
+        friendsInfo.map((friend) => { ids.push(friend.id); });
 
-        const allUsers = [userInfo, ...friendsInfo];
-        const postsPromises = [];
-        allUsers.map((user, i) => {
-            postsPromises.push(api("GET", "/entries/", { userId: user.id }));
+        const postsPromises = api("GET", "/entries/all", { skip: 0, count:100} );
+        postsPromises.then((result) => {
+            setEntriesPromises(result.data);
         })
-
-        fetchUsersEntries(postsPromises);
     };
 
     useEffect(() => {
-        if (!entriesPromises || !userInfo || (1 + friendsInfo.length !== entriesPromises.length)) return;
-        if (!entriesPromises[0].data) return;
-        //получаем записи из промисов 
+        if (!entriesPromises || !userInfo) return;
+        // промисы загрузились
+
+        const usersMap = {};
+        usersMap[userInfo.id] = userInfo;
+        friendsInfo.map((friend) => { usersMap[friend.id] = friend; });
+
         const newPosts = [];
         const now = new Date();
-        const allUsers = [userInfo, ...friendsInfo];
-        allUsers.map((user, i) => {
-            entriesPromises[i].data.map((post, j) => {
-                const postDate = new Date(post.date);
-                postDate.setHours(postDate.getHours() + userInfo.timezone);
-                post.dateField = getDateDescription(postDate, now);
-                const obj = {
-                    user: user,
-                    post: post,
-                    currentUser: userInfo,
-                }
-                newPosts.push(obj);
-            })
-        })
-        const cmp = (left, right) => {
-            const l = new Date(left.post.date);
-            const r = new Date(right.post.date);
-            if (l < r) {
-                return 1;
+
+        entriesPromises.map((post, i) => {
+            const postDate = new Date(post.date);
+            postDate.setHours(postDate.getHours() + userInfo.timezone);
+            post.dateField = getDateDescription(postDate, now);
+            const obj = {
+                user: usersMap[post.userId],
+                post: post,
+                currentUser: userInfo,
             }
-            if (l > r) {
-                return -1;
-            }
-            return 0;
-        }
-        newPosts.sort(cmp);
+            newPosts.push(obj);
+        });
         setAllUsersEntries(newPosts);
     }, [entriesPromises]);
 
@@ -152,14 +146,14 @@ function useAppState() {
         rootPopup: rootPopup,
 
         feed: {
-            deleteEntrie: deleteEntrie,
+            createEntry: createEntry,
+            deleteEntry: deleteEntry,
             fetchFriendsInfo: fetchFriendsInfo,
             userInfo: userInfo,
             userToken: userToken,
             fetchEntries: fetchAllEntries,
             entries: allUsersEntries,
             friendsInfo: friendsInfo,
-            usersInfo: (userInfo && friendsInfo ? [userInfo, ...friendsInfo] : null)
         },
         profiles: {
             fetchFriendsInfo: fetchFriendsInfo,
