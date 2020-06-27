@@ -20,8 +20,8 @@ const api = async (method, url, data) => {
         data: method !== "GET" ? qs.stringify(data) : null,
     })
         .catch(error => {
-            if (error.response) console.log(error.response.data);
-            else console.log(error);
+            if (error.response) console.error(error.response.data);
+            else console.error(error);
         });
 };
 

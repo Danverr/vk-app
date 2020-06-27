@@ -6,8 +6,7 @@ import { getDateDescription } from './chrono.js'
 
 const APP_ID = 7424071;
 
-function useAppState() {
-    const [userEntries, setUserEntries] = useState(null);
+const useAppState = () => {
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [friendsInfo, setFriendsInfo] = useState(null);
@@ -138,9 +137,6 @@ function useAppState() {
         initAppState();
     }, []);
 
-    // Profiles
-    const [activeUserProfile, setActiveUserProfile] = useState(null);
-
     return {
         rootPopup: rootPopup,
 
@@ -164,6 +160,6 @@ function useAppState() {
         calendar: null,
         settings: null,
     };
-}
+};
 
 export default useAppState;
