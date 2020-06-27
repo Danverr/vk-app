@@ -5,7 +5,7 @@ import {
     CardGrid
 } from '@vkontakte/vkui';
 
-import TextPost from './components/TextPost/TextPost.js';
+import TextPost from '../../components/TextPost/TextPost.js';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';

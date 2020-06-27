@@ -6,7 +6,7 @@ import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import { platform, IOS } from '@vkontakte/vkui';
 
 import DeleteBar from '../DeleteBar/DeleteBar.js';
-import emojiList from '../../../../assets/emoji/emojiList.js';
+import emojiList from '../../assets/emoji/emojiList.js';
 
 const TextPost = (props) => {
     const dat = props.postData;;

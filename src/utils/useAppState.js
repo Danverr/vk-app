@@ -3,7 +3,6 @@ import {ScreenSpinner} from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import api from "./api";
 import { getDateDescription } from './chrono.js'
-import DeleteBar from '../panels/feed/components/DeleteBar/DeleteBar';
 
 const APP_ID = 7424071;
 
