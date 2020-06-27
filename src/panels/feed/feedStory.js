@@ -1,86 +1,75 @@
 import React, { useState, useEffect } from 'react';
 
 import {
-    Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent,
-    CardGrid
+    Panel, PanelHeader, View, ActionSheet, ActionSheetItem, PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent, Text
 } from '@vkontakte/vkui';
 
 import TextPost from './components/TextPost/TextPost.js';
+import DeleteBar from './components/DeleteBar/DeleteBar.js';
+import api from '../../utils/api'
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import './feedStory.css'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
-const BasePost = {
-    userId: "505643430",
-    mood: "3",
-    stress: "2",
-    anxiety: "3",
-    isPublic: "0",
-    title: "Обычный день, чо",
-    note: "у меня все хорошо, но скоро егэ!(хе)",
+import { platform, IOS } from '@vkontakte/vkui';
+
+const createPost = async () => {
+    api("POST", "/entries/", {
+        userId: "505643430",
+        mood: "5",
+        stress: "1",
+        anxiety: "1",
+        isPublic: "1",
+        title: "День норм",
+        note: "",
+    });
 };
 
-const renderData = (post) => {
-    return <TextPost postData={post} />;
+const localState = {};
+
+const setPosts = (posts) => {
+    localState.posts = posts;
 }
 
-const localState = {
-    currentMode: 'feed',
-    needUpdate: 1,
-    posts: null,
-    renderFunc : null,
+const deletePost = (post) => {
+    localState.posts[localState.posts.findIndex((e) => (e.post.entryId === localState.lastPost.entryId))].delete = 1;
+}
 
-    setPosts(posts) {
-        this.posts = posts;
-    },
+const reconstructionPost = (post) => {
+    localState.posts[localState.posts.findIndex((e) => (e.post.entryId === localState.lastPost.entryId))].delete = 0;
+}
 
-    setMode(mode) {
-        this.currentMode = mode;
-    },
+const osname = platform();
+const renderData = (post) => {
+    return (!post.delete) ?
+        <TextPost postData={post} />
+        : null
+}
 
-    setNeedUpdate(value) {
-        this.needUpdate = value;
-    },
-
-};
-
-const deletePostFromList = (post) => {
-    setDeleted(1);
-    localState.posts.splice(localState.posts.findIndex((e) => { return e === post; }), 1);
-    localState.renderFunc(null);
-    localState.renderFunc(localState.posts.map(renderData));
-};
-
-const addPostToList = (post) => {
-    setDeleted(0);
-    localState.posts.push(post);
-    localState.posts.sort((left, right) => {
-        const l = new Date(left.post.date);
-        const r = new Date(right.post.date);
-        return ((l < r) ? 1 : (l > r) ? -1 : 0);
-    });
-    localState.renderFunc(null);
-    localState.renderFunc(localState.posts.map(renderData));
-};
-
-const setDeleted = (val) => {
-    localState.deleted = val;
-};
+const Action = (props) => {
+    return (
+        <ActionSheet onClose={props.onClose} >
+            <ActionSheetItem onClick={() => { alert("YES!") }} autoclose> <Text> Редактировать пост </Text> </ActionSheetItem>
+            <ActionSheetItem onClick={props.prevDeletePost} autoclose mode="destructive"> <Text> Удалить пост </Text>  </ActionSheetItem>
+            {osname === IOS && <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
+        </ActionSheet>
+    );
+}
 
 const Feed = (props) => {
     const [curPopout, setCurPopout] = useState(null);
     const [fetching, setFetching] = useState(null);
     const [wasUpdated, setWasUpdated] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
-    const [mode, setMode] = useState(localState.currentMode);
+    const [mode, setMode] = useState('feed');
     const [postWasDeleted, setPostWasDeleted] = useState(null);
     const [displayPosts, setDisplayPosts] = useState(null);
 
     useEffect(() => {
-        localState.renderFunc = setDisplayPosts;
         props.state.fetchFriendsInfo();
     }, [props.state.userInfo, props.state.userToken]);
 
@@ -90,47 +79,54 @@ const Feed = (props) => {
 
     useEffect(() => {
         if (!props.state.entries) return;
-
-        if (!localState.needUpdate) {
-            for (const i of localState.posts) {
-                i.setCurPopout = setCurPopout;
-                i.setPostWasDeleted = setPostWasDeleted;
-                i.checkPopout = checkPopout;
-            }
-            setDisplayPosts(localState.posts.map(renderData));
-            return;
-        }
-
-        //props.state.createEntry(BasePost);
-        localState.setNeedUpdate(0);
-
         const newPosts = [];
         props.state.entries.map((e, i) => {
             if (mode === "feed" || (mode === "diary" && e.user === props.state.userInfo)) {
-                newPosts.push({
-                    ...e,
-                    setCurPopout: setCurPopout,
-                    setPostWasDeleted: setPostWasDeleted,
-                    deletePostFromList: deletePostFromList,
-                    addPostToList: addPostToList,
-                    deletePostFromBase: props.state.deleteEntry,
-                    addPostToBase: props.state.createEntry,
-                    setDeleted: setDeleted,
-                    checkPopout: checkPopout
-                });
+                const currentPost = { ...e, onSettingClick: onSettingClick };
+                if (localState.postWasDeleted && currentPost.post.entryId === localState.lastPost.entryId) {
+                    currentPost.delete = 1;
+                }
+                newPosts.push(currentPost);
             }
         });
-
-        localState.setPosts(newPosts);
+        setPosts(newPosts);
         setDisplayPosts(newPosts.map(renderData));
         setFetching(null);
     }, [props.state.entries]);
 
-    const checkPopout = () => {
-        if (localState.deleted) {
-            setPostWasDeleted(null);
-            setDeleted(0);
+    const reconstructionPostOnFeed = () => {
+        localState.postWasDeleted = 0;
+        reconstructionPost(localState.lastPost);
+        setPostWasDeleted(null);
+        setDisplayPosts(localState.posts.map(renderData));
+    };
+
+    const prevDeletePost = () => {
+        localState.postWasDeleted = 1;
+        deletePost(localState.lastPost);
+        setPostWasDeleted(< DeleteBar
+            reconstructionPostOnFeed={reconstructionPostOnFeed}
+            finallyDeletePost={finallyDeletePost}
+        />);
+        setDisplayPosts(localState.posts.map(renderData));
+    }
+
+    const onSettingClick = (post) => {
+        if (localState.postWasDeleted) {
+            finallyDeletePost();
         }
+        localState.lastPost = post;
+        setCurPopout(<Action
+            onClose={() => { setCurPopout(null); }}
+            prevDeletePost={prevDeletePost}
+        />);
+    }
+
+    const finallyDeletePost = () => {
+        if (!localState.lastPost) return;
+        localState.postWasDeleted = 0;
+        setPostWasDeleted(null);
+        props.state.deleteEntrie(localState.lastPost.entryId);
     };
 
     const toggleContext = () => {
@@ -142,16 +138,12 @@ const Feed = (props) => {
             toggleContext();
             return;
         }
-        localState.setMode(e);
-        localState.setNeedUpdate(1);
         setDisplayPosts(null);
         setMode(e);
         toggleContext();
     };
 
     const toggleRefresh = () => {
-        setDisplayPosts(null);
-        localState.setNeedUpdate(1);
         setFetching(1);
         setWasUpdated(!wasUpdated);
     };
@@ -181,13 +173,19 @@ const Feed = (props) => {
                             onClick={() => { select('diary') }}
                             asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}>
                             Мой дневник
-                        </Cell>
+                        </Cell> 
                     </List>
                 </PanelHeaderContext>
+                {console.log("Я рендерюсь!")}
                 <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
-                    <CardGrid className="grid">
+
+                    <ReactCSSTransitionGroup
+                        transitionName="example"
+                        transitionEnterTimeout={500}
+                        transitionLeaveTimeout={300}>
                         {displayPosts}
-                    </CardGrid>
+                    </ReactCSSTransitionGroup>
+
                 </PullToRefresh>
                 {postWasDeleted}
             </Panel>
@@ -198,7 +196,3 @@ const Feed = (props) => {
 }
 
 export default Feed;
-
-/*
- *  <button onClick={toggleRefresh}> Обновить страничку (кнопка для дебага) </button>
- */
