@@ -1,35 +1,36 @@
-import React, {useState} from 'react';
-import { Text } from '@vkontakte/vkui';
+import React from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
-import { getDate, getYear, getMonth, getMonthStart, getNextDayStart, getNextMonthStart } from '@wojtekmaj/date-utils';
-import Tile from './Tile'
+
+import moment from 'moment';
+
+import Tile from './Tile';
 import s from './Calendar.module.css';
 
 const TileGroup = (props) => {
-    let[activeTile, setActiveTile] = useState(new Date());
-
     let Tiles = [];
-    let cur = getMonthStart(props.curDate);
+    let cur = moment(props.curMonth), last = moment(props.curMonth);
+    cur.startOf('month'); last.endOf('month');
+    
+    for(let i = 0; i < (cur.day() + 6) % 7; i++) //push empty
+        Tiles.push(<div key = {-i}/>);
 
-    for(let i = 0; i < (cur.getDay() + 6) % 7; i++) //push empty
-        Tiles.push(<Tile onClickTile = {() => {}}/>);
-    while(cur < getNextMonthStart(props.curDate)){
-        let year = getYear(cur);
-        let month = ('0' + (parseInt(getMonth(cur)) + 1).toString()).slice(-2);
-        let day = ('0' + getDate(cur)).slice(-2);
-        let curDateStr = year + "-" + month + "-" + day;
+    var curActiveDateStr = moment(props.curDate).format("YYYY-MM-DD");
+
+    while(cur <= last){
+        var curDateStr = moment(cur).format("YYYY-MM-DD");
 
         let curTileProps = {};
-        console.log(props.daysColors);
-        if (props.daysColors != null && props.daysColors[curDateStr] != null) {
-            curTileProps.mood = props.daysColors[curDateStr].mood - 1;
-            curTileProps.stress = props.daysColors[curDateStr].stress - 1;
-            curTileProps.anxiety = props.daysColors[curDateStr].anxiety - 1;
+
+        if (props.stats != null && props.stats[curDateStr] != null) {
+            curTileProps.mood = props.stats[curDateStr].mood - 1;
+            curTileProps.stress = props.stats[curDateStr].stress - 1;
+            curTileProps.anxiety = props.stats[curDateStr].anxiety - 1;
         }
-        if(activeTile.toString() == cur.toString())
+       
+        if(curActiveDateStr == curDateStr)
             curTileProps.active = true;
-        Tiles.push(<Tile date = {cur} onClickTile = {(date) => {setActiveTile(date); props.onClickTile(date);}} {...curTileProps}/>);
-        cur = getNextDayStart(cur);
+        Tiles.push(<Tile key = {cur.format("D")}date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
+        cur.add(1, 'days');
     }
 
     return (
