@@ -1,0 +1,28 @@
+.slideContainer {
+    width: auto;
+}
+
+.formLayout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.formLayout button:not(:first-child) {
+    margin-top: 12px;
+}
+
+.radioButton :global(.Button__in) {
+    justify-content: flex-start;
+}
+
+.radioButton :global(.Button__before) img {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    margin-right: 8px;
+}
+
+.radioButton:global(.Tappable--active) {
+    opacity: 1;
+}

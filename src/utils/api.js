@@ -22,6 +22,7 @@ const api = async (method, url, data) => {
         .catch(error => {
             if (error.response) console.error(error.response.data);
             else console.error(error);
+            return error;
         });
 };
 

@@ -1,108 +1,132 @@
-import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, View, Div, Header, Group, Spinner} from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import {getDate, getMonthHuman, getYear} from '@wojtekmaj/date-utils';
-import api from "../../utils/api";
 
+import api from "../../utils/api";
+import moment from 'moment';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 
-const getEntries = (entries) => {
-    let temp = {};
-
-    entries.map(
-        (entry) => {
-            let now = entry.date.split(' ')[0];
-
-            if (temp[now] == null) temp[now] = [entry];
-            else temp[now] = [...temp[now], entry];
-        }
-    );
-
-    return temp;
+let localState = {
+    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
+    entriesField: null,
+    userEntries: {},
+    userStats: {},
+    minMonth: moment().startOf('month'),
+    maxMonth: moment().startOf('month'),
+    curMonth: moment().startOf('month'),
+    curDate: moment()
 };
 
 const CalendarStory = (props) => {
-    const [userEntries, setUserEntries] = useState(null);
-    const [calendarField, setCalendarField] = useState(null);
-    const [entriesField, setEntriesField] = useState(null);
-    const [curDate, setCurDate] = useState(null);
-    const [userEntriesMap, setUserEntriesMap] = useState({});
-    const {userInfo} = props.state;
+    const [calendarField, setCalendarField] = useState(localState.calendarField);
+    const [entriesField, setEntriesField] = useState(localState.entriesField);
+    const [userEntries, setUserEntries] = useState(localState.userEntries);
+    const [userStats, setUserStats] = useState(localState.userStats);
+    const [minMonth, setMinMonth] = useState(localState.minMonth);
+    const [maxMonth, setMaxMonth] = useState(localState.maxMonth);
+    const [curMonth, setCurMonth] = useState(localState.curMonth);
+    const [curDate, setCurDate] = useState(localState.curDate);
+
+    const { userInfo } = props.state;
 
     useEffect(() => {
-        if (!userInfo.id) return;
+        if (!userInfo.id)
+            return;
 
-        api("GET", "/entries/", {
-            users: userInfo.id,
-        }).then((promise) => {
-            setUserEntries(promise.data[userInfo.id]);
-        });
-    }, [userInfo]);
-
-    useEffect(() => {
-        if (!userInfo || !userEntries || !curDate) return;
-
-        setEntriesField(<Spinner size="large" style={{marginTop: 20}}/>);
-
-        let year = getYear(curDate);
-        let month = ('0' + getMonthHuman(curDate).toString()).slice(-2);
-        let day = ('0' + getDate(curDate)).slice(-2);
-
-        if (userEntriesMap[year + "-" + month + "-" + day]) {
-            let temp = [];
-            userEntriesMap[year + "-" + month + "-" + day].map((entries) => {
-                temp.push(<TextPost postData={{user: userInfo, post: entries}}/>);
+        const getUserEntries = async () => {
+            let entriesPromise = await api("GET", "/entries/", {
+                users: userInfo.id,
             });
-            setEntriesField(temp);
-        } else {
-            setEntriesField(null);
-        }
-    }, [userInfo, userEntriesMap, curDate]);
+            let entries = entriesPromise.data[userInfo.id], temp = {};
+            entries.map(
+                (entry) => {
+                    let date = moment.utc(entry.date);
+                    let now = date.local().format("YYYY-MM-DD");
 
-    useEffect(() => {
-            setCalendarField(<Spinner size="large" style={{marginTop: 20}}/>);
-            if (!userEntries) return;
+                    if (temp[now] == null) temp[now] = [entry];
+                    else temp[now] = [...temp[now], entry];
+                });
+            setUserEntries(temp);
+            localState.userEntries = temp;
 
-            let result = getEntries(userEntries);
-            setUserEntriesMap(result);
-            let daysColorsMap = {};
+            let stats = {}, l = moment().startOf('month'), r = moment().startOf('month');
 
-            for (let day in result) {
+            for (let day in temp) {
                 let mood = 0, stress = 0, anxiety = 0;
 
-                result[day].map((entry) => {
+                let date = moment(day);
+                if(date < l) l = date;
+                if(date > r) r = date;
+
+                temp[day].map((entry) => {
                     mood += entry.mood;
                     stress += entry.stress;
                     anxiety += entry.anxiety;
                 });
 
-                mood /= result[day].length;
-                stress /= result[day].length;
-                anxiety /= result[day].length;
+                mood /= temp[day].length;
+                stress /= temp[day].length;
+                anxiety /= temp[day].length;
                 mood = Math.floor(mood + 0.5);
                 stress = Math.floor(stress + 0.5);
                 anxiety = Math.floor(anxiety + 0.5);
-                daysColorsMap[day] = {mood: mood, stress: stress, anxiety: anxiety};
+                stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
             }
+            l.startOf('month');
+            r.startOf('month');
+            setMinMonth(l);
+            localState.minMonth = l;
+            setMaxMonth(r);
+            localState.maxMonth = r;
+            setUserStats(stats);
+            localState.userStats = stats;
+        }
+        getUserEntries();
+    }, [userInfo]);
 
-            setCalendarField(<Calendar onClickTile={(date) => {
-                setCurDate(date)
-            }} daysColors={daysColorsMap}/>);
-        },
-        [userEntries]
-    );
+    //изменился выбранный день
+    useEffect(() => {
+        if (!userInfo)
+            return;
 
+        if (userEntries[curDate.format("YYYY-MM-DD")]) {
+            let temp = [];
+            userEntries[curDate.format("YYYY-MM-DD")].map((entry) => {
+                temp.push(<TextPost key = {entry.entryId} postData={{ user: userInfo, post: entry }} />);
+            });
+            setEntriesField(temp);
+            localState.entriesField = temp;
+        } else {
+            setEntriesField(null);
+            localState.entriesField = null;
+        }
+    }, [userInfo, userEntries, curDate]);
+
+    useEffect(() => {
+        let temp = <Calendar 
+        minMonth = {minMonth}
+        maxMonth = {maxMonth}
+        curMonth={curMonth}
+        curDate={curDate} 
+        onClickPrev = {(date) => {setCurMonth(date); localState.curMonth = date;}}
+        onClickNext = {(date) => {setCurMonth(date); localState.curMonth = date;}}
+        onClickTile={(date) => { setCurDate(date); localState.curDate = date; }} 
+        stats={userStats} />;
+        setCalendarField(temp);
+        localState.calendarField = temp;
+    }, [userStats, curMonth, curDate])
+ 
     return (
         <View id={props.id}
-              activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
-              onSwipeBack={props.nav.goBack}
+            activePanel={props.nav.activePanel}
+            history={props.nav.viewHistory}
+            onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Group separator="show">
-                    <Div style={{paddingTop: "0px"}}>
+                    <Div style={{ paddingTop: "0px" }}>
                         {calendarField}
                     </Div>
                 </Group>

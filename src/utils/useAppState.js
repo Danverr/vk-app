@@ -7,7 +7,17 @@ const APP_ID = 7424071;
 const useAppState = () => {
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
-    const [rootPopup, setRootPopup] = useState(<ScreenSpinner />);
+    const [rootPopup, setRootPopup] = useState(<ScreenSpinner/>);
+    const [entryAdded, setEntryAdded] = useState(false);
+    const [answer, setAnswer] = useState({
+        mood: {val: null, index: null},
+        stress: {val: null, index: null},
+        anxiety: {val: null, index: null},
+        title: {val: "", index: null},
+        note: {val: "", index: null},
+        date: {val: null, index: null},
+        isPublic: {val: 0, index: null},
+    });
 
     const fetchUserToken = () => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -49,6 +59,10 @@ const useAppState = () => {
         rootPopup: rootPopup,
         userToken: userToken,
         userInfo: userInfo,
+        answer: answer,
+        setAnswer: setAnswer,
+        entryAdded: entryAdded,
+        setEntryAdded: setEntryAdded
     };
 };
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text } from '@vkontakte/vkui';
+import { Subhead } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import { getDate } from '@wojtekmaj/date-utils';
+
+import moment from 'moment';
 import s from './Calendar.module.css';
 
 const Tile = (props) => {
@@ -11,7 +12,7 @@ const Tile = (props) => {
         anxiety
     } = props;
 
-    let borderStyle = {}, circleStyle = {}, containerStyle = {};
+    let borderStyle = {}, circleStyle = {}, circleClass = s.circle, borderClass = s.border;
     if (mood != null && stress != null && anxiety != null) {
         let colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
         let gradient = [];
@@ -23,22 +24,17 @@ const Tile = (props) => {
         gradient.push(colors[4 - mood]);
 
         borderStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';
-        circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')';        
+        circleStyle.background = 'conic-gradient(' + gradient.join(', ') + ')'; 
+        if (props.active)
+            circleClass += " " + s.circleActive;       
     }
-    if (props.active){
-        borderStyle.border = '2px solid rgba(0, 0, 0, 0.5)';
-        circleStyle.height = '22px';
-        circleStyle.width = '22px';
-        borderStyle.height = '20px';
-        borderStyle.width = '20px';
-    }
+    if(props.active)
+        borderClass += " " + s.borderActive;
 
     return (
-        <div className={s.tile} onClick={() => { props.onClickTile(props.date) }}>
-            <div className={s.border} style={borderStyle}>
-                <div className={s.container} style = {containerStyle}>
-                    <div className={s.circle} style = {circleStyle}> {(props.date != null) ? getDate(props.date) : null} </div>
-                </div>
+        <div className={s.tile} onClick={() => {props.onClickTile(moment(props.date));}}>
+            <div className={borderClass} style={borderStyle}>
+                <div className={circleClass} style = {circleStyle}> <Subhead className = {s.tileText} weight = "regular"> {props.date.format("D")} </Subhead> </div>
             </div>
         </div>
     );
