@@ -46,6 +46,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.9.0",
     "react-flickity-component": "^3.5.0",
+    "react-mobile-datepicker": "^4.0.2",
     "recharts": "^1.8.5"
   },
   "browserslist": {

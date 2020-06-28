@@ -6,15 +6,25 @@
     padding: 0 !important;
 }
 
+:global(#mainCheckInPanel .Panel__in) {
+    display: flex;
+    padding-bottom: 0 !important;
+}
+
+.panelsGallery {
+    flex: auto;
+}
+
 .bullet {
     height: 8px;
     width: 8px;
     padding: 0 !important;
     margin: 0 5px;
-    background: #c5c5c5;
+    opacity: .56;
+    background: #000;
     border-radius: 50%;
 }
 
 .bulletSelected {
-    background: #000000;
+    opacity: 1;
 }

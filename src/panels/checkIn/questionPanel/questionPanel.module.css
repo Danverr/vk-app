@@ -6,10 +6,9 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 12px;
 }
 
-.formLayout button {
+.formLayout button:not(:first-child) {
     margin-top: 12px;
 }
 

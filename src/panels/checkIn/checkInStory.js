@@ -1,94 +1,94 @@
 import React, {useState, useEffect} from 'react';
 import {View, Gallery, Panel, PanelHeaderBack, PanelHeader} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import styles from "./checkInStory.module.css";
 
-import TestSlide from "./testPanel/testSlide";
+import questionPanelsData from "./questionPanelsData";
+import QuestionPanel from "./questionPanel/questionPanel";
 import SubmitPanel from "./submitPanel/submitPanel";
-import testSlideData from "./testPanel/testSlideData";
-import style from "./checkInStory.module.css";
 
-const getBullets = (index = testSlideData.length) => {
+const getBullets = (index = questionPanelsData.length) => {
     let bullets = [];
 
-    for (let i = 0; i < testSlideData.length + 1; i++) {
-        let bulletStyles = style.bullet;
+    for (let i = 0; i < questionPanelsData.length + 1; i++) {
+        let bulletStyles = styles.bullet;
 
         if (i === index) {
-            bulletStyles += " " + style.bulletSelected;
+            bulletStyles += " " + styles.bulletSelected;
         }
 
         bullets.push(<div key={i} className={bulletStyles}/>);
     }
 
-    return (<div className={style.bulletsContainer}>{bullets}</div>);
-};
-
-let localState = {
-    mood: null,
-    stress: null,
-    anxiety: null,
-    title: "",
-    note: "",
-    isPublic: 0
+    return (<div className={styles.bulletsContainer}>{bullets}</div>);
 };
 
 const CheckInStory = (props) => {
-    const [answer, setAnswer] = useState(localState);
-    const [loading, setLoading] = useState(null);
-    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+    const {answer, setAnswer} = props.state;
+    const [popout, setPopout] = useState(null);
+    const activeSlideIndex = props.nav.activePanel;
+    const {setNavbarVis} = props.nav;
+
+    const goToSlideIndex = (index) => {
+        for (let i = activeSlideIndex; i !== index;) {
+            if (activeSlideIndex >= index) {
+                props.nav.goBack();
+                i--;
+            } else {
+                props.nav.goTo(props.id, i + 1);
+                i++;
+            }
+        }
+    };
 
     useEffect(() => {
-        localState = answer;
-    }, [answer]);
-
-    useEffect(() => {
-        props.nav.setNavbarVis(false);
+        setNavbarVis(false);
         return () => {
-            props.nav.setNavbarVis(true);
+            setNavbarVis(true);
         };
-    }, []);
+    }, [setNavbarVis]);
 
     return (
         <View id={props.id}
-              activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
-              onSwipeBack={props.nav.goBack}
-              popout={loading}
+              activePanel={"mainCheckInPanel"}
+              popout={popout}
         >
-            <Panel id="main">
+            <Panel id="mainCheckInPanel">
                 <PanelHeader
                     separator={false}
-                    left={<PanelHeaderBack onClick={() => {
-                        if (activeSlideIndex == 0) window.history.back();
-                        else setActiveSlideIndex(activeSlideIndex - 1);
-                    }}/>}
+                    left={<PanelHeaderBack onClick={() => window.history.back()}/>}
                 >
                     {getBullets(activeSlideIndex)}
                 </PanelHeader>
 
                 <Gallery
+                    className={styles.panelsGallery}
                     slideIndex={activeSlideIndex}
-                    style={{height: "auto"}}
                     align="center"
-                    onChange={slideIndex => setActiveSlideIndex(slideIndex)}
+                    onChange={slideIndex => goToSlideIndex(slideIndex)}
                 >
-                    {
-                        testSlideData.map((slideData, i) => {
-                            return (<TestSlide
+
+                    {questionPanelsData.map((slideData, i) => {
+                        return (
+                            <QuestionPanel
                                 key={i}
-                                goToNext={() => setActiveSlideIndex(i + 1)}
+                                goToNext={() => goToSlideIndex(i + 1)}
                                 answer={answer}
                                 setAnswer={setAnswer}
+                                setPopout={setPopout}
                                 slideData={slideData}
-                            />);
-                        })
-                    }
+                            />
+                        );
+                    })}
+
                     <SubmitPanel
-                        answer={answer}
-                        setAnswer={setAnswer}
                         nav={props.nav}
-                        setLoading={setLoading}
+                        answer={answer}
+                        setPopout={setPopout}
+                        setAnswer={setAnswer}
+                        setEntryAdded={props.state.setEntryAdded}
                     />
+
                 </Gallery>
 
             </Panel>
