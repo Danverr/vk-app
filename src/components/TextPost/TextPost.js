@@ -7,11 +7,17 @@ import { platform, IOS } from '@vkontakte/vkui';
 
 import DeleteBar from '../DeleteBar/DeleteBar.js';
 import emojiList from '../../assets/emoji/emojiList.js';
+import { getDateDescription } from './../../utils/chrono.js'
+
+const getDate = (date, timezone) => {
+    const x = new Date(date);
+    x.setHours(x.getHours() + timezone);
+    return x;
+}
 
 const TextPost = (props) => {
     const dat = props.postData;;
     const user = dat.user;
-    const dateField = dat.post.dateField;
     const description = dat.post.title;
     const text = dat.post.note;
     const userAva = user.photo_100;
@@ -25,6 +31,10 @@ const TextPost = (props) => {
     const emojiMood = emojiList.mood[moodInt - 1];
     const emojiStress = emojiList.stress[stressInt - 1];
     const emojiAnxiety = emojiList.anxiety[anxietyInt - 1];
+
+    const postDate = getDate(dat.post.date, dat.currentUser.timezone);
+
+    const [dateField, setDateField] = useState(getDateDescription(postDate, new Date()));
 
     const deletePost = () => {
         dat.deletePostFromBase(dat.post.entryId);
@@ -67,7 +77,7 @@ const TextPost = (props) => {
                     <div />
                 </div>
                 <div className={s.parametrProgres}> <div /> <Progress value={mood} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }}/> <div /> </div>
 
                 <div className={s.parametrText}>
                     <div />
@@ -75,7 +85,7 @@ const TextPost = (props) => {
                     <div />
                 </div>
                 <div className={s.parametrProgres}> <div /> <Progress value={stress} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiStress} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiStress} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
                 <div className={s.parametrText}>
                     <div />
@@ -83,17 +93,19 @@ const TextPost = (props) => {
                     <div />
                 </div>
                 <div className={s.parametrProgres}> <div /> <Progress value={anxiety} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height':'24px', 'width':'24px'}} /> <div /> </div>
             </div>
             );
     };
+
+    const cmpId = (!currentUser) ? -42394239 : currentUser.id;
 
     const postWithData = () => {
         return (
             <Card size="l" mode="shadow" className={s.all}>
                 <Cell className={s.reference} description={<Text> {dateField} </Text>}
                     before={<Avatar size={40} src={userAva} />}
-                    asideContent={(user.id === currentUser.id) ?
+                    asideContent={(user.id === cmpId) ?
                         <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
                     {<Text> {user.first_name} {user.last_name} </Text>}
                 </Cell>

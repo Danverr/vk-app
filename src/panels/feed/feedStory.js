@@ -2,72 +2,161 @@ import React, { useState, useEffect } from 'react';
 
 import {
     Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent,
-    CardGrid
+    CardGrid, Group, Spinner
 } from '@vkontakte/vkui';
-
-import TextPost from '../../components/TextPost/TextPost.js';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import './feedStory.css'
+import TextPost from '../../components/TextPost/TextPost.js';
 
-const BasePost = {
-    userId: "505643430",
-    mood: "3",
-    stress: "2",
-    anxiety: "3",
-    isPublic: "0",
-    title: "Обычный день, чо",
-    note: "у меня все хорошо, но скоро егэ!(хе)",
-};
+import bridge from "@vkontakte/vk-bridge";
+import api from '../../utils/api.js'
 
 const renderData = (post) => {
     return <TextPost postData={post} />;
 }
 
-const localState = {
+const state = {
     currentMode: 'feed',
     needUpdate: 1,
-    posts: null,
-    renderFunc : null,
+    entries: null,
+    userInfo: null,
+    userToken: null,
+    friendsInfo: null,
+    renderedEntries: null,
 
-    setPosts(posts) {
-        this.posts = posts;
+    setDeleted(val) {
+        state.deleted = val;
     },
 
     setMode(mode) {
-        this.currentMode = mode;
+        state.currentMode = mode;
     },
 
     setNeedUpdate(value) {
-        this.needUpdate = value;
+        state.needUpdate = value;
     },
 
-};
+    setUserInfo(userInfo) {
+        state.userInfo = userInfo;
+    },
 
-const deletePostFromList = (post) => {
-    setDeleted(1);
-    localState.posts.splice(localState.posts.findIndex((e) => { return e === post; }), 1);
-    localState.renderFunc(null);
-    localState.renderFunc(localState.posts.map(renderData));
-};
+    setUserToken(userToken) {
+        state.userToken = userToken;
+    },
 
-const addPostToList = (post) => {
-    setDeleted(0);
-    localState.posts.push(post);
-    localState.posts.sort((left, right) => {
-        const l = new Date(left.post.date);
-        const r = new Date(right.post.date);
-        return ((l < r) ? 1 : (l > r) ? -1 : 0);
-    });
-    localState.renderFunc(null);
-    localState.renderFunc(localState.posts.map(renderData));
-};
+    deleteEntryFromBase(id) {
+        return api("DELETE", "/entries/", { entryId: id });
+    },
 
-const setDeleted = (val) => {
-    localState.deleted = val;
+    addEntryToBase(post) {
+        return api("POST", "/entries/", {
+            entries: JSON.stringify(
+                [post]),
+        });
+    },
+
+    fetchFriendsInfoPromise() {
+        api("GET", "/statAccess/", { type: 'fromId' }).then((result) => {
+            bridge.send("VKWebAppCallAPIMethod", {
+                method: "users.get",
+                params: {
+                    access_token: state.userToken,
+                    v: "5.103",
+                    user_ids: result.data.join(","),
+                    fields: "photo_50, photo_100"
+                }
+            }).then((result) => {
+                state.friendsInfo = result.response;
+                state.fetchEntries();
+            });
+        });
+    },
+
+    fetchEntriesPromise() {
+        api("GET", "/entries/all", { skip: 0, count: 100 }).then((result) => {
+            state.entries = result.data;
+            state.fetchEntries();
+        });
+    },
+
+    fetchEntries() {
+        if (!state.entries || !state.friendsInfo) return;
+
+        const usersMap = {};
+        usersMap[state.userInfo.id] = state.userInfo;
+
+        state.friendsInfo.map((friend) => {
+            usersMap[friend.id] = friend;
+        });
+
+        state.renderedEntries = [];
+
+        const now = new Date();
+
+        state.entries.map((entry) => {
+            if (state.currentMode === 'feed' || (entry.userId === state.userInfo.id)) {
+                const obj = {
+                    post: entry,
+                    user: usersMap[entry.userId],
+                    currentUser: state.userInfo,
+
+                    setCurPopout: state.setCurPopout,
+                    setPostWasDeleted: state.setPostWasDeleted,
+                    checkPopout: state.checkPopout,
+
+                    deletePostFromList: state.deleteEntryFromList,
+                    addPostToList: state.addEntryToList,
+
+                    deletePostFromBase: state.deleteEntryFromBase,
+                    addPostToBase: state.addEntryToBase,
+
+                    setDeleted: state.setDeleted,
+                };
+                state.renderedEntries.push(obj);
+            }
+        });
+
+        state.setFetching(0);
+        state.setDisplayEntries(state.renderedEntries.map(renderData));
+    },
+
+    updateState(setCurPopout, setPostWasDeleted, checkPopout, setDisplayEntries, setFetching) {
+        state.friendsInfo = null;
+        state.entries = null;
+        
+        state.setFetching = setFetching;
+        state.setCurPopout = setCurPopout;
+        state.setPostWasDeleted = setPostWasDeleted;
+        state.checkPopout = checkPopout;
+        state.setDisplayEntries = setDisplayEntries;
+
+        state.fetchFriendsInfoPromise();
+        state.fetchEntriesPromise();
+    },
+
+    deleteEntryFromList(post) {
+        state.setDeleted(1);
+        state.renderedEntries.splice(state.renderedEntries.findIndex((e) => { return e === post; }), 1);
+        state.setDisplayEntries(null);
+        state.setDisplayEntries(state.renderedEntries.map(renderData));
+    },
+
+    addEntryToList(post) {
+        state.setDeleted(0);
+        state.renderedEntries.push(post);
+        state.renderedEntries.sort((left, right) => {
+            const l = new Date(left.post.date);
+            const r = new Date(right.post.date);
+            return ((l < r) ? 1 : (l > r) ? -1 : 0);
+        });
+        state.setDisplayEntries(null);
+        state.setDisplayEntries(state.renderedEntries.map(renderData));
+    },
+
 };
 
 const Feed = (props) => {
@@ -75,61 +164,32 @@ const Feed = (props) => {
     const [fetching, setFetching] = useState(null);
     const [wasUpdated, setWasUpdated] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
-    const [mode, setMode] = useState(localState.currentMode);
+    const [mode, setMode] = useState(state.currentMode);
     const [postWasDeleted, setPostWasDeleted] = useState(null);
-    const [displayPosts, setDisplayPosts] = useState(null);
+    const [displayEntries, setDisplayEntries] = useState((state.renderedEntries) ? null : < Spinner size= 'large' />);
 
     useEffect(() => {
-        localState.renderFunc = setDisplayPosts;
-        props.state.fetchFriendsInfo();
-    }, [props.state.userInfo, props.state.userToken]);
+        if (!state.needUpdate) return;
+        if (!props.state.userInfo && !state.userInfo) return;
+        if (!props.state.userToken && !state.userToken) return;
 
-    useEffect(() => {
-        props.state.fetchEntries();
-    }, [props.state.friendsInfo, mode, wasUpdated]);
-
-    useEffect(() => {
-        if (!props.state.entries) return;
-
-        if (!localState.needUpdate) {
-            for (const i of localState.posts) {
-                i.setCurPopout = setCurPopout;
-                i.setPostWasDeleted = setPostWasDeleted;
-                i.checkPopout = checkPopout;
-            }
-            setDisplayPosts(localState.posts.map(renderData));
-            return;
+        if (!state.userInfo) {
+            state.setUserInfo(props.state.userInfo);
         }
 
-        //props.state.createEntry(BasePost);
-        localState.setNeedUpdate(0);
+        if (!state.userToken) {
+            state.setUserToken(props.state.userToken);
+        }
 
-        const newPosts = [];
-        props.state.entries.map((e, i) => {
-            if (mode === "feed" || (mode === "diary" && e.user === props.state.userInfo)) {
-                newPosts.push({
-                    ...e,
-                    setCurPopout: setCurPopout,
-                    setPostWasDeleted: setPostWasDeleted,
-                    deletePostFromList: deletePostFromList,
-                    addPostToList: addPostToList,
-                    deletePostFromBase: props.state.deleteEntry,
-                    addPostToBase: props.state.createEntry,
-                    setDeleted: setDeleted,
-                    checkPopout: checkPopout
-                });
-            }
-        });
+        state.setNeedUpdate(0);
+        state.updateState(setCurPopout, setPostWasDeleted, checkPopout, setDisplayEntries, setFetching);
+    }, [wasUpdated, mode, props.state.userInfo, props.state.userToken]);
 
-        localState.setPosts(newPosts);
-        setDisplayPosts(newPosts.map(renderData));
-        setFetching(null);
-    }, [props.state.entries]);
 
     const checkPopout = () => {
-        if (localState.deleted) {
+        if (state.deleted) {
             setPostWasDeleted(null);
-            setDeleted(0);
+            state.setDeleted(0);
         }
     };
 
@@ -138,26 +198,24 @@ const Feed = (props) => {
     };
 
     const select = (e) => {
-        if (e === mode) {
-            toggleContext();
-            return;
-        }
-        localState.setMode(e);
-        localState.setNeedUpdate(1);
-        setDisplayPosts(null);
+        if (e === mode) { toggleContext(); return; }
+        setDisplayEntries(<Spinner size='large' />);
+        state.setMode(e);
+        state.setNeedUpdate(1);
         setMode(e);
         toggleContext();
     };
 
     const toggleRefresh = () => {
-        setDisplayPosts(null);
-        localState.setNeedUpdate(1);
         setFetching(1);
+        state.setNeedUpdate(1);
         setWasUpdated(!wasUpdated);
     };
 
     return (
-        <View popout={curPopout}
+        <View
+            id={props.id}
+            popout={curPopout}
             activePanel={props.nav.activePanel}
             history={props.nav.panelHistory[props.id]}
             onSwipeBack={props.nav.goBack}
@@ -186,7 +244,16 @@ const Feed = (props) => {
                 </PanelHeaderContext>
                 <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
                     <CardGrid className="grid">
-                        {displayPosts}
+                        {
+                            (displayEntries) ? displayEntries :
+                                (state.renderedEntries) ?
+                                    state.renderedEntries.map((item) => {
+                                        item.setCurPopout = setCurPopout;
+                                        item.setPostWasDeleted = setPostWasDeleted;
+                                        item.checkPopout = checkPopout;
+                                        return <TextPost postData={item} />
+                                    }) :   null
+                        }
                     </CardGrid>
                 </PullToRefresh>
                 {postWasDeleted}
