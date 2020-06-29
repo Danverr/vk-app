@@ -35,15 +35,18 @@ export const getDateDescription = (a, b) => {
     if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()) {
         return "сегодня в " + setf(h) + ":" + setf(m);
     }
-    const temp = a;
-    temp.setDate(temp.getDate() + 1);
-    if (temp.getFullYear() === b.getFullYear() && temp.getMonth() === b.getMonth() && temp.getDate() === b.getDate()) {
+    a.setDate(a.getDate() + 1);
+    if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()) {
         const h = a.getHours();
         const m = a.getMinutes();
         return "вчера в " + setf(h) + ":" + setf(m);
     }
+    a.setDate(a.getDate() - 1);
     const month = a.getMonth();
     const date = a.getDate();
-    return String(date) + ' ' + monthsRu[month] + " в " + setf(h) + ":" + setf(m);
+    const year = a.getFullYear();
+    if (a.getFullYear() === b.getFullYear())
+        return String(date) + ' ' + monthsRu[month] + " в " + setf(h) + ":" + setf(m);
+    return String(date) + ' ' + monthsRu[month] + " " + String(year) + " в " + setf(h) + ":" + setf(m);
 }
 

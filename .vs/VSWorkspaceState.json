@@ -3,11 +3,9 @@
     "",
     "\\src",
     "\\src\\components",
-    "\\src\\components\\TextPost",
     "\\src\\panels",
-    "\\src\\panels\\feed",
-    "\\src\\utils"
+    "\\src\\panels\\feed"
   ],
-  "SelectedNode": "\\src\\utils\\chrono.js",
+  "SelectedNode": "\\src\\panels\\feed\\feedStory.js",
   "PreviewInSolutionExplorer": false
 }

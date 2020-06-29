@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import api from "../../utils/api";
@@ -7,10 +7,10 @@ import moment from 'moment';
 import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 
+import states from '../../components/entryConvex.js'
+
 let localState = {
     calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
-    entriesField: null,
-    userEntries: {},
     userStats: {},
     minMonth: moment().startOf('month'),
     maxMonth: moment().startOf('month'),
@@ -20,7 +20,6 @@ let localState = {
 
 const CalendarStory = (props) => {
     const [calendarField, setCalendarField] = useState(localState.calendarField);
-    const [entriesField, setEntriesField] = useState(localState.entriesField);
     const [userEntries, setUserEntries] = useState(localState.userEntries);
     const [userStats, setUserStats] = useState(localState.userStats);
     const [minMonth, setMinMonth] = useState(localState.minMonth);
@@ -28,17 +27,25 @@ const CalendarStory = (props) => {
     const [curMonth, setCurMonth] = useState(localState.curMonth);
     const [curDate, setCurDate] = useState(localState.curDate);
 
+    // функции, нужные для работы оболочки постов
+    const [deletedEntryField, setDeletedEntryField] = useState(null);
+    const [displayEntries, setDisplayEntries] = useState(
+        (states.feed.renderedEntries) ? states.feed.getRenderedEntries() : < Spinner size='large' />);
+    const [curPopout, setCurPopout] = useState(null);
+
     const { userInfo } = props.state;
 
     useEffect(() => {
         if (!userInfo.id)
             return;
 
+        states.calendar.init(setDeletedEntryField, setCurPopout, setDisplayEntries, userInfo, null, null);
+
         const getUserEntries = async () => {
             let entriesPromise = await api("GET", "/entries/", {
                 users: userInfo.id,
             });
-            let entries = entriesPromise.data[userInfo.id], temp = {};
+            let entries = entriesPromise.data, temp = {};
             entries.map(
                 (entry) => {
                     let date = moment.utc(entry.date);
@@ -47,6 +54,7 @@ const CalendarStory = (props) => {
                     if (temp[now] == null) temp[now] = [entry];
                     else temp[now] = [...temp[now], entry];
                 });
+
             setUserEntries(temp);
             localState.userEntries = temp;
 
@@ -56,8 +64,8 @@ const CalendarStory = (props) => {
                 let mood = 0, stress = 0, anxiety = 0;
 
                 let date = moment(day);
-                if(date < l) l = date;
-                if(date > r) r = date;
+                if (date < l) l = date;
+                if (date > r) r = date;
 
                 temp[day].map((entry) => {
                     mood += entry.mood;
@@ -87,41 +95,52 @@ const CalendarStory = (props) => {
 
     //изменился выбранный день
     useEffect(() => {
-        if (!userInfo)
+        if (!userInfo || !userEntries)
             return;
 
         if (userEntries[curDate.format("YYYY-MM-DD")]) {
             let temp = [];
+            let objs = [];
             userEntries[curDate.format("YYYY-MM-DD")].map((entry) => {
-                temp.push(<TextPost key = {entry.entryId} postData={{ user: userInfo, post: entry }} />);
+                const obj = {
+                    user: userInfo,
+                    post: entry,
+                    currentUser: userInfo,
+                    states: states.calendar,
+                };
+                temp.push(
+                    <TextPost key={entry.entryId}
+                        postData={obj} />);
+                objs.push(obj);
             });
-            setEntriesField(temp);
-            localState.entriesField = temp;
+            states.calendar.setRenderedEntries(objs);
+            setDisplayEntries(temp);
         } else {
-            setEntriesField(null);
-            localState.entriesField = null;
+            states.calendar.setRenderedEntries(null);
+            setDisplayEntries(null);
         }
     }, [userInfo, userEntries, curDate]);
 
     useEffect(() => {
-        let temp = <Calendar 
-        minMonth = {minMonth}
-        maxMonth = {maxMonth}
-        curMonth={curMonth}
-        curDate={curDate} 
-        onClickPrev = {(date) => {setCurMonth(date); localState.curMonth = date;}}
-        onClickNext = {(date) => {setCurMonth(date); localState.curMonth = date;}}
-        onClickTile={(date) => { setCurDate(date); localState.curDate = date; }} 
-        stats={userStats} />;
+        let temp = <Calendar
+            minMonth={minMonth}
+            maxMonth={maxMonth}
+            curMonth={curMonth}
+            curDate={curDate}
+            onClickPrev={(date) => { setCurMonth(date); localState.curMonth = date; }}
+            onClickNext={(date) => { setCurMonth(date); localState.curMonth = date; }}
+            onClickTile={(date) => { setCurDate(date); localState.curDate = date; }}
+            stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
     }, [userStats, curMonth, curDate])
- 
+
     return (
         <View id={props.id}
             activePanel={props.nav.activePanel}
             history={props.nav.viewHistory}
             onSwipeBack={props.nav.goBack}
+            popout={curPopout}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
@@ -131,8 +150,11 @@ const CalendarStory = (props) => {
                     </Div>
                 </Group>
                 <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    {entriesField}
+                    <CardGrid style={{ 'padding': '15px' }}>
+                        {displayEntries}
+                    </CardGrid>
                 </Group>
+                {deletedEntryField}
             </Panel>
         </View>
     );

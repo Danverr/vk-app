@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
-import { Cell, Progress, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem } from '@vkontakte/vkui';
+import {
+    Cell, Progress, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Snackbar
+} from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import { platform, IOS } from '@vkontakte/vkui';
@@ -35,34 +37,57 @@ const TextPost = (props) => {
     const postDate = getDate(dat.post.date, dat.currentUser.timezone);
 
     const [dateField, setDateField] = useState(getDateDescription(postDate, new Date()));
+    const [upd, setUpd] = useState(0);
 
-    const deletePost = () => {
-        dat.deletePostFromBase(dat.post.entryId);
-        dat.deletePostFromList(dat);
-        dat.setPostWasDeleted(< DeleteBar
-            cancelDelete={returnPost}
-            onClose={() => { dat.setPostWasDeleted(null) }}
-        />);
-    }
-
-    const returnPost = () => {
-        dat.addPostToBase(dat.post).then((result) => {
-            dat.post.entryId = result.data;
-            dat.addPostToList(dat);
-        });
-    }
-
-    const onClose = () => {
-        dat.setDeleted(0);
-        dat.setCurPopout(null);
+    /* пост каждую минуту обновляет свое время */
+    const updateDateField = () => {
+        setTimeout(() => {
+            setDateField(getDateDescription(postDate, new Date()));
+            setUpd(!upd);
+        }, 60 * 1000);
     };
 
+    const deletePost = () => {
+        dat.states.deleteEntryFromList(dat);
+        dat.states.deleteEntryFromBase(dat.post.entryId);
+        dat.states.setDeletedEntryField(<DeleteBar onClose={dat.states.setCurPopout} />)
+    };
+
+    const queryDeletePost = () => {
+        dat.states.setCurPopout(
+            <Alert
+                actions={
+                    [{
+                        title: 'Нет',
+                        autoclose: true,
+                        mode: 'cancel'
+                    },
+                    {
+                        title: 'Да',
+                        autoclose: true,
+                        action : deletePost 
+                    }]
+                }
+                onClose={() => { dat.states.setCurPopout(null); }}
+            >
+                <h2> <Text> Подтверждение </Text> </h2>
+                <p> <Text> Вы действительно хотите удалить эту запись? </Text> </p>
+            </Alert>
+        );
+    }
+
     const onSettingClick = () => {
-        dat.checkPopout();
-        dat.setCurPopout(
-            <ActionSheet onClose={onClose}>
-                <ActionSheetItem onClick={() => { alert("YES!") }} autoclose> <Text> Редактировать пост </Text> </ActionSheetItem>
-                <ActionSheetItem onClick={deletePost} autoclose mode="destructive"> <Text> Удалить пост </Text>  </ActionSheetItem>
+        dat.states.setDeletedEntryField(null);
+        dat.states.setCurPopout(
+            <ActionSheet onClose={() => { dat.states.setCurPopout(null);}}>
+                <ActionSheetItem onClick={() => { alert("YES!") }} autoclose>
+                    <Text> Редактировать пост </Text>
+                </ActionSheetItem>
+
+                <ActionSheetItem onClick={queryDeletePost} autoclose mode="destructive">
+                    <Text> Удалить пост </Text>
+                </ActionSheetItem>
+
                 {platform() === IOS && <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
             </ActionSheet>);
     }
@@ -77,7 +102,7 @@ const TextPost = (props) => {
                     <div />
                 </div>
                 <div className={s.parametrProgres}> <div /> <Progress value={mood} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }}/> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
                 <div className={s.parametrText}>
                     <div />
@@ -93,36 +118,31 @@ const TextPost = (props) => {
                     <div />
                 </div>
                 <div className={s.parametrProgres}> <div /> <Progress value={anxiety} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height':'24px', 'width':'24px'}} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
             </div>
-            );
+        );
     };
 
-    const cmpId = (!currentUser) ? -42394239 : currentUser.id;
-
-    const postWithData = () => {
-        return (
-            <Card size="l" mode="shadow" className={s.all}>
-                <Cell className={s.reference} description={<Text> {dateField} </Text>}
-                    before={<Avatar size={40} src={userAva} />}
-                    asideContent={(user.id === cmpId) ?
-                        <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
-                    {<Text> {user.first_name} {user.last_name} </Text>}
-                </Cell>
-                {(description !== "" || text !== "") ? <div className={s.content}>
-                    <Subhead weight='bold' className={s.title}>
-                        {description}
-                    </Subhead>
-                    <Text weight='regular'>
-                        {text}
-                    </Text>
-                </div> : null}
-                {parametrField()}
-            </Card>
-        );
-    }
-
-    return postWithData();
+    return (
+        <Card size="l" mode="shadow" className={s.all}>
+            <Cell className={s.reference} description={<Text> {dateField} </Text>}
+                before={<Avatar size={40} src={userAva} />}
+                asideContent={(user.id === currentUser.id) ?
+                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
+                {<Text> {user.first_name} {user.last_name} </Text>}
+            </Cell>
+            {(description !== "" || text !== "") ? <div className={s.content}>
+                <Subhead weight='bold' className={s.title}>
+                    {description}
+                </Subhead>
+                <Text weight='regular'>
+                    {text}
+                </Text>
+            </div> : null}
+            {parametrField()}
+            {updateDateField()}
+        </Card>
+    );
 }
 
 export default TextPost;

@@ -1,38 +1,18 @@
 
 import React from 'react';
-import s from './DeleteBar.module.css'
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
 import { Snackbar, Text } from '@vkontakte/vkui';
-
-const renderTime = ({ remainingTime }) => {
-    return (
-        <div className={s.timer}>
-            <Text className="value">{remainingTime}</Text>
-        </div>
-    );
-};
-
 
 const DeleteBar = (props) => {
     return (
         <Snackbar
             layout="horizontal"
-            onClose={props.onClose}
-            action="Отменить"
-            onActionClick={props.cancelDelete}
+            onClose={() => { props.onClose(null); }}
             duration={5000}
-            before={<CountdownCircleTimer
-                size={24}
-                strokeWidth={2}
-                isPlaying
-                duration={5}
-                colors={[["#3f8ae0"]]}
-                onComplete={() => [true, 1000]}>
-                {renderTime}
-            </CountdownCircleTimer>}
+            before={<Icon24Delete fill="var(--accent)" />}
         >
-            Пост удалён
+                <Text> Запись удалена </Text>
         </Snackbar>
     )
 };
