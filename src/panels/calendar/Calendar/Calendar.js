@@ -1,34 +1,62 @@
-import React from 'react';
-import { Text } from '@vkontakte/vkui';
+import React, {useState, useEffect} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import Navigation from './Navigation'
 import Weekdays from './Weekdays';
 import TileGroup from './TileGroup';
 import moment from 'moment';
+import callPicker from '../../../utils/callPicker';
+
+let localState = {
+    curDate: moment(),
+    curMonth: moment().startOf('month')
+};
 
 const Calendar = (props) => {
-    if(props.curMonth < props.minMonth || props.curMonth > props.maxMonth)
-        return null;
+    const [curMonth, setCurMonth] = useState(moment(localState.curMonth));
+    const [curDate, setCurDate] = useState(moment(localState.curDate));
+    const onDateChange = props.onDateChange;
+
+    useEffect(() => {
+        console.log("ok");
+        onDateChange(moment(curDate));
+    }, [curDate, onDateChange]);
+
     return (
         <div>
-            <Navigation NavLabel = {moment(props.curMonth).format("MMMM YYYY")}
-            curMonth = {props.curMonth}
-            minMonth = {props.minMonth}
-            maxMonth = {props.maxMonth}
+            <Navigation 
+            NavLabel = {moment(curMonth).format("MMMM YYYY")}
             onClickPrev = {() => {
-                let date = moment(props.curMonth);
+                let date = moment(curMonth);
                 date.add(-1, 'months');
                 date.startOf('month');
-                props.onClickPrev(moment(date));
+                setCurMonth(moment(date));
+                localState.curMonth = moment(date);
             }} 
+            onClickPicker = {() => {
+                callPicker("date", curDate.toDate(), new Date(2050, 0, 1), props.setPopout, (res) => {
+                    setCurDate(moment(res));
+                    localState.curDate = moment(res);
+                    res.startOf('month');
+                    setCurMonth(moment(res));
+                    localState.curMonth = moment(res);
+                });
+            }}
             onClickNext = {() => {
-                let date = moment(props.curMonth);
+                let date = moment(curMonth);
                 date.add(1, 'months');
                 date.startOf('month');
-                props.onClickNext(moment(date));
+                setCurMonth(moment(date));
+                localState.curMonth = moment(date);
             }} />
             <Weekdays/>
-            <TileGroup onClickTile = {props.onClickTile} curMonth = {props.curMonth} curDate = {props.curDate} stats = {props.stats}/>
+            <TileGroup 
+            onClickTile = {(date) => {
+                setCurDate(moment(date)); 
+                localState.curDate = moment(date); 
+                }} 
+                curMonth = {moment(curMonth)} 
+                curDate = {moment(curDate)} 
+                stats = {props.stats}/>
         </div>
     );
 }

@@ -14,10 +14,10 @@ const TileGroup = (props) => {
     for(let i = 0; i < (cur.day() + 6) % 7; i++) //push empty
         Tiles.push(<div key = {-i}/>);
 
-    var curActiveDateStr = moment(props.curDate).format("YYYY-MM-DD");
+    var curActiveDateStr = props.curDate.format("YYYY-MM-DD");
 
-    while(cur <= last){
-        var curDateStr = moment(cur).format("YYYY-MM-DD");
+    while(!cur.isAfter(last)){
+        var curDateStr = cur.format("YYYY-MM-DD");
 
         let curTileProps = {};
 
@@ -27,9 +27,9 @@ const TileGroup = (props) => {
             curTileProps.anxiety = props.stats[curDateStr].anxiety - 1;
         }
        
-        if(curActiveDateStr == curDateStr)
+        if(curActiveDateStr === curDateStr)
             curTileProps.active = true;
-        Tiles.push(<Tile key = {cur.format("D")}date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
+        Tiles.push(<Tile key = {cur.format("D")} date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
         cur.add(1, 'days');
     }
 

@@ -3,7 +3,7 @@ import moment from "moment";
 import DatePicker from "react-mobile-datepicker";
 import {PopoutWrapper} from "@vkontakte/vkui";
 
-const callPicker = (type, setPopout, callback, ...callbackArgs) => {
+const callPicker = (type, startDate, maxDate, setPopout, callback, ...callbackArgs) => {
     const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
     let dateConfig = {
         'year': {format: 'YYYY', caption: 'Год', step: 1},
@@ -21,14 +21,14 @@ const callPicker = (type, setPopout, callback, ...callbackArgs) => {
     };
 
     let config = dateConfig;
-    if (type == "time") config = timeConfig;
+    if (type === "time") config = timeConfig;
 
     setPopout(
         <PopoutWrapper alignY="center" alignX="center">
             <DatePicker
                 dateConfig={config}
-                value={new Date()}
-                max={type == "date" ? new Date() : new Date(2050, 0, 1)}
+                value={startDate}
+                max={type === "date" ? maxDate : new Date(2050, 0, 1)}
                 isOpen={true}
                 confirmText={"ОК"}
                 cancelText={"Отмена"}
@@ -36,7 +36,7 @@ const callPicker = (type, setPopout, callback, ...callbackArgs) => {
                 onCancel={() => setPopout(null)}
                 onSelect={(res) => {
                     res = moment(res);
-                    if (type == "date") res = formatDate(res);
+                    if (type === "date") res = formatDate(res);
 
                     callback(res, ...callbackArgs);
                     setPopout(null);

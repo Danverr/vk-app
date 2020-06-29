@@ -1,10 +1,8 @@
 
 import React from 'react';
-import { Cell, CardGrid, Progress, List, Avatar, Card, Text, Title, PanelHeaderButton} from '@vkontakte/vkui';
+import { Cell, CardGrid, Progress, Avatar, Card, Text, Title} from '@vkontakte/vkui';
 import s from './TextPost.module.css'
-import { getDate, getMonth, getYear, getHours, getMinutes } from '@wojtekmaj/date-utils';
-import Icon24Dropdown from '@vkontakte/icons/dist/24/dropdown';
-import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+import { getDate, getMonth, getHours, getMinutes } from '@wojtekmaj/date-utils';
 
 import mood1 from '../../assets/emoji/mood/mood1.png'
 import mood2 from '../../assets/emoji/mood/mood2.png'

@@ -12,10 +12,7 @@ let localState = {
     entriesField: null,
     userEntries: {},
     userStats: {},
-    minMonth: moment().startOf('month'),
-    maxMonth: moment().startOf('month'),
-    curMonth: moment().startOf('month'),
-    curDate: moment()
+    curDate: null
 };
 
 const CalendarStory = (props) => {
@@ -23,11 +20,8 @@ const CalendarStory = (props) => {
     const [entriesField, setEntriesField] = useState(localState.entriesField);
     const [userEntries, setUserEntries] = useState(localState.userEntries);
     const [userStats, setUserStats] = useState(localState.userStats);
-    const [minMonth, setMinMonth] = useState(localState.minMonth);
-    const [maxMonth, setMaxMonth] = useState(localState.maxMonth);
-    const [curMonth, setCurMonth] = useState(localState.curMonth);
-    const [curDate, setCurDate] = useState(localState.curDate);
-
+    const [curDate, setCurDate] = useState(moment(localState.curDate));
+    const [popout, setPopout] = useState(null);
     const { userInfo } = props.state;
 
     useEffect(() => {
@@ -39,7 +33,7 @@ const CalendarStory = (props) => {
                 users: userInfo.id,
             });
             let entries = entriesPromise.data[userInfo.id], temp = {};
-            entries.map(
+            entries.forEach(
                 (entry) => {
                     let date = moment.utc(entry.date);
                     let now = date.local().format("YYYY-MM-DD");
@@ -50,16 +44,12 @@ const CalendarStory = (props) => {
             setUserEntries(temp);
             localState.userEntries = temp;
 
-            let stats = {}, l = moment().startOf('month'), r = moment().startOf('month');
+            let stats = {};
 
             for (let day in temp) {
                 let mood = 0, stress = 0, anxiety = 0;
 
-                let date = moment(day);
-                if(date < l) l = date;
-                if(date > r) r = date;
-
-                temp[day].map((entry) => {
+                temp[day].forEach((entry) => {
                     mood += entry.mood;
                     stress += entry.stress;
                     anxiety += entry.anxiety;
@@ -73,12 +63,7 @@ const CalendarStory = (props) => {
                 anxiety = Math.floor(anxiety + 0.5);
                 stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
             }
-            l.startOf('month');
-            r.startOf('month');
-            setMinMonth(l);
-            localState.minMonth = l;
-            setMaxMonth(r);
-            localState.maxMonth = r;
+            
             setUserStats(stats);
             localState.userStats = stats;
         }
@@ -87,12 +72,12 @@ const CalendarStory = (props) => {
 
     //изменился выбранный день
     useEffect(() => {
-        if (!userInfo)
+        if (!userInfo || !curDate)
             return;
 
         if (userEntries[curDate.format("YYYY-MM-DD")]) {
             let temp = [];
-            userEntries[curDate.format("YYYY-MM-DD")].map((entry) => {
+            userEntries[curDate.format("YYYY-MM-DD")].forEach((entry) => {
                 temp.push(<TextPost key = {entry.entryId} postData={{ user: userInfo, post: entry }} />);
             });
             setEntriesField(temp);
@@ -105,20 +90,19 @@ const CalendarStory = (props) => {
 
     useEffect(() => {
         let temp = <Calendar 
-        minMonth = {minMonth}
-        maxMonth = {maxMonth}
-        curMonth={curMonth}
-        curDate={curDate} 
-        onClickPrev = {(date) => {setCurMonth(date); localState.curMonth = date;}}
-        onClickNext = {(date) => {setCurMonth(date); localState.curMonth = date;}}
-        onClickTile={(date) => { setCurDate(date); localState.curDate = date; }} 
+        setPopout = {setPopout}
+        onDateChange={(date) => { 
+            setCurDate(moment(date)); 
+            localState.curDate = moment(date); 
+        }} 
         stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
-    }, [userStats, curMonth, curDate])
+    }, [userStats])
  
     return (
         <View id={props.id}
+            popout = {popout}
             activePanel={props.nav.activePanel}
             history={props.nav.viewHistory}
             onSwipeBack={props.nav.goBack}
