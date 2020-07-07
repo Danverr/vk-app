@@ -1,0 +1,79 @@
+.navigation{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+    margin-bottom: 16px;
+}
+.navItem{
+    text-align: center;
+}
+.navButton{
+    border: 0;
+    outline: none;
+    background: none;
+}
+.navText{
+    text-transform: capitalize;
+}
+.weekdays{
+    color: var(--text_tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+.weekday{
+    flex-grow: 1;
+    text-align: center;
+}
+.tileGroup{
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+.tile{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.border{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    height: 34px;
+    width: 34px;
+    background: var(--tile_background);
+    border-radius: 50%;
+  }
+.circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;    
+    height: 0%;
+    width: 0%;
+    border: 13px solid white;
+    border-radius: 50%;
+    transition-property: height, width, border;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+}
+.circleActive{
+    height: 26px;
+    width: 26px;
+    border: 0px solid white;
+}
+.borderActive{
+    height: 30px;
+    width: 30px;
+    border: 2px solid var(--accent);
+}
+.tileText{
+    font-size: 14px;
+    line-height: 14px;
+}

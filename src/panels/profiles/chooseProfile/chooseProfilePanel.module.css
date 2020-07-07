@@ -1,0 +1,7 @@
+.cardGroup {
+    margin-bottom: 20px;
+}
+
+.cardGroup :global(.Header__content) {
+    margin: 0 auto;
+}

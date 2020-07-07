@@ -11,13 +11,14 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 // Панели по умолчанию для каждого view
 const defaultPanels = {
     feed: "main",
-    profiles: "main",
-    checkIn: "main",
+    profiles: "chooseProfile",
+    checkIn: 0,
     calendar: "main",
     settings: "main",
 };
 
 const useNav = () => {
+    let [scrollHistory] = useState({});
     let [isNavbarVis] = useState(true);
     const [viewHistory] = useState(["feed"]);
     const [panelHistory] = useState({
@@ -31,9 +32,25 @@ const useNav = () => {
     const getActiveStory = () => viewHistory[viewHistory.length - 1];
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
+    const getScrollName = () => `${getActiveStory()}__${getActivePanel()}`;
+    const saveScroll = () => scrollHistory[getScrollName()] = document.scrollingElement.scrollTop;
+    const setSavedScroll = () => {
+        const name = getScrollName();
+        const scrollTop = name in scrollHistory ? scrollHistory[name] : 0;
+        document.scrollingElement.scrollTop = Math.min(scrollTop, document.scrollingElement.scrollHeight);
+    };
+
+    useEffect(() => {
+        setSavedScroll();
+    });
+
     // Функция возврата с экрана
     const goBack = () => {
+        // Сохраняем позицию скролла перед уходом
+        saveScroll();
+
         if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
+            saveScroll();
             panelHistory[getActiveStory()].pop();
         } else { // Переход между историями
             if (viewHistory.length === 1) {
@@ -58,6 +75,9 @@ const useNav = () => {
         // Если переход на ту же историю
         // Если переход на ту же панель внутри истории
         if (getActiveStory() === story && (getActivePanel() === panel || panel === null)) return;
+
+        // Сохраняем позицию скролла перед уходом
+        saveScroll();
 
         if (panel === null) {
             // Возвращаем iOS Swipe Back
@@ -135,10 +155,13 @@ const useNav = () => {
     // Упаковываем все функции
     let [nav, setNav] = useState(getNav());
 
-    console.log(
-        "View history: ", viewHistory,
-        "\nCurrent panel history: ", panelHistory[getActiveStory()]
-    );
+    // Логи
+    console.group("Navigation");
+    console.log("View history: ", viewHistory);
+    console.log("Current panel history: ", panelHistory[getActiveStory()]);
+    console.log("Scroll history: ", scrollHistory);
+    console.groupEnd();
+
     return nav;
 };
 

@@ -1,7 +1,36 @@
 :root {
-    --very_good: #14D947;
-    --good: #9CE80C;
-    --norm: #FECE00;
-    --bad: #E87D0C;
-    --very_bad: #FF2D14;
+    --very_good: #9EF9A7;
+    --good: #D1F99E;
+    --norm: #F3F59E;
+    --bad: #FAD19E;
+    --very_bad: #FAA49E;
+    --default_chart_color: #ADD3FF;
+}
+
+.datepicker.default {
+    background-color: var(--background_content) !important;
+}
+
+.datepicker.default .datepicker-viewport::after {
+    background: linear-gradient(
+            var(--background_content),
+            rgba(245, 245, 245, 0) 52%,
+            rgba(245, 245, 245, 0) 48%,
+            var(--background_content)
+    );
+}
+
+.datepicker.default .datepicker-wheel {
+    border-color: var(--separator_common) !important;
+}
+
+.datepicker.default .datepicker-scroll li {
+    color: var(--text_muted);
+    font-family: var(--font-common);
+}
+
+.datepicker-navbar-btn {
+    color: var(--accent) !important;
+    font-weight: 500;
+    font-family: var(--font-common);
 }
