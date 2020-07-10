@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from "./statsCompareLegend.module.css";
 import {Subhead, Title} from "@vkontakte/vkui";
-import emoji from "../../../../utils/getEmoji";
+import emoji from "../../../../../utils/getEmoji";
 import moment from 'moment';
 import momentLocale from "moment/locale/ru";
 

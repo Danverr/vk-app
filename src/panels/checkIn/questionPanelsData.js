@@ -2,6 +2,23 @@ import moment from "moment";
 import emoji from "../../utils/getEmoji";
 import callPicker from "../../utils/callPicker";
 
+export const getValueIndex = (param, value) => {
+    const buttons = questionPanelsData.find((panel) => {
+        return panel.param === param;
+    }).buttons;
+
+    if (param === "date") {
+        if (value.isSame(moment())) return 0;
+        else if (value.isSame(moment().subtract(1, "days"))) return 1;
+        else if (value.isSame(moment().subtract(2, "days"))) return 2;
+        else return 3;
+    } else {
+        for (let i = 0; i < buttons.length; i++) {
+            if (buttons[i].value === value) return i;
+        }
+    }
+};
+
 const questionPanelsData = [
     {
         param: "date",

@@ -9,15 +9,7 @@ const useAppState = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [rootPopup, setRootPopup] = useState(<ScreenSpinner/>);
     const [entryAdded, setEntryAdded] = useState(false);
-    const [answer, setAnswer] = useState({
-        mood: {val: null, index: null},
-        stress: {val: null, index: null},
-        anxiety: {val: null, index: null},
-        title: {val: "", index: null},
-        note: {val: "", index: null},
-        date: {val: null, index: null},
-        isPublic: {val: 0, index: null},
-    });
+    const [updatingEntryData, setUpdatingEntryData] = useState(null);
 
     const fetchUserToken = () => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -37,7 +29,7 @@ const useAppState = () => {
         });
     };
 
-    const fetchUserInfo = async (userToken) => {
+    const fetchUserInfo = async () => {
         // Данные о пользователе
         let userInfo = await bridge.send('VKWebAppGetUserInfo');
         userInfo["isCurrentUser"] = true;
@@ -59,8 +51,8 @@ const useAppState = () => {
         rootPopup: rootPopup,
         userToken: userToken,
         userInfo: userInfo,
-        answer: answer,
-        setAnswer: setAnswer,
+        updatingEntryData: updatingEntryData,
+        setUpdatingEntryData: setUpdatingEntryData,
         entryAdded: entryAdded,
         setEntryAdded: setEntryAdded
     };

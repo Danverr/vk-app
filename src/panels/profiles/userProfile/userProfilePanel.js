@@ -126,7 +126,7 @@ const UserProfilePanel = (props) => {
                         </Group>
 
                         <Group header={<Header mode="secondary">Cтатистика по дням</Header>}>
-                            <StatsChart stats={stats.meanByDays} activeParam={activeParam}/>
+                            <StatsChart userId={userInfo.id} stats={stats.meanByDays} activeParam={activeParam}/>
                         </Group>
 
                         <Group header={<Header mode="secondary">Cравнение недель</Header>}>

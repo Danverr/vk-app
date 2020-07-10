@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header, Group, Spinner } from '@vkontakte/vkui';
+import React, {useState, useEffect} from 'react';
+import {Panel, PanelHeader, View, Div, Header, Group, Spinner} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import api from "../../utils/api";
 import moment from 'moment';
-import TextPost from '../../components/TextPost/TextPost'
+import TextPost from '../../components/textPost/textPost'
 import Calendar from './Calendar/Calendar';
 
 let localState = {
-    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
+    calendarField: <Spinner size="large" style={{marginTop: 20}}/>,
     entriesField: null,
     userEntries: {},
     userStats: {},
@@ -22,7 +22,7 @@ const CalendarStory = (props) => {
     const [userStats, setUserStats] = useState(localState.userStats);
     const [curDate, setCurDate] = useState(moment(localState.curDate));
     const [popout, setPopout] = useState(null);
-    const { userInfo } = props.state;
+    const {userInfo} = props.state;
 
     useEffect(() => {
         if (!userInfo.id)
@@ -32,7 +32,8 @@ const CalendarStory = (props) => {
             let entriesPromise = await api("GET", "/entries/", {
                 users: userInfo.id,
             });
-            let entries = entriesPromise.data[userInfo.id], temp = {};
+
+            let entries = entriesPromise.data, temp = {};
             entries.forEach(
                 (entry) => {
                     let date = moment.utc(entry.date);
@@ -61,9 +62,9 @@ const CalendarStory = (props) => {
                 mood = Math.floor(mood + 0.5);
                 stress = Math.floor(stress + 0.5);
                 anxiety = Math.floor(anxiety + 0.5);
-                stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
+                stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
             }
-            
+
             setUserStats(stats);
             localState.userStats = stats;
         }
@@ -78,7 +79,7 @@ const CalendarStory = (props) => {
         if (userEntries[curDate.format("YYYY-MM-DD")]) {
             let temp = [];
             userEntries[curDate.format("YYYY-MM-DD")].forEach((entry) => {
-                temp.push(<TextPost key = {entry.entryId} postData={{ user: userInfo, post: entry }} />);
+                temp.push(<TextPost key={entry.entryId} postData={{user: userInfo, post: entry}}/>);
             });
             setEntriesField(temp);
             localState.entriesField = temp;
@@ -89,28 +90,28 @@ const CalendarStory = (props) => {
     }, [userInfo, userEntries, curDate]);
 
     useEffect(() => {
-        let temp = <Calendar 
-        setPopout = {setPopout}
-        onDateChange={(date) => { 
-            setCurDate(moment(date)); 
-            localState.curDate = moment(date); 
-        }} 
-        stats={userStats} />;
+        let temp = <Calendar
+            setPopout={setPopout}
+            onDateChange={(date) => {
+                setCurDate(moment(date));
+                localState.curDate = moment(date);
+            }}
+            stats={userStats}/>;
         setCalendarField(temp);
         localState.calendarField = temp;
     }, [userStats])
- 
+
     return (
         <View id={props.id}
-            popout = {popout}
-            activePanel={props.nav.activePanel}
-            history={props.nav.viewHistory}
-            onSwipeBack={props.nav.goBack}
+              popout={popout}
+              activePanel={props.nav.activePanel}
+              history={props.nav.viewHistory}
+              onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Group separator="show">
-                    <Div style={{ paddingTop: "0px" }}>
+                    <Div style={{paddingTop: "0px"}}>
                         {calendarField}
                     </Div>
                 </Group>

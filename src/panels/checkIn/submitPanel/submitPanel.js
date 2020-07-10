@@ -1,6 +1,11 @@
-import {Cell, FormLayout, FormLayoutGroup, Input, Textarea, Switch, Button, ScreenSpinner} from "@vkontakte/vkui";
+import {
+    FormLayout, FormLayoutGroup, FormStatus, Input, Textarea,
+    Switch, Button, ScreenSpinner, Cell
+} from "@vkontakte/vkui";
 import React, {useState} from "react";
 import api from "../../../utils/api";
+import getAnswer from "../getAnswer";
+
 import QuestionSection from "../questionSection/questionSection";
 
 const SubmitPanel = (props) => {
@@ -8,7 +13,11 @@ const SubmitPanel = (props) => {
     const [isChecked, setCheck] = useState(answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
-    const [formMessage, setFormMessage] = useState({text: " ", status: "default"});
+    const [formStatus, setFormStatus] = useState({
+        title: "",
+        text: "",
+        mode: "default"
+    });
 
     // Обрабатываем изменения в поле заголовка
     const handleTitle = (event, name) => {
@@ -34,50 +43,58 @@ const SubmitPanel = (props) => {
     // Проверяем и отправляем данные
     const saveAnswer = () => {
         if (!answer.mood.val || !answer.stress.val || !answer.anxiety.val || !answer.date.val) {
-            let text = "";
+            let text = "Не указаны параметры:";
+            if (!answer.date.val) text += ", дата";
+            if (!answer.mood.val) text += ", настроение";
+            if (!answer.stress.val) text += ", стресс";
+            if (!answer.anxiety.val) text += ", тревожность";
+            text = text.replace(":,", ": ");
 
-            if (!answer.mood.val) text = "Настроение не указано!";
-            else if (!answer.stress.val) text = "Стресс стресс не указан!";
-            else if (!answer.anxiety.val) text = "Тревожность не указана!";
-            else if (!answer.date.val) text = "Дата не указана!";
-
-            setFormMessage({
+            setFormStatus({
+                title: "Недостаточно данных",
                 text: text,
-                status: "error"
+                mode: "error"
             });
         } else {
             props.setPopout(<ScreenSpinner/>);
+            setFormStatus({
+                title: "",
+                text: "",
+                mode: "default"
+            });
 
-            let entry = {};
-            for (const key in answer) entry[key] = answer[key].val;
-            entry.date = answer.date.val.clone().utc().format("YYYY-MM-DD HH:mm:ss");
+            const method = props.isEntryUpdate ? "PUT" : "POST";
 
-            api("POST", "/entries/", {
-                entries: JSON.stringify([entry])
-            })
-                .then((res) => {
-                    const status = res.response ? res.response.status : res.status;
+            // Форматируем данные
+            let data = {};
 
-                    if (status >= 300) { // Ошибка
-                        setFormMessage({
-                            text: "Упс! Что-то пошло не так. Попробуйте еще раз",
-                            status: "error"
-                        });
-                    } else { // Успех
-                        setAnswer({
-                            mood: {val: null, index: null},
-                            stress: {val: null, index: null},
-                            anxiety: {val: null, index: null},
-                            title: {val: "", index: null},
-                            note: {val: "", index: null},
-                            date: {val: null, index: null},
-                            isPublic: {val: 0, index: null},
-                        });
+            if (props.isEntryUpdate) {
+                for (const key in answer) {
+                    if (answer[key].val && key !== "date") data[key] = answer[key].val;
+                }
+            } else {
+                for (const key in answer) {
+                    if (key !== "entryId") data[key] = answer[key].val;
+                }
 
-                        props.nav.panelHistory.checkIn = [0];
-                        props.setEntryAdded(true);
-                        props.nav.goTo("feed");
-                    }
+                data.date = answer.date.val.clone().utc().format("YYYY-MM-DD HH:mm:ss");
+                data = {entries: JSON.stringify([data])};
+            }
+
+            api(method, "/entries/", data)
+                .then(() => {
+                    setAnswer(getAnswer());
+
+                    props.nav.panelHistory.checkIn = [0];
+                    props.setEntryAdded(true);
+                    props.nav.goTo("feed");
+                })
+                .catch((error) => {
+                    setFormStatus({
+                        title: "Упс, что-то пошло не так!",
+                        text: error.message,
+                        mode: "error"
+                    });
                 })
                 .finally(() => { // Выполнить в любом случае
                     props.setPopout(null);
@@ -91,6 +108,13 @@ const SubmitPanel = (props) => {
             <FormLayout style={{paddingBottom: "16px"}}>
 
                 <FormLayoutGroup>
+                    {
+                        formStatus.text.length === 0 ? null :
+                            <FormStatus header={formStatus.title} mode={formStatus.mode}>
+                                {formStatus.text}
+                            </FormStatus>
+                    }
+
                     <Input placeholder="Назовите этот день"
                            maxLength="64"
                            value={titleText}
@@ -110,8 +134,6 @@ const SubmitPanel = (props) => {
                     size="xl"
                     mode="primary"
                     onClick={saveAnswer}
-                    status={formMessage.status}
-                    bottom={formMessage.text}
                 >
                     Сохранить
                 </Button>

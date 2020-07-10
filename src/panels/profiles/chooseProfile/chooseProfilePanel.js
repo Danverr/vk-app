@@ -1,25 +1,92 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Panel, PanelHeader, Group, CardGrid, Spinner} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
-import '@vkontakte/vkui/dist/vkui.css';
+import api from "../../../utils/api";
+import bridge from "@vkontakte/vk-bridge";
+import moment from "moment";
 
 import ProfileCard from "./profileCard/profileCard";
+import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlaceholder";
+
+const fetchFriendsInfo = async (userToken) => {
+    // ID друзей к которым есть доступ
+    const friendsIdsPromise = await api("GET", "/statAccess/", {
+        type: "fromId",
+    });
+
+    // Информация о друзьях
+    const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
+        method: "users.get",
+        params: {
+            access_token: userToken,
+            v: "5.103",
+            user_ids: friendsIdsPromise.data.join(","),
+            fields: "photo_50, photo_100"
+        }
+    });
+
+    return friendsInfoPromise.response.map((info) => {
+        return {...info, "isCurrentUser": false};
+    });
+};
+
+const defaultStats = {
+    mood: [],
+    stress: [],
+    anxiety: [],
+};
+
+let localState = {
+    usersInfo: null,
+    stats: null,
+};
 
 const ChooseProfilePanel = (props) => {
-    const defaultStats = {
-        mood: [],
-        stress: [],
-        anxiety: [],
-    };
+    const [error, setError] = useState(null);
+    const [usersInfo, setUsersInfo] = useState(localState.usersInfo);
+    const [stats, setStats] = useState(localState.stats);
+    const {userToken, userInfo, activePanel, formatStats, id: panelId} = props;
+
+    // Обновляем локальный стейт
+    useEffect(() => {
+        localState = {
+            usersInfo: usersInfo,
+            stats: stats
+        };
+    }, [stats, usersInfo]);
+
+    // Загружаем данные о друзьях
+    useEffect(() => {
+        if (!userToken || !userInfo || activePanel !== panelId) return;
+
+        fetchFriendsInfo(userToken).then((friendsInfo) => {
+            setUsersInfo([userInfo, ...friendsInfo]);
+        });
+
+        // Загрузка статистики пользователей для карточек
+        api("GET", "/entries/stats/", {
+            startDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
+        }).then((res) => {
+            let newStats = {};
+
+            for (const userId in res.data) {
+                newStats[userId] = formatStats(res.data[userId]);
+            }
+
+            setStats(newStats);
+        }).catch((error) => {
+            setError(<ErrorPlaceholder error={error}/>);
+        });
+    }, [userToken, userInfo, activePanel, formatStats, panelId]);
 
     // Преобразовываем данные в карточки
     let profileCards = [];
-    if (props.usersInfo) {
-        profileCards = props.usersInfo.map((info, i) =>
+    if (usersInfo) {
+        profileCards = usersInfo.map((info, i) =>
             <ProfileCard
                 key={info.id}
                 info={info}
-                stats={props.stats ? props.stats[info.id].meanByDays : defaultStats}
+                stats={stats ? stats[info.id].meanByDays : defaultStats}
                 name={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
                 goToUserProfile={props.goToUserProfile}
                 setActiveUserProfile={props.setActiveUserProfile}
@@ -27,16 +94,19 @@ const ChooseProfilePanel = (props) => {
         );
     }
 
+    let content = <Spinner size="large"/>;
+
+    if (error) {
+        content = error;
+    } else if (usersInfo && stats) {
+        content = <CardGrid>{profileCards}</CardGrid>
+    }
+
     return (
-        <Panel id={props.id}>
+        <Panel id={panelId}>
             <PanelHeader separator={false}>Профиль</PanelHeader>
             <Group className={styles.cardGroup} separator="hide">
-                <CardGrid>
-                    {
-                        // Ставим спиннер, пока данные о юзерах не будут загружены
-                        props.usersInfo && props.stats ? profileCards : <Spinner size="large"/>
-                    }
-                </CardGrid>
+                {content}
             </Group>
         </Panel>
     );
