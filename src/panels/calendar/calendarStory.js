@@ -30,7 +30,7 @@ const CalendarStory = (props) => {
     // функции, нужные для работы оболочки постов
     const [deletedEntryField, setDeletedEntryField] = useState(null);
     const [displayEntries, setDisplayEntries] = useState(
-        (states.feed.renderedEntries) ? states.feed.getRenderedEntries() : < Spinner size='large' />);
+        (states.calendar.renderedEntries) ? states.calendar.getRenderedEntries() : < Spinner size='large' />);
     const [curPopout, setCurPopout] = useState(null);
 
     const { userInfo } = props.state;
@@ -38,6 +38,9 @@ const CalendarStory = (props) => {
     useEffect(() => {
         if (!userInfo.id)
             return;
+
+        console.log(states.calendar);
+        console.log(displayEntries);
 
         states.calendar.init(setDeletedEntryField, setCurPopout, setDisplayEntries, userInfo, null, null);
 

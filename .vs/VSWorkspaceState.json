@@ -1,11 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\public",
     "\\src",
     "\\src\\components",
-    "\\src\\panels",
-    "\\src\\panels\\feed"
+    "\\src\\components\\DeleteBar",
+    "\\src\\panels\\calendar",
+    "\\src\\panels\\calendar\\react-calendar",
+    "\\src\\panels\\settings\\friendsPanel",
+    "\\src\\panels\\settings\\importEntriesPanel",
+    "\\src\\panels\\settings\\importEntriesPanel\\loadSpinner"
   ],
-  "SelectedNode": "\\src\\panels\\feed\\feedStory.js",
+  "SelectedNode": "\\src\\components\\entryConvex.js",
   "PreviewInSolutionExplorer": false
 }

@@ -57,7 +57,7 @@
 }
 
 .parametrText {
-    margin-right: 8px;
+    margin-right: 15px;
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
 }
@@ -79,6 +79,6 @@
     margin-right: 16px;
     margin-bottom: 16px;
     display: grid;
-    grid-template-columns: 1fr 9fr 31px;
+    grid-template-columns: 1fr 9fr 38px;
     grid-template-rows: 40px 40px 40px;
 }

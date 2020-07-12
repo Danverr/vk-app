@@ -29,8 +29,8 @@ const App = () => {
                     <FeedStory id="feed" state={state} nav={nav}/>
                     <ProfilesStory id="profiles" state={state} nav={nav}/>
                     <CheckInStory id="checkIn" state={state} nav={nav}/>
-                    <CalendarStory id="calendar" state={state} nav={nav}/>
-                    <SettingsStory id="settings" state={state} nav={nav}/>
+                    <CalendarStory id="calendar" state={state} nav={nav} />
+                    <SettingsStory id="settings" state={state.settings} nav={nav} />
                 </Epic>
             </Root>
         </ConfigProvider>

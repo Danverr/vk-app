@@ -2,21 +2,20 @@ import React, { useState, useEffect } from 'react';
 
 import {
     Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, List, Cell, PanelHeaderContent,
-    CardGrid, Spinner
+    CardGrid, Spinner, Snackbar, Text
 } from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ListOutline from '@vkontakte/icons/dist/28/list_outline';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+
 import './feedStory.css'
 
 import states from '../../components/entryConvex.js'
 
-import api from '../../utils/api'
-
 const Feed = (props) => {
-    const [curPopout, setCurPopout] = useState(null);
+    const [curPopout, setCurPopout] = useState(null);   
     const [fetching, setFetching] = useState(null);
     const [wasUpdated, setWasUpdated] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
@@ -27,11 +26,24 @@ const Feed = (props) => {
         (states.feed.renderedEntries) ? states.feed.getRenderedEntries() : < Spinner size='large' />);
 
     useEffect(() => {
+        if (props.state.entryAdded) {
+            props.state.setEntryAdded(null);
+            setDeletedEntryField(
+                <Snackbar
+                    layout="horizontal"
+                    onClose={() => { setDeletedEntryField(null); }}
+                    duration={5000}
+                    before={<Icon24Done fill="var(--accent)" />}
+                >
+                    <Text> Запись добавлена </Text>
+                </Snackbar>)
+        }
+
         if (!props.state.userInfo || !props.state.userToken) return;
 
         states.feed.init(setDeletedEntryField, setCurPopout, setDisplayEntries,
             props.state.userInfo, 
-            props.state.userToken, setFetching);
+            props.state.userToken, setFetching, props.nav, props.state.setAnswer);
 
         if (!states.feed.needUpdate) return;
 

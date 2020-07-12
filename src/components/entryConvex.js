@@ -4,10 +4,6 @@ import TextPost from '../components/TextPost/TextPost.js'
 import bridge from "@vkontakte/vk-bridge";
 import api from '../utils/api.js'
 
-const renderData = (post) => {
-    return <TextPost postData={post} />;
-}
-
 /* методы, которые можно использовать в оболочках */
 
 function setUserInfo(userInfo) {
@@ -128,13 +124,16 @@ function deleteEntryFromList(post) {
 }
 
 /*  основные функции, нужные для работы оболочки  */
-function init(setDeletedEntryField, setCurPopout, setDisplayEntries, userInfo, userToken, setFetching) {
+function init(setDeletedEntryField, setCurPopout, setDisplayEntries, userInfo, userToken, setFetching, nav, setAnswer) {
     this.setDeletedEntryField = setDeletedEntryField;
     this.setCurPopout = setCurPopout;
     this.setDisplayEntries = setDisplayEntries;
     this.setUserInfo(userInfo);
     this.setUserToken(userToken);
     this.setFetching = setFetching;
+    this.nav = nav;
+    this.setAnswer = setAnswer;
+   
 }
 
 function getRenderedEntries() {
@@ -170,7 +169,7 @@ function getInstance() {
 }
 
 // используемые оболочки
-
+    
 export const states = {
     feed: getInstance(),
     calendar: getInstance(), 

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { ScreenSpinner } from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 
+import api from "./api";
+
 const APP_ID = 7424071;
 
 function useAppState() {
@@ -129,8 +131,17 @@ function useAppState() {
         initAppState();
     }, []);
 
+    // Profiles
+    const [activeUserProfile, setActiveUserProfile] = useState(null);
+
     return {
         rootPopup: rootPopup,
+        userToken: userToken,
+        userInfo: userInfo,
+        answer: answer,
+        setAnswer: setAnswer,
+        entryAdded: entryAdded,
+        setEntryAdded: setEntryAdded,
 
         feed: null,
         profiles: {

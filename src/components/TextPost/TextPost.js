@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
 import {
-    Cell, Progress, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Snackbar
+    Cell, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert
 } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import { platform, IOS } from '@vkontakte/vkui';
 
-import DeleteBar from '../DeleteBar/DeleteBar.js';
+import ProgressBar from '../ProgressBar/ProgressBar'
+import DeleteBar from '../DeleteBar/DeleteBar'
+
 import emojiList from '../../assets/emoji/emojiList.js';
 import { getDateDescription } from './../../utils/chrono.js'
 
@@ -47,6 +49,10 @@ const TextPost = (props) => {
         }, 60 * 1000);
     };
 
+    const editPost = () => {
+        
+    };
+
     const deletePost = () => {
         dat.states.deleteEntryFromList(dat);
         dat.states.deleteEntryFromBase(dat.post.entryId);
@@ -79,8 +85,8 @@ const TextPost = (props) => {
     const onSettingClick = () => {
         dat.states.setDeletedEntryField(null);
         dat.states.setCurPopout(
-            <ActionSheet onClose={() => { dat.states.setCurPopout(null);}}>
-                <ActionSheetItem onClick={() => { alert("YES!") }} autoclose>
+            <ActionSheet onClose={() => { dat.states.setCurPopout(null); }}>
+                <ActionSheetItem onClick={editPost} autoclose>
                     <Text> Редактировать пост </Text>
                 </ActionSheetItem>
 
@@ -101,7 +107,7 @@ const TextPost = (props) => {
                     <Text weight='regular' style={{ 'fontSize': '85%' }}> Настроение </Text>
                     <div />
                 </div>
-                <div className={s.parametrProgres}> <div /> <Progress value={mood} /> <div /> </div>
+                <div className={s.parametrProgres}> <div /> <ProgressBar param="mood" value={mood} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
                 <div className={s.parametrText}>
@@ -109,7 +115,7 @@ const TextPost = (props) => {
                     <Text weight='regular' style={{ 'fontSize': '85%' }}> Стресс </Text>
                     <div />
                 </div>
-                <div className={s.parametrProgres}> <div /> <Progress value={stress} /> <div /> </div>
+                <div className={s.parametrProgres}> <div /> <ProgressBar param="stress" value={stress} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiStress} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
                 <div className={s.parametrText}>
@@ -117,7 +123,7 @@ const TextPost = (props) => {
                     <Text weight='regular' style={{ 'fontSize': '85%' }}> Тревожность </Text>
                     <div />
                 </div>
-                <div className={s.parametrProgres}> <div /> <Progress value={anxiety} /> <div /> </div>
+                <div className={s.parametrProgres}> <div /> <ProgressBar param="anxiety" value={anxiety} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
             </div>
         );
@@ -146,6 +152,28 @@ const TextPost = (props) => {
 }
 
 export default TextPost;
+
+/*
+ * <Cell className={s.reference} description={<Text> {dateField} </Text>}
+                before={<Avatar size={40} src={userAva} />}
+                asideContent={(user.id === currentUser.id) ?
+                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
+                {<Text> {user.first_name} {user.last_name} </Text>}
+            </Cell>
+            {(description !== "" || text !== "") ? <div className={s.content}>
+                <Subhead weight='bold' className={s.title}>
+                    {description}
+                </Subhead>
+                <Text weight='regular'>
+                    {text}
+                </Text>
+            </div> : null}
+            {parametrField()}
+            {updateDateField()}
+ * 
+ * 
+ * 
+ */ 
 
 /*
  * теги настроения
