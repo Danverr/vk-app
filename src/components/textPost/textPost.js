@@ -50,7 +50,7 @@ const TextPost = (props) => {
     };
 
     const editPost = () => {
-        
+
     };
 
     const deletePost = () => {
@@ -71,7 +71,7 @@ const TextPost = (props) => {
                     {
                         title: 'Да',
                         autoclose: true,
-                        action : deletePost 
+                        action : deletePost
                     }]
                 }
                 onClose={() => { dat.states.setCurPopout(null); }}
@@ -170,10 +170,10 @@ export default TextPost;
             </div> : null}
             {parametrField()}
             {updateDateField()}
- * 
- * 
- * 
- */ 
+ *
+ *
+ *
+ */
 
 /*
  * теги настроения

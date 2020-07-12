@@ -3,14 +3,16 @@ import {View, Gallery, Panel, PanelHeaderBack, PanelHeader} from '@vkontakte/vku
 import '@vkontakte/vkui/dist/vkui.css';
 import styles from "./checkInStory.module.css";
 
+import getAnswer from "./getAnswer";
 import questionPanelsData from "./questionPanelsData";
+
 import QuestionPanel from "./questionPanel/questionPanel";
 import SubmitPanel from "./submitPanel/submitPanel";
 
-const getBullets = (index = questionPanelsData.length) => {
+const getBullets = (questionPanels, index) => {
     let bullets = [];
 
-    for (let i = 0; i < questionPanelsData.length + 1; i++) {
+    for (let i = 0; i < questionPanels.length + 1; i++) {
         let bulletStyles = styles.bullet;
 
         if (i === index) {
@@ -23,11 +25,36 @@ const getBullets = (index = questionPanelsData.length) => {
     return (<div className={styles.bulletsContainer}>{bullets}</div>);
 };
 
+const localState = {
+    answer: getAnswer(),
+};
+
 const CheckInStory = (props) => {
-    const {answer, setAnswer} = props.state;
+    const {updatingEntryData, setUpdatingEntryData} = props.state;
+    const isEntryUpdate = updatingEntryData !== null;
+
+    const [answer, setAnswer] = useState(isEntryUpdate ? getAnswer(updatingEntryData) : localState.answer);
     const [popout, setPopout] = useState(null);
     const activeSlideIndex = props.nav.activePanel;
     const {setNavbarVis} = props.nav;
+
+    // Включаем и отключаем BottomNavBar (Epic)
+    useEffect(() => {
+        setNavbarVis(false);
+        return () => setNavbarVis(true);
+    }, [setNavbarVis]);
+
+    // Обновляем ответ в localState
+    useEffect(() => {
+        if (!isEntryUpdate) localState.answer = answer;
+    }, [answer, isEntryUpdate]);
+
+    // Если редактировали пост, сбросим его при уходе
+    useEffect(() => {
+        return () => {
+            if (isEntryUpdate) setUpdatingEntryData(null);
+        }
+    }, [isEntryUpdate, setUpdatingEntryData]);
 
     const goToSlideIndex = (index) => {
         for (let i = activeSlideIndex; i !== index;) {
@@ -41,12 +68,9 @@ const CheckInStory = (props) => {
         }
     };
 
-    useEffect(() => {
-        setNavbarVis(false);
-        return () => {
-            setNavbarVis(true);
-        };
-    }, [setNavbarVis]);
+    const questionPanels = questionPanelsData.filter((panel) => {
+        return !(isEntryUpdate && panel.param === "date");
+    });
 
     return (
         <View id={props.id}
@@ -58,7 +82,7 @@ const CheckInStory = (props) => {
                     separator={false}
                     left={<PanelHeaderBack onClick={() => window.history.back()}/>}
                 >
-                    {getBullets(activeSlideIndex)}
+                    {getBullets(questionPanels, activeSlideIndex)}
                 </PanelHeader>
 
                 <Gallery
@@ -68,7 +92,7 @@ const CheckInStory = (props) => {
                     onChange={slideIndex => goToSlideIndex(slideIndex)}
                 >
 
-                    {questionPanelsData.map((slideData, i) => {
+                    {questionPanels.map((slideData, i) => {
                         return (
                             <QuestionPanel
                                 key={i}
@@ -87,6 +111,7 @@ const CheckInStory = (props) => {
                         setPopout={setPopout}
                         setAnswer={setAnswer}
                         setEntryAdded={props.state.setEntryAdded}
+                        isEntryUpdate={isEntryUpdate}
                     />
 
                 </Gallery>

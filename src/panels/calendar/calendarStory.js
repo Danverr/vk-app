@@ -4,7 +4,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import api from "../../utils/api";
 import moment from 'moment';
-import TextPost from '../../components/TextPost/TextPost'
+import TextPost from '../../components/textPost/textPost'
 import Calendar from './Calendar/Calendar';
 
 import states from '../../components/entryConvex.js'
@@ -12,10 +12,7 @@ import states from '../../components/entryConvex.js'
 let localState = {
     calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
     userStats: {},
-    minMonth: moment().startOf('month'),
-    maxMonth: moment().startOf('month'),
-    curMonth: moment().startOf('month'),
-    curDate: moment()
+    curDate: null
 };
 
 const CalendarStory = (props) => {
@@ -61,7 +58,7 @@ const CalendarStory = (props) => {
             setUserEntries(temp);
             localState.userEntries = temp;
 
-            let stats = {}, l = moment().startOf('month'), r = moment().startOf('month');
+            let stats = {};
 
             for (let day in temp) {
                 let mood = 0, stress = 0, anxiety = 0;
@@ -82,14 +79,9 @@ const CalendarStory = (props) => {
                 mood = Math.floor(mood + 0.5);
                 stress = Math.floor(stress + 0.5);
                 anxiety = Math.floor(anxiety + 0.5);
-                stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
+                stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
             }
-            l.startOf('month');
-            r.startOf('month');
-            setMinMonth(l);
-            localState.minMonth = l;
-            setMaxMonth(r);
-            localState.maxMonth = r;
+
             setUserStats(stats);
             localState.userStats = stats;
         }
@@ -148,7 +140,7 @@ const CalendarStory = (props) => {
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Group separator="show">
-                    <Div style={{ paddingTop: "0px" }}>
+                    <Div style={{paddingTop: "0px"}}>
                         {calendarField}
                     </Div>
                 </Group>
