@@ -10,7 +10,7 @@ const DeleteBar = (props) => {
             layout="horizontal"
             onClose={() => { props.onClose(null); }}
             duration={5000}
-            before={<Icon24Delete fill="var(--accent)" />}
+            before={<Icon24Delete fill="#E64646" />}
         >
                 <Text> Запись удалена </Text>
         </Snackbar>

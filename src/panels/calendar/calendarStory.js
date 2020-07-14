@@ -2,33 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import api from "../../utils/api";
 import moment from 'moment';
-import TextPost from '../../components/textPost/textPost'
 import Calendar from './Calendar/Calendar';
-
-import states from '../../components/entryConvex.js'
+import states from '../../components/entryWrapper';
+import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
 
 let localState = {
+    ...states.calendar, 
     calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
-    userStats: {},
     curDate: null
 };
 
 const CalendarStory = (props) => {
     const [calendarField, setCalendarField] = useState(localState.calendarField);
-    const [userEntries, setUserEntries] = useState(localState.userEntries);
+    const [entriesField, setEntriesField] = useState(localState.renderedEntries);
     const [userStats, setUserStats] = useState(localState.userStats);
-    const [minMonth, setMinMonth] = useState(localState.minMonth);
-    const [maxMonth, setMaxMonth] = useState(localState.maxMonth);
-    const [curMonth, setCurMonth] = useState(localState.curMonth);
-    const [curDate, setCurDate] = useState(localState.curDate);
-
-    // функции, нужные для работы оболочки постов
+    const [curDate, setCurDate] = useState(moment(localState.curDate));
+    const [popout, setPopout] = useState(null);
+    const [fetching, setFetching] = useState(1);
     const [deletedEntryField, setDeletedEntryField] = useState(null);
-    const [displayEntries, setDisplayEntries] = useState(
-        (states.calendar.renderedEntries) ? states.calendar.getRenderedEntries() : < Spinner size='large' />);
-    const [curPopout, setCurPopout] = useState(null);
+    const [error, setError] = useState(null);
 
     const { userInfo } = props.state;
 
@@ -36,117 +29,75 @@ const CalendarStory = (props) => {
         if (!userInfo.id)
             return;
 
-        console.log(states.calendar);
-        console.log(displayEntries);
-
-        states.calendar.init(setDeletedEntryField, setCurPopout, setDisplayEntries, userInfo, null, null);
-
-        const getUserEntries = async () => {
-            let entriesPromise = await api("GET", "/entries/", {
-                users: userInfo.id,
-            });
-            let entries = entriesPromise.data, temp = {};
-            entries.map(
-                (entry) => {
-                    let date = moment.utc(entry.date);
-                    let now = date.local().format("YYYY-MM-DD");
-
-                    if (temp[now] == null) temp[now] = [entry];
-                    else temp[now] = [...temp[now], entry];
-                });
-
-            setUserEntries(temp);
-            localState.userEntries = temp;
-
-            let stats = {};
-
-            for (let day in temp) {
-                let mood = 0, stress = 0, anxiety = 0;
-
-                let date = moment(day);
-                if (date < l) l = date;
-                if (date > r) r = date;
-
-                temp[day].map((entry) => {
-                    mood += entry.mood;
-                    stress += entry.stress;
-                    anxiety += entry.anxiety;
-                });
-
-                mood /= temp[day].length;
-                stress /= temp[day].length;
-                anxiety /= temp[day].length;
-                mood = Math.floor(mood + 0.5);
-                stress = Math.floor(stress + 0.5);
-                anxiety = Math.floor(anxiety + 0.5);
-                stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
-            }
-
-            setUserStats(stats);
-            localState.userStats = stats;
+        localState = {
+            ...localState,
+            setDeletedEntryField: setDeletedEntryField,
+            setPopout: setPopout,
+            setDisplayEntries: setEntriesField,
+            userInfo: userInfo,
+            setFetching: setFetching,
+            nav: props.nav,
+            setUpdatingEntryData: props.state.setUpdatingEntryData,
+            setUserStats: setUserStats,
+            setError: setError,
         }
-        getUserEntries();
+
+        localState.updateState();
     }, [userInfo]);
 
-    //изменился выбранный день
+
+    //изменился выбранный день или загрузились записи пользователя
     useEffect(() => {
-        if (!userInfo || !userEntries)
+        if (!userInfo || !curDate || fetching)
             return;
 
-        if (userEntries[curDate.format("YYYY-MM-DD")]) {
+        if (localState.entriesOfDate[curDate.format("YYYY-MM-DD")]) {
             let temp = [];
             let objs = [];
-            userEntries[curDate.format("YYYY-MM-DD")].map((entry) => {
+            localState.entriesOfDate[curDate.format("YYYY-MM-DD")].forEach((entry) => {
                 const obj = {
                     user: userInfo,
                     post: entry,
                     currentUser: userInfo,
-                    states: states.calendar,
+                    states: localState,
                 };
-                temp.push(
-                    <TextPost key={entry.entryId}
-                        postData={obj} />);
                 objs.push(obj);
             });
-            states.calendar.setRenderedEntries(objs);
-            setDisplayEntries(temp);
+            localState.setEntries(1, objs);
         } else {
-            states.calendar.setRenderedEntries(null);
-            setDisplayEntries(null);
+            localState.setEntries(1, null);
         }
-    }, [userInfo, userEntries, curDate]);
+    }, [userInfo, fetching, curDate]);
 
     useEffect(() => {
         let temp = <Calendar
-            minMonth={minMonth}
-            maxMonth={maxMonth}
-            curMonth={curMonth}
-            curDate={curDate}
-            onClickPrev={(date) => { setCurMonth(date); localState.curMonth = date; }}
-            onClickNext={(date) => { setCurMonth(date); localState.curMonth = date; }}
-            onClickTile={(date) => { setCurDate(date); localState.curDate = date; }}
+            setPopout={setPopout}
+            onDateChange={(date) => {
+                setCurDate(moment(date));
+                localState.curDate = moment(date);
+            }}
             stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
-    }, [userStats, curMonth, curDate])
+    }, [userStats])
 
-    return (
+    return error ? <ErrorPlaceholder error={error} /> : (
         <View id={props.id}
+            popout={popout}
             activePanel={props.nav.activePanel}
             history={props.nav.viewHistory}
             onSwipeBack={props.nav.goBack}
-            popout={curPopout}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Group separator="show">
-                    <Div style={{paddingTop: "0px"}}>
+                    <Div style={{ paddingTop: "0px" }}>
                         {calendarField}
                     </Div>
                 </Group>
                 <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    <CardGrid style={{ 'padding': '15px' }}>
-                        {displayEntries}
+                    <CardGrid className="grid">
+                        {entriesField}
                     </CardGrid>
                 </Group>
                 {deletedEntryField}

@@ -5,12 +5,12 @@
     "\\src",
     "\\src\\components",
     "\\src\\components\\DeleteBar",
-    "\\src\\panels\\calendar",
-    "\\src\\panels\\calendar\\react-calendar",
-    "\\src\\panels\\settings\\friendsPanel",
-    "\\src\\panels\\settings\\importEntriesPanel",
-    "\\src\\panels\\settings\\importEntriesPanel\\loadSpinner"
+    "\\src\\components\\TextPost",
+    "\\src\\panels",
+    "\\src\\panels\\checkIn",
+    "\\src\\panels\\checkIn\\questionPanel",
+    "\\src\\utils"
   ],
-  "SelectedNode": "\\src\\components\\entryConvex.js",
+  "SelectedNode": "\\src\\components\\TextPost\\TextPost.js",
   "PreviewInSolutionExplorer": false
 }

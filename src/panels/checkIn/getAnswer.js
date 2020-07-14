@@ -1,6 +1,7 @@
 import {getValueIndex} from "./questionPanelsData";
 
 const getAnswer = (data = null) => {
+
     let answer = {
         entryId: {val: null},
         mood: {val: null, index: null},
