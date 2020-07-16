@@ -12,6 +12,8 @@ const fetchFriendsInfo = async (userToken) => {
     // ID друзей к которым есть доступ
     const friendsIdsPromise = await api("GET", "/statAccess/", {
         type: "fromId",
+    }).catch((error) => {
+        throw error;
     });
 
     // Информация о друзьях
@@ -23,6 +25,8 @@ const fetchFriendsInfo = async (userToken) => {
             user_ids: friendsIdsPromise.data.join(","),
             fields: "photo_50, photo_100"
         }
+    }).catch((error) => {
+        throw error;
     });
 
     return friendsInfoPromise.response.map((info) => {
@@ -45,7 +49,8 @@ const ChooseProfilePanel = (props) => {
     const [error, setError] = useState(null);
     const [usersInfo, setUsersInfo] = useState(localState.usersInfo);
     const [stats, setStats] = useState(localState.stats);
-    const {userToken, userInfo, activePanel, formatStats, id: panelId} = props;
+    const {userToken, userInfo, formatStats, id: panelId} = props;
+    const {activePanel} = props.nav;
 
     // Обновляем локальный стейт
     useEffect(() => {
@@ -57,10 +62,12 @@ const ChooseProfilePanel = (props) => {
 
     // Загружаем данные о друзьях
     useEffect(() => {
-        if (!userToken || !userInfo || activePanel !== panelId) return;
+        if (!userInfo || activePanel !== panelId) return;
 
         fetchFriendsInfo(userToken).then((friendsInfo) => {
             setUsersInfo([userInfo, ...friendsInfo]);
+        }).catch((error) => {
+            setError(error);
         });
 
         // Загрузка статистики пользователей для карточек
@@ -75,7 +82,7 @@ const ChooseProfilePanel = (props) => {
 
             setStats(newStats);
         }).catch((error) => {
-            setError(<ErrorPlaceholder error={error}/>);
+            setError(error);
         });
     }, [userToken, userInfo, activePanel, formatStats, panelId]);
 
@@ -97,7 +104,7 @@ const ChooseProfilePanel = (props) => {
     let content = <Spinner size="large"/>;
 
     if (error) {
-        content = error;
+        content = <ErrorPlaceholder error={error}/>;
     } else if (usersInfo && stats) {
         content = <CardGrid>{profileCards}</CardGrid>
     }

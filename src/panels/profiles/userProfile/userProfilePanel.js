@@ -6,14 +6,15 @@ import {
 } from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
 import emoji from "../../../utils/getEmoji";
+import api from "../../../utils/api";
 
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
+import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlaceholder";
 import StatsChart from "./statsChart/statsChart";
 import StatsCounter from "./statsCounter/statsCounter";
 import StatsCompare from "./statsCompare/statsCompare";
-import api from "../../../utils/api";
 
 let localState = {
     userId: null,
@@ -32,7 +33,8 @@ const UserProfilePanel = (props) => {
         };
     }
 
-    let [stats, setStats] = useState(localState.stats);
+    const [error, setError] = useState(null);
+    const [stats, setStats] = useState(localState.stats);
     const [activeParam, setActiveParam] = useState(localState.activeParam);
     const [contextOpened, setContextOpened] = useState(false);
 
@@ -53,6 +55,8 @@ const UserProfilePanel = (props) => {
             users: userInfo.id,
         }).then((res) => {
             setStats(formatStats(res.data[userInfo.id]));
+        }).catch((error) => {
+            setError(error);
         });
     }, [userInfo, formatStats]);
 
@@ -79,6 +83,32 @@ const UserProfilePanel = (props) => {
     const toggleContext = () => {
         setContextOpened(!contextOpened);
     };
+
+    let content = <Spinner size="large" className={styles.loadingSpinner}/>;
+
+    if (error) {
+        content = <ErrorPlaceholder error={error}/>;
+    } else if (stats) {
+        content = <>
+            <Group>
+                <Cell className={styles.avatarCell} before={<Avatar src={userInfo.photo_100}/>}>
+                    {`${userInfo.first_name} ${userInfo.last_name}`}
+                </Cell>
+            </Group>
+
+            <Group header={<Header mode="secondary">Cтатистика по дням</Header>}>
+                <StatsChart userId={userInfo.id} stats={stats.meanByDays} activeParam={activeParam}/>
+            </Group>
+
+            <Group header={<Header mode="secondary">Cравнение недель</Header>}>
+                <StatsCompare stats={stats.meanByDays} activeParam={activeParam}/>
+            </Group>
+
+            <Group header={<Header mode="secondary">Счетчик</Header>}>
+                <StatsCounter stats={stats.all} activeParam={activeParam}/>
+            </Group>
+        </>;
+    }
 
     return (
         <Panel id={props.id}>
@@ -115,29 +145,9 @@ const UserProfilePanel = (props) => {
                     }
                 </List>
             </PanelHeaderContext>
-            {
-                stats === null ? <Spinner size="large" className={styles.loadingSpinner}/> :
 
-                    <>
-                        <Group>
-                            <Cell className={styles.avatarCell} before={<Avatar src={userInfo.photo_100}/>}>
-                                {`${userInfo.first_name} ${userInfo.last_name}`}
-                            </Cell>
-                        </Group>
+            {content}
 
-                        <Group header={<Header mode="secondary">Cтатистика по дням</Header>}>
-                            <StatsChart userId={userInfo.id} stats={stats.meanByDays} activeParam={activeParam}/>
-                        </Group>
-
-                        <Group header={<Header mode="secondary">Cравнение недель</Header>}>
-                            <StatsCompare stats={stats.meanByDays} activeParam={activeParam}/>
-                        </Group>
-
-                        <Group header={<Header mode="secondary">Счетчик</Header>}>
-                            <StatsCounter stats={stats.all} activeParam={activeParam}/>
-                        </Group>
-                    </>
-            }
         </Panel>
     );
 };

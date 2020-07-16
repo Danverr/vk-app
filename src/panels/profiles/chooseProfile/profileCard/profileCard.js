@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Card, Cell, Div, Group, Placeholder, Subhead} from "@vkontakte/vkui";
+import {Avatar, Card, Cell, Group, Placeholder, Subhead} from "@vkontakte/vkui";
 import styles from "./profileCard.module.css";
 import {Line, LineChart, ResponsiveContainer, XAxis, YAxis} from "recharts";
 import getColors from "../../../../utils/getColors";
@@ -58,33 +58,31 @@ const Chart = React.memo(({data, param, title}) => {
 
 const ProfileCard = (props) => {
     return (
-        <Card size="l" mode="shadow" onClick={() => {
+        <Card className={styles.profileCard} size="l" mode="shadow" onClick={() => {
             props.goToUserProfile();
             props.setActiveUserProfile(props.info);
         }}>
-            <Div>
 
-                <Cell className={styles.avatarCell} before={<Avatar src={props.info.photo_100}/>}>
-                    {`${props.info.first_name} ${props.info.last_name}`}
-                </Cell>
+            <Cell className={styles.avatarCell} before={<Avatar src={props.info.photo_100}/>}>
+                {`${props.info.first_name} ${props.info.last_name}`}
+            </Cell>
 
-                {
-                    Object.values(props.stats).find(stats => stats.length < 2) !== undefined ?
+            {
+                Object.values(props.stats).find(stats => stats.length < 2) !== undefined ?
 
-                        <Placeholder header="Недостаточно записей">
-                            Для краткой статистики нужно хотя бы 2 записи за последние 7 дней
-                        </Placeholder>
+                    <Placeholder header="Недостаточно записей">
+                        Для краткой статистики нужно хотя бы 2 записи за последние 7 дней
+                    </Placeholder>
 
-                        :
+                    :
 
-                        <>
-                            <Chart data={props.stats.mood} param={"mood"} title={"Настроение"}/>
-                            <Chart data={props.stats.stress} param={"stress"} title={"Стресс"}/>
-                            <Chart data={props.stats.anxiety} param={"anxiety"} title={"Тревожность"}/>
-                        </>
-                }
+                    <>
+                        <Chart data={props.stats.mood} param={"mood"} title={"Настроение"}/>
+                        <Chart data={props.stats.stress} param={"stress"} title={"Стресс"}/>
+                        <Chart data={props.stats.anxiety} param={"anxiety"} title={"Тревожность"}/>
+                    </>
+            }
 
-            </Div>
         </Card>
     );
 };

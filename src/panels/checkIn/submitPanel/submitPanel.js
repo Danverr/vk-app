@@ -1,16 +1,19 @@
 import {
-    FormLayout, FormLayoutGroup, FormStatus, Input, Textarea,
+    FormLayout, FormStatus, Input, Textarea,
     Switch, Button, ScreenSpinner, Cell
 } from "@vkontakte/vkui";
 import React, {useState} from "react";
 import api from "../../../utils/api";
+import styles from "./submitPanel.module.css";
 import getAnswer from "../getAnswer";
+
+import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 
 import QuestionSection from "../questionSection/questionSection";
 
 const SubmitPanel = (props) => {
     const {answer, setAnswer} = props;
-    const [isChecked, setCheck] = useState(answer.isPublic.val);
+    const [isChecked, setCheck] = useState(!answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
     const [formStatus, setFormStatus] = useState({
@@ -35,7 +38,7 @@ const SubmitPanel = (props) => {
 
     // Переключаем доступ друзей к записи
     const switchPublic = (event) => {
-        answer.isPublic.val = event.target.checked ? 1 : 0;
+        answer.isPublic.val = event.target.checked ? 0 : 1;
         setAnswer(answer);
         setCheck(event.target.checked);
     };
@@ -105,30 +108,36 @@ const SubmitPanel = (props) => {
     return (
         <div>
             <QuestionSection question={"Что вам запомнилось?"} date={answer.date.val}/>
-            <FormLayout style={{paddingBottom: "16px"}}>
+            <FormLayout className={styles.formLayout}>
+                {
+                    formStatus.text.length === 0 ? null :
+                        <FormStatus header={formStatus.title} mode={formStatus.mode}>
+                            {formStatus.text}
+                        </FormStatus>
+                }
 
-                <FormLayoutGroup>
-                    {
-                        formStatus.text.length === 0 ? null :
-                            <FormStatus header={formStatus.title} mode={formStatus.mode}>
-                                {formStatus.text}
-                            </FormStatus>
-                    }
-
-                    <Input placeholder="Назовите этот день"
-                           maxLength="64"
-                           value={titleText}
-                           onChange={handleTitle}
-                    />
-                    <Textarea placeholder="Просто начните писать"
-                              maxLength="2048"
-                              value={noteText}
-                              onChange={handleNote}
-                    />
-                    <Cell asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>}>
-                        Видно друзьям
-                    </Cell>
-                </FormLayoutGroup>
+                <Input
+                    top="Заголовок"
+                    placeholder="Назовите этот день"
+                    maxLength="64"
+                    value={titleText}
+                    onChange={handleTitle}
+                />
+                <Textarea
+                    top="Текст заметки"
+                    placeholder="Просто начните писать"
+                    maxLength="2048"
+                    value={noteText}
+                    onChange={handleNote}
+                />
+                <Cell
+                    className={styles.privacySwitch}
+                    asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>}
+                    description="Заметка будет доступна только вам"
+                >
+                    <span>Приватная запись</span>
+                    <Icon12Lock className={styles.lockIcon}/>
+                </Cell>
 
                 <Button
                     size="xl"
@@ -137,7 +146,6 @@ const SubmitPanel = (props) => {
                 >
                     Сохранить
                 </Button>
-
             </FormLayout>
         </div>
     );

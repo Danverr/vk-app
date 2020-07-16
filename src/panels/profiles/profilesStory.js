@@ -110,7 +110,7 @@ const ProfilesStory = (props) => {
                 userToken={userToken}
                 userInfo={userInfo}
                 formatStats={formatStats}
-                activePanel={activePanel}
+                nav={props.nav}
             />
 
             <UserProfilePanel

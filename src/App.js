@@ -5,6 +5,10 @@ import '@vkontakte/vkui/dist/vkui.css';
 import useAppState from "./utils/useAppState";
 import useNav from "./utils/useNav";
 
+import GlobalErrorView from "./panels/globalError/globalErrorView";
+import LoadingScreen from "./panels/loadingScreen/loadingScreen";
+import IntroView from "./panels/intro/introView";
+
 import ProfilesStory from './panels/profiles/profilesStory';
 import FeedStory from "./panels/feed/feedStory";
 import CheckInStory from "./panels/checkIn/checkInStory";
@@ -22,10 +26,17 @@ const App = () => {
         window.addEventListener('popstate', goBack);
     }, [goBack]);
 
+    if (state.globalError) nav.goTo("globalError");
+    if (state.showIntro) nav.goTo("intro");
+
     return (
         <ConfigProvider isWebView={true}>
-            <Root activeView="Epic" popout={state.rootPopup}>
-                <Epic id="Epic" activeStory={nav.activeStory} tabbar={nav.navbar}>
+            <Root activeView="Epic">
+                <Epic id="Epic" activeStory={state.loading ? "loadingScreen" : nav.activeStory} tabbar={nav.navbar}>
+                    <GlobalErrorView id="globalError" error={state.globalError} state={state} nav={nav}/>
+                    <LoadingScreen id="loadingScreen" state={state} nav={nav}/>
+                    <IntroView id="intro" state={state} nav={nav}/>
+
                     <FeedStory id="feed" state={state} nav={nav}/>
                     <ProfilesStory id="profiles" state={state} nav={nav}/>
                     <CheckInStory id="checkIn" state={state} nav={nav}/>
@@ -33,6 +44,7 @@ const App = () => {
                     <SettingsStory id="settings" state={state} nav={nav}/>
                 </Epic>
             </Root>
+
         </ConfigProvider>
     );
 };

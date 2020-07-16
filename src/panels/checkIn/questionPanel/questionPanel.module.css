@@ -20,7 +20,7 @@
     width: 24px;
     height: 24px;
     display: flex;
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 .radioButton:global(.Tappable--active) {

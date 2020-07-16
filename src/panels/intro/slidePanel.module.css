@@ -1,0 +1,48 @@
+.slidePanel {
+    background-position: center;
+    background-size: cover;
+}
+
+.slidePanel::after {
+    background: unset;
+}
+
+.panelHeader :global(.FixedLayout) {
+    background: unset;
+}
+
+.panelHeader :global(.PanelHeader__left) {
+    color: white;
+}
+
+.slidePanel :global(.Panel__in) {
+    display: flex;
+    padding-bottom: 0;
+    background-color: unset;
+}
+
+.contentContainer {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+}
+
+.textContainer {
+    margin: auto;
+    color: white;
+    text-align: center;
+}
+
+.textContainer :global(.Title) {
+    margin-bottom: 8px;
+}
+
+.slideProgress {
+    background: #00000080;
+}
+
+.slideProgress :global(.Progress__in) {
+    height: 6px;
+    margin-top: 8px;
+    background: white;
+}

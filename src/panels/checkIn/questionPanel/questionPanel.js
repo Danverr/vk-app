@@ -47,6 +47,7 @@ const QuestionPanel = (props) => {
                             return (
                                 <Button
                                     key={i}
+                                    align="left"
                                     className={style.radioButton}
                                     mode={i === selectedIndex ? "primary" : "outline"}
                                     before={button.icon ? <img src={button.icon} alt=""/> : null}

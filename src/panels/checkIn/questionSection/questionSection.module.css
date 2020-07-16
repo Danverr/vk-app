@@ -10,7 +10,7 @@
     padding: 0 32px;
 }
 
-.questionText h5 {
+.questionText :global(.Subhead) {
     margin-top: 4px;
     color: var(--text_secondary);
 }

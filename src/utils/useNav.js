@@ -8,8 +8,13 @@ import Icon28AddCircleOutline from '@vkontakte/icons/dist/28/add_circle_outline'
 import Icon28CalendarOutline from '@vkontakte/icons/dist/28/calendar_outline';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
+const defaultStory = "feed";
+
 // Панели по умолчанию для каждого view
 const defaultPanels = {
+    globalError: "main",
+    intro: 0,
+
     feed: "main",
     profiles: "chooseProfile",
     checkIn: 0,
@@ -17,17 +22,21 @@ const defaultPanels = {
     settings: "main",
 };
 
+const getDefaultPanelHistory = () => {
+    const panelHistory = {};
+
+    for (let key in defaultPanels) {
+        panelHistory[key] = [defaultPanels[key]];
+    }
+
+    return panelHistory;
+};
+
 const useNav = () => {
     let [scrollHistory] = useState({});
     let [isNavbarVis] = useState(true);
-    const [viewHistory] = useState(["feed"]);
-    const [panelHistory] = useState({
-        feed: [defaultPanels.feed],
-        profiles: [defaultPanels.profiles],
-        checkIn: [defaultPanels.checkIn],
-        calendar: [defaultPanels.calendar],
-        settings: [defaultPanels.settings],
-    });
+    const [viewHistory] = useState([defaultStory]);
+    const [panelHistory] = useState(getDefaultPanelHistory());
 
     const getActiveStory = () => viewHistory[viewHistory.length - 1];
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
@@ -105,13 +114,14 @@ const useNav = () => {
         setNav(getNav());
     };
 
-    const clearStory = (story, callback) => {
+    const clearStory = (story, callback = null) => {
         if (viewHistory.includes(story)) {
             viewHistory.splice(viewHistory.indexOf(story), 1);
         }
+
         panelHistory[story] = [defaultPanels[story]];
 
-        callback();
+        if (callback) callback();
         setNav(getNav());
     };
 

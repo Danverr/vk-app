@@ -111,7 +111,7 @@ const CalendarStory = (props) => {
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>
                 <Group separator="show">
-                    <Div style={{paddingTop: "0px"}}>
+                    <Div style={{paddingTop: "0", paddingBottom: "0"}}>
                         {calendarField}
                     </Div>
                 </Group>
