@@ -1,0 +1,11 @@
+.loadingPanel :global(.Panel__in) {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.backgroundImg {
+    width: 100%;
+    background-position: center;
+    background-size: contain;
+}

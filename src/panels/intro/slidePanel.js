@@ -1,22 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import styles from './slidePanel.module.css';
 import {Button, Div, Panel, PanelHeader, PanelHeaderBack, Progress, Text, Title} from "@vkontakte/vkui";
 
 const SlidePanel = (props) => {
     const {slideData, progress, nav, index} = props;
-    const [image, setImage] = useState(slideData.placeholder);
-
-    useEffect(() => {
-        const imageLoader = new Image();
-        imageLoader.src = slideData.img;
-        imageLoader.onload = () => setImage(slideData.img);
-    }, [slideData.img]);
 
     return (
         <Panel
             id={props.id}
             className={styles.slidePanel}
-            style={{backgroundImage: `url(${image})`}}
+            style={{backgroundImage: `url(${slideData.img})`}}
         >
             <PanelHeader
                 className={styles.panelHeader}
@@ -24,7 +17,7 @@ const SlidePanel = (props) => {
                 left={index ? <PanelHeaderBack onClick={() => window.history.back()}/> : null}
             />
 
-            <Div className={styles.textContainer}>
+            <Div className={styles.textContainer} style={slideData.textStyles}>
                 <Title level="1" weight="bold">{slideData.title}</Title>
                 <Text weight="regular">{slideData.text}</Text>
             </Div>

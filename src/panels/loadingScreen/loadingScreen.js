@@ -1,5 +1,8 @@
 import React, {useEffect} from "react";
-import {View, Panel, PanelSpinner} from "@vkontakte/vkui";
+import {View, Panel} from "@vkontakte/vkui";
+import styles from "./loadingScreen.module.css";
+
+import logo from "../../assets/logo.png";
 
 const LoadingScreen = (props) => {
     const {setNavbarVis} = props.nav;
@@ -12,8 +15,8 @@ const LoadingScreen = (props) => {
 
     return (
         <View id={props.id} activePanel="main">
-            <Panel id="main">
-                <PanelSpinner/>
+            <Panel id="main" className={styles.loadingPanel}>
+                <img className={styles.backgroundImg} src={logo} alt=""/>
             </Panel>
         </View>
     );

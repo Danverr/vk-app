@@ -53,14 +53,6 @@ const useAppState = () => {
         initApp();
     }, [showIntro]);
 
-    // Отлавливаем потерю интернета
-    useEffect(() => {
-        window.addEventListener('onoffline', () => {
-            debugger;
-            setGlobalError(Error("Сеть потеряна. Проверьте свое соединение и перезагрузите приложение"));
-        });
-    }, []);
-
     return {
         loading: loading,
         globalError: globalError,

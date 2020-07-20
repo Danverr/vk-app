@@ -2,11 +2,9 @@ import React, {useEffect} from 'react';
 import {View} from "@vkontakte/vkui";
 
 import intro0 from "../../assets/introPhotos/intro0.jpg";
-import intro0_placeholder from "../../assets/introPhotos/intro0.svg";
 import intro1 from "../../assets/introPhotos/intro1.jpg";
-import intro1_placeholder from "../../assets/introPhotos/intro1.svg";
 import intro2 from "../../assets/introPhotos/intro2.jpg";
-import intro2_placeholder from "../../assets/introPhotos/intro2.svg";
+import intro3 from "../../assets/introPhotos/intro3.jpg";
 
 import SlidePanel from "./slidePanel";
 
@@ -16,22 +14,24 @@ const IntroView = (props) => {
     const slidesData = [
         {
             title: "Что такое mood?",
-            text: "Это Mini App для трекинга настроения,  тревожности и стресса своих друзей",
+            text: "Это трекер настроения,  тревожности и стресса для тебя и твоих близких людей. Личный дневник и статистика настроения друзей теперь в одном приложении ВК.",
             img: intro0,
-            placeholder: intro0_placeholder
+        },
+        {
+            title: "Наша цель",
+            text: "У всех бывают трудные дни, но не всегда с ними легко справится в одиночку. mood поможет вам проявить поддержку, когда это крайне необходимо, без лиших слов.",
+            img: intro1,
         },
         {
             title: "Как это работает?",
-            text: "Проходите опросы, создавайте заметки и смотрите, как это делают ваши друзья!",
-            img: intro1,
-            placeholder: intro1_placeholder
+            text: "Проходите опросы, создавайте заметки и смотрите, как это делают ваши друзья! С помощью красочной статистики следить за прогрессом стало удобно, как никогда.",
+            img: intro2,
         },
         {
             title: "Нужен доступ к друзьям",
-            text: "Для того, чтобы вы могли поделится своим настроением с близкими, нам нужно знать," +
-                "с кем вы дружите. Без доступа нельзя продолжить!",
-            img: intro2,
-            placeholder: intro2_placeholder,
+            text: "Для того, чтобы вы могли поделится своим настроением с близкими, нам нужно знать, с кем вы дружите. Без доступа нельзя продолжить",
+            img: intro3,
+            textStyles: {color: "black"},
             buttonText: "Дать доступ",
             action: () => {
                 props.state.fetchUserToken(() => {
