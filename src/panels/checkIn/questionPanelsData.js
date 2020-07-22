@@ -28,7 +28,7 @@ const questionPanelsData = [
             {
                 text: "Выбрать дату",
                 value: (setPopout, callback, ...callbackArgs) => {
-                    callPicker("date", new Date(), new Date(), setPopout, callback, ...callbackArgs);
+                    callPicker({type: "date", startDate: new Date(), maxDate: new Date()}, setPopout, callback, ...callbackArgs);
                 }
             }
         ],

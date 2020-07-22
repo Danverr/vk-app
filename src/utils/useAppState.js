@@ -5,6 +5,7 @@ import bridge from "@vkontakte/vk-bridge";
 const APP_ID = 7424071;
 
 const useAppState = () => {
+    const [notifications, setNotifications] = useState(window.location.search.split('&')[2].split('=')[1] == '1');
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [rootPopup, setRootPopup] = useState(<ScreenSpinner/>);
@@ -17,6 +18,13 @@ const useAppState = () => {
         note: {val: "", index: null},
         date: {val: null, index: null},
         isPublic: {val: 0, index: null},
+    });
+
+    bridge.subscribe((e) => {
+        if(e.detail.type == 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
+            setNotifications(true);
+        else if(e.detail.type == 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
+            setNotifications(false);
     });
 
     const fetchUserToken = () => {
@@ -57,6 +65,7 @@ const useAppState = () => {
 
     return {
         rootPopup: rootPopup,
+        notifications: notifications, 
         userToken: userToken,
         userInfo: userInfo,
         answer: answer,

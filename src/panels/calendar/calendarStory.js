@@ -8,10 +8,10 @@ import TextPost from '../../components/TextPost/TextPost'
 import Calendar from './Calendar/Calendar';
 
 let localState = {
-    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
+    calendarField: <Spinner size="large" />,
     entriesField: null,
-    userEntries: {},
-    userStats: {},
+    userEntries: null,
+    userStats: null,
     curDate: null
 };
 
@@ -29,57 +29,58 @@ const CalendarStory = (props) => {
             return;
 
         const getUserEntries = async () => {
-            let entriesPromise = await api("GET", "/entries/", {
+            api("GET", "/entries/", {
                 users: userInfo.id,
+            }).then((res) => {
+                let entries = res.data, temp = {};
+                entries.forEach(
+                    (entry) => {
+                        let date = moment.utc(entry.date);
+                        let now = date.local().format("YYYY-MM-DD");
+
+                        if (temp[now] == null) temp[now] = [entry];
+                        else temp[now] = [...temp[now], entry];
+                    });
+                setUserEntries(temp);
+                localState.userEntries = temp;
+
+                let stats = {};
+
+                for (let day in temp) {
+                    let mood = 0, stress = 0, anxiety = 0;
+
+                    temp[day].forEach((entry) => {
+                        mood += entry.mood;
+                        stress += entry.stress;
+                        anxiety += entry.anxiety;
+                    });
+
+                    mood /= temp[day].length;
+                    stress /= temp[day].length;
+                    anxiety /= temp[day].length;
+                    mood = Math.floor(mood + 0.5);
+                    stress = Math.floor(stress + 0.5);
+                    anxiety = Math.floor(anxiety + 0.5);
+                    stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
+                }
+
+                setUserStats(stats);
+                localState.userStats = stats;
+            }).catch((error) => {
+                console.log(error);
             });
-            let entries = entriesPromise.data[userInfo.id], temp = {};
-            entries.forEach(
-                (entry) => {
-                    let date = moment.utc(entry.date);
-                    let now = date.local().format("YYYY-MM-DD");
-
-                    if (temp[now] == null) temp[now] = [entry];
-                    else temp[now] = [...temp[now], entry];
-                });
-            setUserEntries(temp);
-            localState.userEntries = temp;
-
-            let stats = {};
-
-            for (let day in temp) {
-                let mood = 0, stress = 0, anxiety = 0;
-
-                temp[day].forEach((entry) => {
-                    mood += entry.mood;
-                    stress += entry.stress;
-                    anxiety += entry.anxiety;
-                });
-
-                mood /= temp[day].length;
-                stress /= temp[day].length;
-                anxiety /= temp[day].length;
-                mood = Math.floor(mood + 0.5);
-                stress = Math.floor(stress + 0.5);
-                anxiety = Math.floor(anxiety + 0.5);
-                stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
-            }
-            
-            setUserStats(stats);
-            localState.userStats = stats;
         }
         getUserEntries();
     }, [userInfo]);
 
     //изменился выбранный день
     useEffect(() => {
-        if (!userInfo || !curDate)
+        if (!userInfo || !userEntries || !curDate)
             return;
+        setEntriesField(<Spinner size="large" />);
 
         if (userEntries[curDate.format("YYYY-MM-DD")]) {
-            let temp = [];
-            userEntries[curDate.format("YYYY-MM-DD")].forEach((entry) => {
-                temp.push(<TextPost key = {entry.entryId} postData={{ user: userInfo, post: entry }} />);
-            });
+            let temp = userEntries[curDate.format("YYYY-MM-DD")].map((entry) => { return (<TextPost key={entry.entryId} postData={{ user: userInfo, post: entry }} />); });
             setEntriesField(temp);
             localState.entriesField = temp;
         } else {
@@ -89,20 +90,21 @@ const CalendarStory = (props) => {
     }, [userInfo, userEntries, curDate]);
 
     useEffect(() => {
-        let temp = <Calendar 
-        setPopout = {setPopout}
-        onDateChange={(date) => { 
-            setCurDate(moment(date)); 
-            localState.curDate = moment(date); 
-        }} 
-        stats={userStats} />;
+        if (!userStats || !userEntries) return;
+        let temp = <Calendar
+            setPopout={setPopout}
+            onDateChange={(date) => {
+                setCurDate(moment(date));
+                localState.curDate = moment(date);
+            }}
+            stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
-    }, [userStats])
- 
+    }, [userStats, userEntries])
+
     return (
         <View id={props.id}
-            popout = {popout}
+            popout={popout}
             activePanel={props.nav.activePanel}
             history={props.nav.viewHistory}
             onSwipeBack={props.nav.goBack}

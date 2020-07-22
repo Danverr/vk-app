@@ -3,27 +3,14 @@ import { Text } from '@vkontakte/vkui';
 
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './loadSpinner.module.css'
+import Icon56CheckCircleOutline from '@vkontakte/icons/dist/56/check_circle_outline';
 
-const DaylioPanelContent = (props) => {
-    const PI = Math.PI;
-    const R = 40;
-
+const loadSpinner = (props) => {
     return (
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className={s.beforeContent}>
-                <Text className={s.timeLeft} weight='medium'> {`${Math.ceil(props.a / props.b * 100)}%`} </Text>
-                <svg className={s.circle}>
-                    <circle
-                        cx="45" cy="45" r={R} stroke="rgb(63,138,224)" strokeWidth="6" fill="transparent"
-                        style={{
-                            'strokeDasharray': (2 * PI * R * (props.a / props.b)).toString() + " 1000",
-                        }}
-                    />
-                </svg>
-            </div>
-            <Text className={s.dialog} weight='medium'> {(props.a == props.b) && "Загрузка завершена"} </Text>
+        <div className={s.container}>
+            <Icon56CheckCircleOutline className = {s.done} fill = 'var(--accent)' height = {96} width = {96} />
+            <Text weight="medium" className={s.dialog}> Загрузка завершена </Text>
         </div>
     );
 }
-export default DaylioPanelContent;
+export default loadSpinner;

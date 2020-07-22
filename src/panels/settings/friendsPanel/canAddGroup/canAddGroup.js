@@ -4,7 +4,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 const CanAddGroup = (props) => {
     var [search, setSearch] = useState('');
-
+    const {waitToAdd} = props;
     const searchFriends = () => {
         const searchStr = search.toLowerCase();
 
@@ -14,7 +14,6 @@ const CanAddGroup = (props) => {
     }
 
     const searchedFriends = searchFriends();
-
     return (
         <Group header={<Header mode="secondary"> предоставить доступ </Header>}>
             <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
@@ -23,18 +22,12 @@ const CanAddGroup = (props) => {
                 <List>
                     {searchedFriends.map(friend =>
                         <Cell selectable
-                            checked = {props.waitToAdd.find((waitFriend) => waitFriend.id == friend.id)}
+                            checked = {props.waitToAdd.find((waitFriend) => {return waitFriend.id == friend.id;}) != null}
                             onChange={(e) => {
-                                if (e.target.checked){
-                                    props.setWaitToAdd((waitToAdd) => {
-                                        return [...waitToAdd, friend];
-                                    });
-                                }
-                                else{
-                                    props.setWaitToAdd((waitToAdd) => {
-                                        return waitToAdd.filter((waitFriend) => waitFriend.id != friend.id);
-                                    });
-                                }
+                                if (e.target.checked)
+                                    props.updateWaitToAdd([...waitToAdd, friend]);
+                                else
+                                    props.updateWaitToAdd(waitToAdd.filter((waitFriend) => waitFriend.id != friend.id));
                             }}
                             key={friend.id}
                             before={<Avatar size={48}

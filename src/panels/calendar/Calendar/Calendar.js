@@ -17,7 +17,6 @@ const Calendar = (props) => {
     const onDateChange = props.onDateChange;
 
     useEffect(() => {
-        console.log("ok");
         onDateChange(moment(curDate));
     }, [curDate, onDateChange]);
 
@@ -33,7 +32,7 @@ const Calendar = (props) => {
                 localState.curMonth = moment(date);
             }} 
             onClickPicker = {() => {
-                callPicker("date", curDate.toDate(), new Date(2050, 0, 1), props.setPopout, (res) => {
+                callPicker({type: "date", startDate: curDate.toDate(), maxDate: new Date(2050, 0, 1)}, props.setPopout, (res) => {
                     setCurDate(moment(res));
                     localState.curDate = moment(res);
                     res.startOf('month');
