@@ -78,9 +78,7 @@ const NotificationsPanel = (props) => {
             });
 
             api("GET", "/statNotifications/", {}).then((res) => {
-                if(res.data == false)
-                    setHealthNotif(false);
-                else setHealthNotif(true);
+                setHealthNotif(res.data);
             }).catch((error) => {
                 setError(error);
             });

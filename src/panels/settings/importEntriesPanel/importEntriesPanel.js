@@ -21,7 +21,7 @@ const ImportEntriesPanel = (props) => {
     const { userInfo, userToken } = props.state;
 
     const importEntries = async (files) => {
-        if (!files || files.length == 0)
+        if (!files || files.length === 0)
             return;
 
         let reader = new FileReader();
@@ -33,7 +33,7 @@ const ImportEntriesPanel = (props) => {
 
             const csvparse = require('js-csvparser');
             let entries = csvparse(reader.result).data;
-            entries = entries.filter((entry) => { return (entry.length == 7); });
+            entries = entries.filter((entry) => { return (entry.length === 7); });
             
             if(entries.length > 500){
                 setTop("Нельзя импортировать более 500 записей за раз");
@@ -65,7 +65,7 @@ const ImportEntriesPanel = (props) => {
                         access_token: userToken,
                         v: "5.103",
                         key: "import",
-                        value: ((importCount - 1 != 0) ? importCount - 1 : "-")
+                        value: ((importCount === 1) ? "-" : importCount - 1)
                     }
                 }).then((res) => {
                     setImportCount(importCount - 1);
@@ -79,7 +79,7 @@ const ImportEntriesPanel = (props) => {
     }
 
     useEffect(() => {
-        if(importCount == 0)
+        if(importCount === 0)
             setTop("У вас не осталось попыток импорта");
     }, [importCount])
 
@@ -93,9 +93,9 @@ const ImportEntriesPanel = (props) => {
                     keys: "import"
                 }
             }).then((res) => {
-                if (res.response[0].value == "")
+                if (res.response[0].value === "")
                     setImportCount(2);
-                else if(res.response[0].value == "-")
+                else if(res.response[0].value === "-")
                     setImportCount(0);
                 else
                     setImportCount(res.response[0].value);
@@ -104,7 +104,7 @@ const ImportEntriesPanel = (props) => {
             });
         }
         fetchImportCount();
-    }, []);
+    }, [userToken]);
 
     var content = <Spinner size="large" />;
 
@@ -117,7 +117,7 @@ const ImportEntriesPanel = (props) => {
             <FormLayout>
                 <Button
                     top = {<Text className = {s.errorText}> {top} </Text>}
-                    disabled = {importCount == 0} 
+                    disabled = {importCount === 0} 
                     align="center"
                     Component="label"
                     after={<Counter> {importCount} </Counter>}
@@ -126,7 +126,7 @@ const ImportEntriesPanel = (props) => {
                     <input 
                     className="File__input" 
                     type="file" 
-                    disabled = {importCount == 0} 
+                    disabled = {importCount === 0} 
                     ref={fileInputRef} 
                     onInput ={() => { importEntries(fileInputRef.current.files); fileInputRef.current.value = null;}} />
                 Загрузить записи

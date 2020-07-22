@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Panel, PanelHeader, View, Cell, CellButton, Group, Header, Button } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Cell, CellButton, Group, Header } from '@vkontakte/vkui';
 import bridge from "@vkontakte/vk-bridge";
 import '@vkontakte/vkui/dist/vkui.css';
 

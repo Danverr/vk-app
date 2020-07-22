@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Div, FixedLayout, Counter, Button, Panel, PanelHeader, PanelHeaderBack, Spinner, ScreenSpinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from "@vkontakte/vk-bridge";
@@ -41,16 +41,16 @@ const FriendsPanel = (props) => {
         localState.edgesInfo = data.slice(0);
         setEdgesInfo(data);
     }
-    const updateCanAdd = (data) => {
+    const updateCanAdd = useCallback((data) => {
         data.sort(cmp);
         localState.canAdd = data.slice(0);
         setCanAdd(data);
-    }
-    const updateAdded = (data) => {
+    }, []);
+    const updateAdded = useCallback((data) => {
         data.sort(cmp);
         localState.added = data.slice(0);
         setAdded(data);
-    }
+    }, []);
     const updateWaitToAdd = (data) => {
         setWaitToAdd(data);
     }
@@ -104,9 +104,9 @@ const FriendsPanel = (props) => {
         if (VKFriendsInfo == null || edgesInfo == null)
             return;
 
-        updateCanAdd(VKFriendsInfo.items.filter((friend) => !edgesInfo.find((curFriend) => curFriend.id == friend.id)));
+        updateCanAdd(VKFriendsInfo.items.filter((friend) => !edgesInfo.find((curFriend) => curFriend.id === friend.id)));
         updateAdded(edgesInfo);
-    }, [VKFriendsInfo, edgesInfo])
+    }, [VKFriendsInfo, edgesInfo, updateCanAdd, updateAdded])
 
     const postEdges = async () => {
         if (!userInfo) return;
@@ -115,7 +115,7 @@ const FriendsPanel = (props) => {
             toId: waitToAdd.map((friend) => { return friend.id; }).join(', ')
         }).then((res) => {
             updateAdded([...added, ...waitToAdd]);
-            updateCanAdd(canAdd.filter((friend) => !waitToAdd.find((curFriend) => curFriend.id == friend.id)));
+            updateCanAdd(canAdd.filter((friend) => !waitToAdd.find((curFriend) => curFriend.id === friend.id)));
             updateWaitToAdd([]);
         }).catch((error) => {
             setError(error);
@@ -130,7 +130,7 @@ const FriendsPanel = (props) => {
         api("DELETE", "/statAccess/", {
             toId: friend.id
         }).then((res) => {
-            updateAdded(added.filter((addedFriend) => addedFriend.id != friend.id));
+            updateAdded(added.filter((addedFriend) => addedFriend.id !== friend.id));
             updateCanAdd([...canAdd, friend]);
         }).catch((error) => {
             setError(error);

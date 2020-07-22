@@ -22,12 +22,12 @@ const CanAddGroup = (props) => {
                 <List>
                     {searchedFriends.map(friend =>
                         <Cell selectable
-                            checked = {props.waitToAdd.find((waitFriend) => {return waitFriend.id == friend.id;}) != null}
+                            checked = {props.waitToAdd.find((waitFriend) => {return waitFriend.id === friend.id;}) != null}
                             onChange={(e) => {
                                 if (e.target.checked)
                                     props.updateWaitToAdd([...waitToAdd, friend]);
                                 else
-                                    props.updateWaitToAdd(waitToAdd.filter((waitFriend) => waitFriend.id != friend.id));
+                                    props.updateWaitToAdd(waitToAdd.filter((waitFriend) => waitFriend.id !== friend.id));
                             }}
                             key={friend.id}
                             before={<Avatar size={48}
