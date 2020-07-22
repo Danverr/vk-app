@@ -33,7 +33,6 @@ const api = async (method, url, data) => {
                 // Something happened in setting up the request that triggered an Error
                 console.error('Error', error.message);
             }
-
             throw error;
         });
 };

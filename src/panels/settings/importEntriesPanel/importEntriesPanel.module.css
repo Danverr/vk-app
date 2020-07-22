@@ -1,0 +1,19 @@
+.errorText{
+    position: absolute;
+    top: 0px;
+    font-size: 13px;
+    line-height: 16px;
+    color: var(--field_error_border);
+}
+.androidContainer{
+    height: calc(100vh - var(--tabbar_height) - var(--panelheader_height_android));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.iosContainer{
+    height: calc(100vh - var(--tabbar_height) - var(--panelheader_height_ios));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

@@ -6,12 +6,20 @@ const APP_ID = 7424071;
 const useAppState = () => {
     const [loading, setLoading] = useState(true);
     const [globalError, setGlobalError] = useState(null);
+    const [notifications, setNotifications] = useState(window.location.search.split('&')[2].split('=')[1] == '1');
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
     const [updatingEntryData, setUpdatingEntryData] = useState(null);
     const showIntro = localStorage.showIntro === "true" || localStorage.showIntro === undefined;
 
+    bridge.subscribe((e) => {
+        if(e.detail.type == 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
+            setNotifications(true);
+        else if(e.detail.type == 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
+            setNotifications(false);
+    });
+    
     const fetchUserToken = (callback = null) => {
         return bridge.send("VKWebAppGetAuthToken", {
             "app_id": APP_ID,
@@ -57,6 +65,8 @@ const useAppState = () => {
         loading: loading,
         globalError: globalError,
         showIntro: showIntro,
+        rootPopup: rootPopup,
+        notifications: notifications, 
         userToken: userToken,
         fetchUserToken: fetchUserToken,
         userInfo: userInfo,

@@ -22,31 +22,31 @@ const Calendar = (props) => {
 
     return (
         <div>
-            <Navigation
-                NavLabel={moment(curMonth).format("MMMM YYYY")}
-                onClickPrev={() => {
-                    let date = moment(curMonth);
-                    date.add(-1, 'months');
-                    date.startOf('month');
-                    setCurMonth(moment(date));
-                    localState.curMonth = moment(date);
-                }}
-                onClickPicker={() => {
-                    callPicker("date", curDate.toDate(), new Date(2050, 0, 1), props.setPopout, (res) => {
-                        setCurDate(moment(res));
-                        localState.curDate = moment(res);
-                        res.startOf('month');
-                        setCurMonth(moment(res));
-                        localState.curMonth = moment(res);
-                    });
-                }}
-                onClickNext={() => {
-                    let date = moment(curMonth);
-                    date.add(1, 'months');
-                    date.startOf('month');
-                    setCurMonth(moment(date));
-                    localState.curMonth = moment(date);
-                }}/>
+            <Navigation 
+            NavLabel = {moment(curMonth).format("MMMM YYYY")}
+            onClickPrev = {() => {
+                let date = moment(curMonth);
+                date.add(-1, 'months');
+                date.startOf('month');
+                setCurMonth(moment(date));
+                localState.curMonth = moment(date);
+            }} 
+            onClickPicker = {() => {
+                callPicker({type: "date", startDate: curDate.toDate(), maxDate: new Date(2050, 0, 1)}, props.setPopout, (res) => {
+                    setCurDate(moment(res));
+                    localState.curDate = moment(res);
+                    res.startOf('month');
+                    setCurMonth(moment(res));
+                    localState.curMonth = moment(res);
+                });
+            }}
+            onClickNext = {() => {
+                let date = moment(curMonth);
+                date.add(1, 'months');
+                date.startOf('month');
+                setCurMonth(moment(date));
+                localState.curMonth = moment(date);
+            }} />
             <Weekdays/>
             <TileGroup
                 onClickTile={(date) => {
