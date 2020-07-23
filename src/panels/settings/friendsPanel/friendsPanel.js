@@ -10,18 +10,15 @@ import AddedGroup from './addedGroup/addedGroup'
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
 
 var localState = {
-    VKFriendsInfo: null,
-    edgesInfo: null,
     canAdd: null,
     added: null,
 };
 
 const FriendsPanel = (props) => {
     const [error, setError] = useState(null);
-    const [VKFriendsInfo, setVKFriendsInfo] = useState(localState.VKFriendsInfo);
-    const [edgesInfo, setEdgesInfo] = useState(localState.edgesInfo);
     const [canAdd, setCanAdd] = useState(localState.canAdd);
     const [added, setAdded] = useState(localState.added);
+    const [VKfriends, setVKfriends] = useState(null);
     const [waitToAdd, setWaitToAdd] = useState([]);
     const { userToken, userInfo } = props.state;
 
@@ -33,14 +30,6 @@ const FriendsPanel = (props) => {
         return a.id - b.id;
     }
 
-    const updateVKFriendsInfo = (data) => {
-        localState.VKFriendsInfo = {...data};
-        setVKFriendsInfo(data);
-    }
-    const updateEdgesInfo = (data) => {
-        localState.edgesInfo = data.slice(0);
-        setEdgesInfo(data);
-    }
     const updateCanAdd = useCallback((data) => {
         data.sort(cmp);
         localState.canAdd = data.slice(0);
@@ -58,59 +47,46 @@ const FriendsPanel = (props) => {
     useEffect(() => {
         if (!userToken) return;
 
-        const fetchVKFriendsInfo = async () => {
-            bridge.send("VKWebAppCallAPIMethod", {
-                method: "friends.get",
-                params: {
-                    access_token: userToken,
-                    v: "5.103",
-                    order: "name",
-                    fields: "photo_50, photo_100"
-                }
-            }).then((res) => {
-                updateVKFriendsInfo(res.response);
-            }).catch((error) => {
-                setError(error);
-            });
-        }
-        const fetchEdgesInfo = async () => {
-            // ID друзей к которым есть доступ
+        bridge.send("VKWebAppCallAPIMethod", {
+            method: "friends.get",
+            params: {
+                access_token: userToken,
+                v: "5.103",
+                order: "name",
+                fields: "photo_50, photo_100"
+            }
+        }).then((friends) => {
+            setVKfriends(friends.response.items);
             api("GET", "/statAccess/", {
                 type: "toId"
-            }).then((res) => {
+            }).then((edges) => {
                 // Информация о друзьях
                 bridge.send("VKWebAppCallAPIMethod", {
                     method: "users.get",
                     params: {
                         access_token: userToken,
                         v: "5.103",
-                        user_ids: res.data.join(","),
+                        user_ids: edges.data.map((friend) => { return friend.id; }).join(","),
                         fields: "photo_50, photo_100"
                     }
-                }).then((res) => {
-                    updateEdgesInfo(res.response);
+                }).then((edgesInfo) => {
+                    let a = friends.response.items, b = edgesInfo.response;
+                    updateCanAdd(a.filter((friend) => !b.find((curFriend) => curFriend.id === friend.id)));
+                    updateAdded(b);
                 }).catch((error) => {
                     setError(error);
                 });
             }).catch((error) => {
                 setError(error);
             });
-        };
-        fetchVKFriendsInfo();
-        fetchEdgesInfo();
-    }, [userToken]);
-
-    useEffect(() => {
-        if (VKFriendsInfo == null || edgesInfo == null)
-            return;
-
-        updateCanAdd(VKFriendsInfo.items.filter((friend) => !edgesInfo.find((curFriend) => curFriend.id === friend.id)));
-        updateAdded(edgesInfo);
-    }, [VKFriendsInfo, edgesInfo, updateCanAdd, updateAdded])
+        }).catch((error) => {
+            setError(error);
+        });
+    }, [userToken, updateCanAdd, updateAdded]);
 
     const postEdges = async () => {
         if (!userInfo) return;
-        props.setPopout(<ScreenSpinner/>);
+        props.setPopout(<ScreenSpinner />);
         api("POST", "/statAccess/", {
             toId: waitToAdd.map((friend) => { return friend.id; }).join(', ')
         }).then((res) => {
@@ -125,13 +101,14 @@ const FriendsPanel = (props) => {
     }
 
     const deleteEdge = async (friend) => {
-        if (!userInfo) return;
-        props.setPopout(<ScreenSpinner/>);
+        if (!added || !VKfriends) return;
+        props.setPopout(<ScreenSpinner />);
         api("DELETE", "/statAccess/", {
             toId: friend.id
         }).then((res) => {
             updateAdded(added.filter((addedFriend) => addedFriend.id !== friend.id));
-            updateCanAdd([...canAdd, friend]);
+            if(VKfriends.find((curFriend) => curFriend.id === friend.id))
+                updateCanAdd([...canAdd, friend]);
         }).catch((error) => {
             setError(error);
         }).finally(() => {
@@ -147,19 +124,19 @@ const FriendsPanel = (props) => {
         content = (<div>
             <AddedGroup
                 added={added}
-                deleteEdge={deleteEdge}/>
+                deleteEdge={deleteEdge} />
             <CanAddGroup
                 canAdd={canAdd}
                 waitToAdd={waitToAdd}
-                updateWaitToAdd={updateWaitToAdd}/>
+                updateWaitToAdd={updateWaitToAdd} />
             <FixedLayout vertical="bottom">
-                <Div style = {{background: 'white'}}>
-                    <Button size="xl" after={<Counter> {waitToAdd.length} </Counter>} onClick={() => {postEdges();}}>
+                <Div style={{ background: 'white' }}>
+                    <Button size="xl" after={<Counter> {waitToAdd.length} </Counter>} onClick={() => { postEdges(); }}>
                         Сохранить
                     </Button>
                 </Div>
             </FixedLayout>
-            </div>);
+        </div>);
 
     return (
         <Panel id={props.id}>
