@@ -7,49 +7,12 @@ export const getValueIndex = (param, value) => {
         return panel.param === param;
     }).buttons;
 
-    if (param === "date") {
-        if (value.isSame(moment())) return 0;
-        else if (value.isSame(moment().subtract(1, "days"))) return 1;
-        else if (value.isSame(moment().subtract(2, "days"))) return 2;
-        else return 3;
-    } else {
-        for (let i = 0; i < buttons.length; i++) {
-            if (buttons[i].value === value) return i;
-        }
+    for (let i = 0; i < buttons.length; i++) {
+        if (buttons[i].value === value) return i;
     }
 };
 
 const questionPanelsData = [
-    {
-        param: "date",
-        question: "Выберите дату записи",
-        buttons: [
-            {
-                text: "Сегодня",
-                value: (setPopout, callback, ...callbackArgs) => {
-                    callback(moment(), ...callbackArgs,);
-                }
-            },
-            {
-                text: "Вчера",
-                value: (setPopout, callback, ...callbackArgs) => {
-                    callback(moment().subtract(1, "days"), ...callbackArgs);
-                }
-            },
-            {
-                text: "Позавчера",
-                value: (setPopout, callback, ...callbackArgs) => {
-                    callback(moment().subtract(2, "days"), ...callbackArgs);
-                }
-            },
-            {
-                text: "Другая дата",
-                value: (setPopout, callback, ...callbackArgs) => {
-                    callPicker({type: "date", startDate: new Date(), maxDate: new Date()}, setPopout, callback, ...callbackArgs);
-                }
-            }
-        ],
-    },
     {
         param: "mood",
         question: "Как настроение?",

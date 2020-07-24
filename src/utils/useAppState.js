@@ -3,25 +3,59 @@ import bridge from "@vkontakte/vk-bridge";
 
 const APP_ID = 7424071;
 
+const getLaunchParams = () => {
+    const search = window.location.search.slice(1);
+    let params = {};
+
+    for (const pair of search.split("&")) {
+        const [key, value] = pair.split("=");
+        params[key] = value;
+    }
+
+    return params;
+};
+
+const launchParams = getLaunchParams();
+
 const useAppState = () => {
     const [loading, setLoading] = useState(true);
     const [globalError, setGlobalError] = useState(null);
-    const [notifications, setNotifications] = useState(window.location.search.split('&')[2].split('=')[1] === '1');
+    const [notifications, setNotifications] = useState(launchParams["vk_are_notifications_enabled"] === '1');
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
     const [updatingEntryData, setUpdatingEntryData] = useState(null);
-    const showIntro = localStorage.showIntro === "true" || localStorage.showIntro === undefined;
+    const [showIntro, setShowIntro] = useState(launchParams["vk_access_token_settings"] === "");
 
-    bridge.subscribe((e) => {
-        if(e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
-            setNotifications(true);
-        else if(e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
-            setNotifications(false);
-    });
-    
+    useEffect(() => {
+        bridge.subscribe((e) => {
+            if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
+                setNotifications(true);
+            else if (e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
+                setNotifications(false);
+        });
+    }, []);
+
+    useEffect(() => {
+        const showNativeAds = () => {
+            bridge.send("VKWebAppShowNativeAds", {ad_format: "preloader"})
+                .then((data) => {
+                    if (data.result === false) {
+                        setTimeout(showNativeAds, 1000);
+                    }
+                })
+                .catch(() => {
+                    setTimeout(showNativeAds, 1000);
+                });
+        };
+
+        if (showIntro === false) {
+            showNativeAds();
+        }
+    }, [showIntro]);
+
     const fetchUserToken = (callback = null) => {
-        return bridge.send("VKWebAppGetAuthToken", {
+        bridge.send("VKWebAppGetAuthToken", {
             "app_id": APP_ID,
             "scope": "friends"
         }).then((res) => {
@@ -29,12 +63,14 @@ const useAppState = () => {
             if (res.scope === "friends") {
                 setUserToken(res.access_token);
                 if (callback) callback();
-                return res.access_token;
+            } else {
+                throw new Error("User denied");
             }
         }).catch((error) => {
-            if (error.error_data.error_code !== 4) { // 4: User denied
+            if (error.error_data && error.error_data.error_code !== 4) { // 4: User denied
                 setGlobalError(error);
-                throw error;
+            } else {
+                setShowIntro(true);
             }
         });
     };
@@ -53,19 +89,24 @@ const useAppState = () => {
 
     useEffect(() => {
         const initApp = async () => {
-            if (!showIntro) await fetchUserToken();
+            if (!showIntro) {
+                await fetchUserToken();
+            }
+
             await fetchUserInfo();
             setLoading(false);
         };
 
         initApp();
-    }, [showIntro]);
+        // eslint-disable-next-line
+    }, []);
 
     return {
         loading: loading,
         globalError: globalError,
         showIntro: showIntro,
-        notifications: notifications, 
+        setShowIntro: setShowIntro,
+        notifications: notifications,
         userToken: userToken,
         fetchUserToken: fetchUserToken,
         userInfo: userInfo,

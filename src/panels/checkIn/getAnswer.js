@@ -1,4 +1,5 @@
 import {getValueIndex} from "./questionPanelsData";
+import moment from "moment";
 
 const getAnswer = (data = null) => {
     let answer = {
@@ -9,7 +10,7 @@ const getAnswer = (data = null) => {
         title: {val: ""},
         note: {val: ""},
         isPublic: {val: 0},
-        date: {val: null, index: null}
+        date: {val: moment()}
     };
 
     if (data) {

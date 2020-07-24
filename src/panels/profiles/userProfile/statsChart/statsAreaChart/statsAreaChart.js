@@ -68,26 +68,35 @@ const AxisTick = (props) => {
 };
 
 const getColor = (id, stats, param, islineColor) => {
+    // Считаем максимум и минимум функции
     const max = stats.reduce((max, item) => Math.max(max, item.val), 0);
     const min = stats.reduce((min, item) => {
         const val = item.val === null ? 6 : item.val;
         return Math.min(min, val);
     }, 6);
 
+    // Оставляем нужные нам цвета
     let colors = getColors(param);
+
     colors = colors.filter((item, index) => {
         index += 1;
-        return index <= max && (!islineColor || index >= min);
+        return index - 0.5 <= max && (!islineColor || index + 0.5 >= min);
     });
+
     colors.reverse();
 
-    const step = 1 / (colors.length - islineColor);
-    let offset = max - Math.floor(max);
+    // Считаем долю каждого цвета
+    const parts = colors.map(() => 1);
+    parts[0] = max - (Math.round(max) - 0.5);
+    parts[colors.length - 1] = islineColor ? (Math.round(min) + 0.5) - min : 0.5;
+
+    const step = 1 / (parts.reduce((sum, val) => val + sum, 0) + !islineColor * 0.5);
+    let offset = 0;
     let stops = [];
 
     for (let i = 0; i < colors.length; i++) {
         stops.push(<stop key={`${id} ${i}_begin`} offset={offset} stopColor={colors[i]} stopOpacity={1}/>);
-        offset += i === 0 || i === colors.length - 1 ? step / 2 : step;
+        offset += parts[i] * step;
         stops.push(<stop key={`${id} ${i}_end`} offset={offset} stopColor={colors[i]} stopOpacity={1}/>);
     }
 
@@ -122,7 +131,7 @@ const StatsAreaChart = (props) => {
                 height={40} dataKey="date" reversed={true}
                 tick={<AxisTick/>} interval={0} axisLine={false} tickMargin={12}
             />
-            <YAxis dataKey="val" hide={true} domain={[0, 5.5]}/>
+            <YAxis dataKey="val" hide={true} domain={[0.5, 5.5]}/>
             <Tooltip
                 content={<TooltipCard emoji={emoji[param]}/>}
                 cursor={false} coordinate={{x: 100, y: 140}}

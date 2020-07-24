@@ -22,7 +22,7 @@ const fetchFriendsInfo = async (userToken) => {
         params: {
             access_token: userToken,
             v: "5.103",
-            user_ids: friendsIdsPromise.data.join(","),
+            user_ids: friendsIdsPromise.data.map(item => item.id).join(","),
             fields: "photo_50, photo_100"
         }
     }).catch((error) => {
