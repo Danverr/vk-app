@@ -10,9 +10,11 @@
     display: flex;
     padding-bottom: 0 !important;
 }
-
-.panelsGallery {
-    flex: auto;
+.iosGallery{
+    height: calc(100vh - var(--panelheader_height_ios));
+}
+.androidGallery{
+    height: calc(100vh - var(--panelheader_height_android));
 }
 
 .bullet {

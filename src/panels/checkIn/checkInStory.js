@@ -9,6 +9,8 @@ import questionPanelsData from "./questionPanelsData";
 import QuestionPanel from "./questionPanel/questionPanel";
 import SubmitPanel from "./submitPanel/submitPanel";
 
+import { platform, IOS } from '@vkontakte/vkui';
+
 const getBullets = (questionPanels, index) => {
     let bullets = [];
 
@@ -28,6 +30,8 @@ const getBullets = (questionPanels, index) => {
 const localState = {
     answer: getAnswer(),
 };
+
+const osname = platform();
 
 const CheckInStory = (props) => {
     const {updatingEntryData, setUpdatingEntryData} = props.state;
@@ -86,7 +90,7 @@ const CheckInStory = (props) => {
                 </PanelHeader>
 
                 <Gallery
-                    className={styles.panelsGallery}
+                    className={((osname === IOS) ? styles.iosGallery : styles.androidGallery)}
                     slideIndex={activeSlideIndex}
                     align="center"
                     onChange={slideIndex => goToSlideIndex(slideIndex)}
