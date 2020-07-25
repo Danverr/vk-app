@@ -1,12 +1,9 @@
-
-
 export const setf = (a) => {
     return ((a < 10) ? "0" : "") + String(a);
 }
 
 export const getDateDescription = (a, b) => {
     const monthsRu = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    const monthsEn = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
     if (b.diff(a, 'minutes') < 1) {
         return "только что";

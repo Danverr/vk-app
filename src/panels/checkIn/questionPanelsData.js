@@ -1,6 +1,4 @@
-import moment from "moment";
 import emoji from "../../utils/getEmoji";
-import callPicker from "../../utils/callPicker";
 
 export const getValueIndex = (param, value) => {
     const buttons = questionPanelsData.find((panel) => {

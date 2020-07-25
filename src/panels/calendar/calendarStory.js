@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid } from '@vkontakte/vkui';
+import React, {useState, useEffect} from 'react';
+import {Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import moment from 'moment';
 import Calendar from './Calendar/Calendar';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
-import TextPost from '../../components/TextPost/textPost';
+import TextPost from '../../components/textPost/textPost';
 import api from '../../utils/api.js'
 import entryWrapper from '../../components/entryWrapper'
-
 function calendarStateUpdate() {
     const temp = {};
     localState.allEntries.forEach((entry) => {
@@ -37,7 +36,7 @@ function calendarStateUpdate() {
         mood = Math.floor(mood + 0.5);
         stress = Math.floor(stress + 0.5);
         anxiety = Math.floor(anxiety + 0.5);
-        stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
+        stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
     }
     localState.userStats = stats;
     localState.setUserStats(stats);
@@ -46,8 +45,10 @@ function calendarStateUpdate() {
 
 function fetchCalendar() {
     localState.usersMap[localState.userInfo.id] = localState.userInfo;
-    const Promise = api("GET", "/entries/", { users: localState.userInfo.id });
-    Promise.catch((error) => { localState.setError(error) });
+    const Promise = api("GET", "/entries/", {users: localState.userInfo.id});
+    Promise.catch((error) => {
+        localState.setError(error)
+    });
     Promise.then((result) => {
         localState.allEntries = result.data;
         localState.calendarStateUpdate();
@@ -55,13 +56,19 @@ function fetchCalendar() {
 }
 
 function deleteEntryFromBase(entryData) {
-    const Promise = api("DELETE", "/entries/", { entryId: entryData.post.entryId });
-    Promise.catch((error) => { localState.setError(error) });
+    const Promise = api("DELETE", "/entries/", {entryId: entryData.post.entryId});
+    Promise.catch((error) => {
+        localState.setError(error)
+    });
 }
 
 function deleteEntryFromList(entryData) {
-    localState.entries.splice(localState.entries.findIndex((e) => { return e === entryData.post }), 1);
-    localState.allEntries.splice(localState.allEntries.findIndex((e) => { return e === entryData.post }), 1);
+    localState.entries.splice(localState.entries.findIndex((e) => {
+        return e === entryData.post
+    }), 1);
+    localState.allEntries.splice(localState.allEntries.findIndex((e) => {
+        return e === entryData.post
+    }), 1);
     localState.calendarStateUpdate();
 }
 
@@ -73,7 +80,7 @@ let localState = {
     deleteEntryFromBase: deleteEntryFromBase,
     deleteEntryFromList: deleteEntryFromList,
     fetchCalendar: fetchCalendar,
-    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
+    calendarField: <Spinner size="large" style={{marginTop: 20}}/>,
     curDate: null
 };
 
@@ -87,7 +94,7 @@ const CalendarStory = (props) => {
     const [deletedEntryField, setDeletedEntryField] = useState(null);
     const [error, setError] = useState(null);
 
-    const { userInfo } = props.state;
+    const {userInfo} = props.state;
 
     useEffect(() => {
         if (!userInfo.id)
@@ -109,7 +116,7 @@ const CalendarStory = (props) => {
     useEffect(() => {
         if (!userInfo || !curDate || fetching)
             return;
-        setEntriesField(<Spinner size="large" />);
+        setEntriesField(<Spinner size="large"/>);
 
         localState.entries = []
 
@@ -128,7 +135,7 @@ const CalendarStory = (props) => {
                 setCurDate(moment(date));
                 localState.curDate = moment(date);
             }}
-            stats={userStats} />;
+            stats={userStats}/>;
         setCalendarField(temp);
         localState.calendarField = temp;
     }, [userStats])
@@ -144,17 +151,17 @@ const CalendarStory = (props) => {
             wrapper: localState,
             nav: props.nav,
             deleteEntryFromFeedList: entryWrapper.deleteEntryFromFeedList,
-            visible : 1,
+            visible: 1,
         };
-        return <TextPost postData={dat} key={entry.entryId} />
+        return <TextPost postData={dat} key={entry.entryId}/>
     };
 
-    return error ? <ErrorPlaceholder error={error} /> : (
+    return error ? <ErrorPlaceholder error={error}/> : (
         <View id={props.id}
-            popout={popout}
-            activePanel={props.nav.activePanel}
-            history={props.nav.viewHistory}
-            onSwipeBack={props.nav.goBack}
+              popout={popout}
+              activePanel={props.nav.activePanel}
+              history={props.nav.viewHistory}
+              onSwipeBack={props.nav.goBack}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
-import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
-import { Snackbar, Text, Placeholder, Title } from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
+import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
+import {Snackbar, Placeholder, Title} from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -16,11 +16,10 @@ import api from '../../utils/api';
 import moment from 'moment';
 import s from './feedStory.module.css';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
-import TextPost from '../../components/TextPost/textPost';
-import AccessEntry from '../../components/AccessEntry/AccessEntry';
+import TextPost from '../../components/textPost/textPost';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import entryWrapper from '../../components/entryWrapper';
-import AccesEntry from '../../components/AccessEntry/AccessEntry';
+import AccessPost from '../../components/accessPost/accessPost';
 
 const UPLOADED_QUANTITY = 1000;
 const FIRST_BLOCK_SIZE = 15;
@@ -36,7 +35,9 @@ function cmp(l, r) {
 }
 
 let deleteEntryFromFeedList = (entryData) => {
-    DAT.entries.splice(DAT.entries.findIndex((e) => { return e.entryId === entryData.post.entryId }), 1);
+    DAT.entries.splice(DAT.entries.findIndex((e) => {
+        return e.entryId === entryData.post.entryId
+    }), 1);
 }
 
 let DAT = {
@@ -47,10 +48,10 @@ let DAT = {
     queue: [],
     accessEntries: [],
     accessEntriesPointer: 0,
-    wantUpdate : 1,
+    wantUpdate: 1,
 
     deleteEntryFromFeedList: deleteEntryFromFeedList,
-    deleteEntryFromList : deleteEntryFromFeedList,
+    deleteEntryFromList: deleteEntryFromFeedList,
 
     Error: (error) => {
         DAT.setError(error);
@@ -85,18 +86,19 @@ let DAT = {
     },
 
     deleteEntryFromBase: (entryData) => {
-        const Promise = api("DELETE", "/entries/", { entryId: entryData.post.entryId });
+        const Promise = api("DELETE", "/entries/", {entryId: entryData.post.entryId});
         Promise.catch(Error);
     },
 
     fetchFriendsInfo: async () => {
         if (DAT.mode === 'diary') return;
-        const accessPromise = api("GET", "/statAccess", { type: 'fromId' });
+        const accessPromise = api("GET", "/statAccess", {type: 'fromId'});
         accessPromise.catch(Error);
         DAT.accessEntries = (await accessPromise).data;
         DAT.friends = [];
-        DAT.accessEntries.forEach((accessEntry) => {
-            accessEntry.systemFlag = 1; DAT.friends.push(accessEntry.id)
+        DAT.accessEntries.forEach((accessPost) => {
+            accessPost.systemFlag = 1;
+            DAT.friends.push(accessPost.id)
         });
         DAT.friends.push(DAT.userInfo.id);
         const newFriends = [];
@@ -117,13 +119,15 @@ let DAT = {
             });
             Promise.catch(Error);
             const newFriendsData = (await Promise).response;
-            newFriendsData.forEach((friend) => { DAT.usersMap[friend.id] = friend; });
+            newFriendsData.forEach((friend) => {
+                DAT.usersMap[friend.id] = friend;
+            });
         }
     },
 
     fetchPseudoFriends: async () => {
         if (DAT.mode === 'diary') return;
-        const Promise = api("GET", "/statAccess", { type: 'toId' });
+        const Promise = api("GET", "/statAccess", {type: 'toId'});
         Promise.catch(Error);
         DAT.pseudoFriends = {};
         (await Promise).data.forEach((friend) => {
@@ -132,7 +136,6 @@ let DAT = {
     },
 
     fetchEntriesPack: (PACK_SZ, lastDate) => {
-        debugger;
         const queryData = {
             lastDate: lastDate,
             count: PACK_SZ,
@@ -161,7 +164,7 @@ let DAT = {
             }
             DAT.setDisplayEntries(obj);
             if (afterPull && DAT.hasMore) {
-                DAT.setLoading(<Spinner size='large' />);
+                DAT.setLoading(<Spinner size='large'/>);
             }
             DAT.queue.splice(0, cur);
         }
@@ -173,14 +176,16 @@ let DAT = {
             await DAT.fetchPseudoFriends();
         }
 
-        if (DAT.queue.length) { Pop(); return }
+        if (DAT.queue.length) {
+            Pop();
+            return
+        }
 
         let lastDate = (DAT.entries.length) ? back(DAT.entries).date :
             moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
 
         const Promise = DAT.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime);
 
-        debugger;
         Promise.then((result) => {
             let newEntries = result.data;
             DAT.queue = DAT.queue.concat(newEntries);
@@ -203,14 +208,14 @@ let DAT = {
 
 }
 
-const Done = ({ onClose }) => {
+const Done = ({onClose}) => {
     return (<Snackbar
         layout="horizontal"
         onClose={onClose}
         duration={5000}
-        before={<Icon16CheckCircle fill="var(--accent)" height={24} width={24} />}
+        before={<Icon16CheckCircle fill="var(--accent)" height={24} width={24}/>}
     >
-        <Text> Изменения сохранены </Text>
+        Изменения сохранены
     </Snackbar>);
 };
 
@@ -220,7 +225,7 @@ const Feed = (props) => {
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState(DAT.mode);
     const [deletedEntryField, setDeletedEntryField] = useState(null);
-    const [loading, setLoading] = useState(DAT.hasMore ? <Spinner size='large' /> : null);
+    const [loading, setLoading] = useState(DAT.hasMore ? <Spinner size='large'/> : null);
     const [displayEntries, setDisplayEntries] = useState(DAT.entries);
     const [error, setError] = useState(null);
 
@@ -234,7 +239,9 @@ const Feed = (props) => {
         const pState = props.state;
         if (pState.entryAdded) {
             pState.setEntryAdded(null);
-            setDeletedEntryField(<Done onClose={() => { setDeletedEntryField(null) }} />);
+            setDeletedEntryField(<Done onClose={() => {
+                setDeletedEntryField(null)
+            }}/>);
         }
         if (!pState.userInfo || !pState.userToken) return;
         [DAT.userInfo, DAT.userToken] = [pState.userInfo, pState.userToken];
@@ -242,7 +249,7 @@ const Feed = (props) => {
 
     useEffect(() => {
         if (!DAT.userInfo || !DAT.userToken || !DAT.wantUpdate) return;
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='large'/>);
         DAT.fetchEntries(1);
     }, [props.state]);
 
@@ -259,7 +266,7 @@ const Feed = (props) => {
         setDisplayEntries([]);
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='large'/>);
         DAT.fetchEntries(1);
     };
 
@@ -270,11 +277,11 @@ const Feed = (props) => {
 
     const renderData = (entry, id) => {
         if (entry.systemFlag) {
-            return <AccesEntry postData={{
+            return <AccessPost postData={{
                 user: DAT.usersMap[entry.id],
                 nav: props.nav,
                 haveEdge: DAT.pseudoFriends[entry.id],
-            }} key={id} />
+            }} key={id}/>
         }
         return <TextPost postData={{
             post: entry,
@@ -285,14 +292,13 @@ const Feed = (props) => {
             setDisplayEntries: setDisplayEntries,
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: DAT,
-            nav: props.nav,
-            visible: 1,
-        }} key={id} />
+            nav: props.nav
+        }} key={id}/>
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
             header={<Title level='2' weight='medium'> Нет записей </Title>}
             stretched={true}
         >
@@ -302,7 +308,7 @@ const Feed = (props) => {
         </Placeholder>
     }
 
-    return error ? <ErrorPlaceholder error={error} /> :
+    return error ? <ErrorPlaceholder error={error}/> :
         <View
             id={props.id}
             popout={popout}
@@ -314,26 +320,30 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
+                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
-                <PanelHeaderContext opened={contextOpened} onClose={toggleContext} >
+                <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed />}
-                            onClick={() => { select('feed') }}
-                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Все записи"
+                        <Cell before={<Icon28Newsfeed/>}
+                              onClick={() => {
+                                  select('feed')
+                              }}
+                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Все записи"
                         >
                             Лента
-                </Cell>
-                        <Cell before={<Icon28ArticleOutline />}
-                            onClick={() => { select('diary') }}
-                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Только мои записи"
+                        </Cell>
+                        <Cell before={<Icon28ArticleOutline/>}
+                              onClick={() => {
+                                  select('diary')
+                              }}
+                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Только мои записи"
                         >
                             Мой дневник
-                </Cell>
+                        </Cell>
                     </List>
                 </PanelHeaderContext>
 
@@ -353,7 +363,7 @@ const Feed = (props) => {
                 {loading}
                 {deletedEntryField}
             </Panel>
-        </View >
+        </View>
 
 }
 

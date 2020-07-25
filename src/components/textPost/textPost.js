@@ -1,18 +1,15 @@
-
-
-import React, { useState } from 'react';
-import { Cell, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
-import s from './textPost.module.css'
+import React, {useState} from 'react';
+import {Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption} from '@vkontakte/vkui';
+import s from './textPost.module.css';
+import {platform, IOS} from '@vkontakte/vkui';
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 
-import { platform, IOS } from '@vkontakte/vkui';
-
 import moment from 'moment';
-import ProgressBar from '../ProgressBar/ProgressBar'
-import emojiList from '../../assets/emoji/emojiList.js';
-import DeleteBar from '../DeleteBar/DeleteBar'
+import ProgressBar from '../progressBar/progressBar'
+import emojiList from "../../utils/getEmoji";
+import DeleteSnackbar from '../deleteSnackbar/deleteSnackbar'
 import getDateDescription from '../../utils/chrono';
 import entryWrapper from '../entryWrapper'
 
@@ -30,17 +27,19 @@ const TextPost = (props) => {
     const stress = postData.post.stress * 20;
     const anxiety = postData.post.anxiety * 20;
 
-    const emojiMood = emojiList.mood[postData.post.mood - 1];
-    const emojiStress = emojiList.stress[postData.post.stress - 1];
-    const emojiAnxiety = emojiList.anxiety[postData.post.anxiety - 1];
+    const emojiMood = postData.post.mood ? emojiList.mood[Math.round(postData.post.mood) - 1] : emojiList.placeholder;
+    const emojiStress = postData.post.stress ? emojiList.stress[Math.round(postData.post.stress) - 1] : emojiList.placeholder;
+    const emojiAnxiety = postData.post.anxiety ? emojiList.anxiety[Math.round(postData.post.anxiety) - 1] : emojiList.placeholder;
 
     const postDate = moment.utc(postData.post.date);
 
-    const [dateField, setDateField] = useState(getDateDescription(postDate.local(), moment()));
+    const [dateField] = useState(getDateDescription(postDate.local(), moment()));
 
     const editPost = () => {
-        entryWrapper.editFunction = () => { postData.wrapper.deleteEntryFromList(postData); }
-        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
+        entryWrapper.editFunction = () => {
+            postData.wrapper.deleteEntryFromList(postData);
+        }
+        postData.setUpdatingEntryData({...postData.post, date: postDate});
         if (postData.deleteEntryFromFeedList) {
             postData.deleteEntryFromFeedList(postData);
         }
@@ -54,7 +53,7 @@ const TextPost = (props) => {
             postData.deleteEntryFromFeedList(postData);
         }
         postData.setDisplayEntries(postData.wrapper.entries);
-        postData.setDeletedEntryField(<DeleteBar onClose={postData.setDeletedEntryField} />)
+        postData.setDeletedEntryField(<DeleteSnackbar onClose={postData.setDeletedEntryField}/>)
     };
 
     const queryDeletePost = () => {
@@ -66,16 +65,18 @@ const TextPost = (props) => {
                         autoclose: true,
                         mode: 'cancel'
                     },
-                    {
-                        title: 'Да',
-                        autoclose: true,
-                        action: deletePost
-                    }]
+                        {
+                            title: 'Да',
+                            autoclose: true,
+                            action: deletePost
+                        }]
                 }
-                onClose={() => { postData.setPopout(null); }}
+                onClose={() => {
+                    postData.setPopout(null);
+                }}
             >
-                <h2> <Text> Подтверждение </Text> </h2>
-                <p> <Text> Вы действительно хотите удалить эту запись? </Text> </p>
+                <h2><Text> Подтверждение </Text></h2>
+                <p><Text> Вы действительно хотите удалить эту запись? </Text></p>
             </Alert>
         );
     }
@@ -83,7 +84,9 @@ const TextPost = (props) => {
     const onSettingClick = () => {
         postData.setDeletedEntryField(null);
         postData.setPopout(
-            <ActionSheet onClose={() => { postData.setPopout(null); }}>
+            <ActionSheet onClose={() => {
+                postData.setPopout(null);
+            }}>
                 <ActionSheetItem onClick={editPost} autoclose>
                     <Text> Редактировать запись </Text>
                 </ActionSheetItem>
@@ -92,94 +95,71 @@ const TextPost = (props) => {
                     <Text> Удалить запись </Text>
                 </ActionSheetItem>
 
-                {platform() === IOS && <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
+                {platform() === IOS &&
+                <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
             </ActionSheet>);
     }
 
     const parametrField = () => {
-        const style = {
-            'color': 'var(--text_secondary)',
-        };
         return (
-            <div className={s.parametresField}>
+            <div className={s.paramsTable}>
+                <div>
+                    <Caption level="2" weight='regular'> Настроение </Caption>
+                    <Caption level="2" weight='regular'> Тревожность </Caption>
+                    <Caption level="2" weight='regular'> Стресс </Caption>
+                </div>
 
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Настроение </Caption> <div /> </div>
-                <div className={s.parametrProgress}> <div /> <ProgressBar param="mood" value={mood} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
+                <div className={s.progressBarsCol}>
+                    <div><ProgressBar param="mood" value={mood}/></div>
+                    <div><ProgressBar param="anxiety" value={anxiety}/></div>
+                    <div><ProgressBar param="stress" value={stress}/></div>
+                </div>
 
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Тревожность </Caption> <div /> </div>
-                <div className={s.parametrProgress}> <div /> <ProgressBar param="anxiety" value={anxiety} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
-
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Стресс </Caption> <div /> </div>
-                <div className={s.parametrProgress}> <div /> <ProgressBar param="stress" value={stress} /> <div /> </div>
-                <div className={s.parametrEmoji}> <div /> <img src={emojiStress} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
-
+                <div>
+                    <img src={emojiMood} alt=""/>
+                    <img src={emojiAnxiety} alt=""/>
+                    <img src={emojiStress} alt=""/>
+                </div>
             </div>
         );
     };
 
     const description = () => {
-        return <div className={s.description}>
-            <Text> {dateField} </Text>
-            <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock />}  </div>
-        </div>
+        if (postData.post.description) {
+            return postData.post.description;
+        }
+
+        if (postData.post.date) {
+            return <>
+                {dateField}
+                <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock/>}</div>
+            </>;
+        }
+
+        return null;
+    };
+
+    const postText = () => {
+        const titleNode = !title || title.length === 0 ? null : <Headline weight='medium'>{title}</Headline>;
+        const noteNode = !note || note.length === 0 ? null : <Text weight='regular'>{note}</Text>;
+
+        return noteNode || titleNode ? <div className={s.postText}>{titleNode}{noteNode}</div> : null;
     };
 
     return (
-        <Card size="l" mode="shadow" className="TextPost">
-            <div className={s.content}>
-                <Cell description={description()}
-                    before={<Avatar size={48} src={avatar} />}
-                    asideContent={(currentUser && user.id === currentUser.id) ?
-                        <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
-                    {<Text> {user.first_name} {user.last_name} </Text>}
-                </Cell>
+        <Card size="l" mode="shadow" className="TextPost" onClick={props.onClick}>
+            <Cell
+                description={description()}
+                before={<Avatar size={48} src={avatar}/>}
+                asideContent={(currentUser && user.id === currentUser.id) ?
+                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon}/> : null}>
+                {`${user.first_name} ${user.last_name}`}
+            </Cell>
 
-                {postData.visible && <Subhead weight='bold' className={s.title}>
-                    {title}
-                </Subhead>
-                }
-                {postData.visible && <Text weight='regular' className={s.note}>
-                    {note}
-                </Text>}
-                {parametrField()}
-            </div>
+            {postText()}
+            {parametrField()}
         </Card>
     )
 }
 
 export default TextPost;
-
-
-/*
- * теги настроения
- *
- *  <div className={s.emojiTegsField}>
-                        <div className={s.emojiTegContainer}>
-                            <img src={emojiMood} className={s.emoji}>
-                            </img>
-                            <Text className={s.emojiTegText}>
-                                Настроение
-                            </Text>
-                        </div>
-
-
-                        <div className={s.emojiTegContainer}>
-                            <img src={emojiStress} className={s.emoji}>
-                            </img>
-                            <Text className={s.emojiTegText}>
-                                Стресс
-                            </Text>
-                        </div>
-
-                        <div className={s.emojiTegContainer}>
-                            <img src={emojiAnxiety} className={s.emoji}>
-                            </img>
-                            <Text className={s.emojiTegText}>
-                                Тревожность
-                            </Text>
-                        </div>
-                    </div>
- *
- */

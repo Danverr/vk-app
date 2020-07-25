@@ -5,7 +5,7 @@ import api from "../../../utils/api";
 import bridge from "@vkontakte/vk-bridge";
 import moment from "moment";
 
-import ProfileCard from "./profileCard/profileCard";
+import TextPost from "../../../components/textPost/textPost";
 import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlaceholder";
 
 const fetchFriendsInfo = async (userToken) => {
@@ -34,10 +34,17 @@ const fetchFriendsInfo = async (userToken) => {
     });
 };
 
-const defaultStats = {
-    mood: [],
-    stress: [],
-    anxiety: [],
+const getMeanStats = (stats) => {
+    let mean = [];
+    const lastDate = moment().startOf("day").subtract(7, "days");
+
+    for (const key in stats.meanByDays) {
+        const filteredStats = stats.meanByDays[key].filter(stat => stat.date.isAfter(lastDate));
+        mean[key] = filteredStats.reduce((sum, item) => sum + item.val, 0);
+        mean[key] /= Math.max(1, stats.meanByDays[key].length);
+    }
+
+    return mean;
 };
 
 let localState = {
@@ -49,8 +56,7 @@ const ChooseProfilePanel = (props) => {
     const [error, setError] = useState(null);
     const [usersInfo, setUsersInfo] = useState(localState.usersInfo);
     const [stats, setStats] = useState(localState.stats);
-    const {userToken, userInfo, formatStats, id: panelId} = props;
-    const {activePanel} = props.nav;
+    const {activePanel, userToken, userInfo, formatStats, id: panelId} = props;
 
     // Обновляем локальный стейт
     useEffect(() => {
@@ -89,15 +95,21 @@ const ChooseProfilePanel = (props) => {
     // Преобразовываем данные в карточки
     let profileCards = [];
     if (usersInfo) {
-        profileCards = usersInfo.map((info, i) =>
-            <ProfileCard
-                key={info.id}
-                info={info}
-                stats={stats ? stats[info.id].meanByDays : defaultStats}
-                name={i === 0 ? "Мой профиль" : `${info.first_name} ${info.last_name}`}
-                goToUserProfile={props.goToUserProfile}
-                setActiveUserProfile={props.setActiveUserProfile}
-            />
+        profileCards = usersInfo.map((user) => {
+                const post = stats ? getMeanStats(stats[user.id]) : {mood: null, stress: null, anxiety: null};
+                post.description = "Среднее за последние 7 дней";
+
+                return (
+                    <TextPost
+                        key={`profileCard_${user.id}`}
+                        onClick={() => {
+                            props.goToUserProfile();
+                            props.setActiveUserProfile(user);
+                        }}
+                        postData={{user: user, post: post}}
+                    />
+                );
+            }
         );
     }
 

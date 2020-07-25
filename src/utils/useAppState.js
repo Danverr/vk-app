@@ -1,8 +1,6 @@
 import {useEffect, useState} from 'react';
 import bridge from "@vkontakte/vk-bridge";
 
-import api from "./api";
-
 const APP_ID = 7424071;
 
 const getLaunchParams = () => {
@@ -102,9 +100,6 @@ const useAppState = () => {
         initApp();
         // eslint-disable-next-line
     }, []);
-
-    // Profiles
-    const [activeUserProfile, setActiveUserProfile] = useState(null);
 
     return {
         loading: loading,

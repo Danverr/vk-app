@@ -1,5 +1,5 @@
-import React, { useEffect} from 'react';
-import {Epic, Root, ConfigProvider, ScreenSpinner} from '@vkontakte/vkui';
+import React, {useEffect} from 'react';
+import {Epic, Root, ConfigProvider} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import useAppState from "./utils/useAppState";

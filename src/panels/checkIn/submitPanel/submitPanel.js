@@ -79,7 +79,7 @@ const SubmitPanel = (props) => {
             } else {
                 for (const key in answer) {
                     if (key !== "entryId") data[key] = answer[key].val;
-                }   
+                }
 
                 data.date = answer.date.val.clone().utc().format("YYYY-MM-DD HH:mm:ss");
                 data = {entries: JSON.stringify([data])};
@@ -87,19 +87,24 @@ const SubmitPanel = (props) => {
 
             api(method, "/entries/", data)
                 .then((result) => {
-                    if (entryWrapper.editFunction){
+                    if (entryWrapper.editFunction) {
                         entryWrapper.editFunction();
                         entryWrapper.editFunction = null;
                     }
+
                     let entryData = Object.assign({}, answer);
-                    if (result.data){
+
+                    if (result.data) {
                         entryData.entryId.val = result.data;
                     }
+
                     entryWrapper.addEntryToFeedList(entryData);
+
                     setAnswer(getAnswer());
                     props.nav.panelHistory.checkIn = [0];
-                    props.setEntryAdded(true);
-                    props.nav.goTo("feed");
+                    props.nav.goBack();
+
+                    if (!props.isEntryUpdate) props.setEntryAdded(true);
                 })
                 .catch((error) => {
                     setFormStatus({
