@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\components",
+    "\\src\\components\\DeleteBar",
+    "\\src\\components\\TextPost",
+    "\\src\\panels",
+    "\\src\\panels\\checkIn",
+    "\\src\\panels\\checkIn\\questionPanel",
+    "\\src\\utils"
+  ],
+  "SelectedNode": "\\src\\components\\TextPost\\TextPost.js",
+  "PreviewInSolutionExplorer": false
+}

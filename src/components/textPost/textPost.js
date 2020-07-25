@@ -1,101 +1,185 @@
-import React from 'react';
-import {Cell, CardGrid, Progress, Avatar, Card, Text, Title} from '@vkontakte/vkui';
-import s from './textPost.module.css'
-import {getDate, getMonth, getHours, getMinutes} from '@wojtekmaj/date-utils';
 
-import mood1 from '../../assets/emoji/mood/mood1.png'
-import mood2 from '../../assets/emoji/mood/mood2.png'
-import mood3 from '../../assets/emoji/mood/mood3.png'
-import mood4 from '../../assets/emoji/mood/mood4.png'
-import mood5 from '../../assets/emoji/mood/mood5.png'
 
-import stress1 from '../../assets/emoji/stress/stress1.png'
-import stress2 from '../../assets/emoji/stress/stress2.png'
-import stress3 from '../../assets/emoji/stress/stress3.png'
-import stress4 from '../../assets/emoji/stress/stress4.png'
-import stress5 from '../../assets/emoji/stress/stress5.png'
+import React, { useState } from 'react';
+import { Cell, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
+import s from './TextPost.module.css'
 
-import anxiety1 from '../../assets/emoji/anxiety/anxiety1.png'
-import anxiety2 from '../../assets/emoji/anxiety/anxiety2.png'
-import anxiety3 from '../../assets/emoji/anxiety/anxiety3.png'
-import anxiety4 from '../../assets/emoji/anxiety/anxiety4.png'
-import anxiety5 from '../../assets/emoji/anxiety/anxiety5.png'
+import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+import Icon12Lock from '@vkontakte/icons/dist/12/lock';
+
+import { platform, IOS } from '@vkontakte/vkui';
+
+import moment from 'moment';
+import ProgressBar from '../ProgressBar/ProgressBar'
+import emojiList from '../../assets/emoji/emojiList.js';
+import DeleteBar from '../DeleteBar/DeleteBar'
+import getDateDescription from '../../utils/chrono';
+import entryWrapper from '../entryWrapper'
 
 const TextPost = (props) => {
-    const user = props.postData.user;
-    const unDate = props.postData.post.date;
-    const date = {
-        day: getDate(new Date(unDate)),
-        month: getMonth(new Date(unDate)),
-        hour: getHours(new Date(unDate)),
-        minute: getMinutes(new Date(unDate))
+    const postData = props.postData;
+
+    const user = postData.user;
+    const title = postData.post.title;
+    const note = postData.post.note;
+    const currentUser = postData.currentUser;
+
+    const avatar = user.photo_100;
+
+    const mood = postData.post.mood * 20;
+    const stress = postData.post.stress * 20;
+    const anxiety = postData.post.anxiety * 20;
+
+    const emojiMood = emojiList.mood[postData.post.mood - 1];
+    const emojiStress = emojiList.stress[postData.post.stress - 1];
+    const emojiAnxiety = emojiList.anxiety[postData.post.anxiety - 1];
+
+    const postDate = moment.utc(postData.post.date);
+
+    const [dateField, setDateField] = useState(getDateDescription(postDate.local(), moment()));
+
+    const editPost = () => {
+        entryWrapper.editFunction = () => { postData.wrapper.deleteEntryFromList(postData); }
+        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
+        if (postData.deleteEntryFromFeedList) {
+            postData.deleteEntryFromFeedList(postData);
+        }
+        postData.nav.goTo("checkIn");
     };
-    const description = props.postData.post.title;
-    const text = props.postData.post.note;
-    const userAva = user.photo_100;
 
-    const moodInt = Number.parseInt(props.postData.post.mood);
-    const stressInt = Number.parseInt(props.postData.post.stress);
-    const anxietyInt = Number.parseInt(props.postData.post.anxiety);
+    const deletePost = () => {
+        postData.wrapper.deleteEntryFromBase(postData);
+        postData.wrapper.deleteEntryFromList(postData);
+        if (postData.deleteEntryFromFeedList) {
+            postData.deleteEntryFromFeedList(postData);
+        }
+        postData.setDisplayEntries(postData.wrapper.entries);
+        postData.setDeletedEntryField(<DeleteBar onClose={postData.setDeletedEntryField} />)
+    };
 
-    const mood = moodInt * 20;
-    const stress = stressInt * 20;
-    const anxiety = anxietyInt * 20;
+    const queryDeletePost = () => {
+        postData.setPopout(
+            <Alert
+                actions={
+                    [{
+                        title: 'Нет',
+                        autoclose: true,
+                        mode: 'cancel'
+                    },
+                    {
+                        title: 'Да',
+                        autoclose: true,
+                        action: deletePost
+                    }]
+                }
+                onClose={() => { postData.setPopout(null); }}
+            >
+                <h2> <Text> Подтверждение </Text> </h2>
+                <p> <Text> Вы действительно хотите удалить эту запись? </Text> </p>
+            </Alert>
+        );
+    }
 
-    const moods = [mood1, mood2, mood3, mood4, mood5];
-    const anxietys = [anxiety1, anxiety2, anxiety3, anxiety4, anxiety5];
-    const stresses = [stress1, stress2, stress3, stress4, stress5];
+    const onSettingClick = () => {
+        postData.setDeletedEntryField(null);
+        postData.setPopout(
+            <ActionSheet onClose={() => { postData.setPopout(null); }}>
+                <ActionSheetItem onClick={editPost} autoclose>
+                    <Text> Редактировать запись </Text>
+                </ActionSheetItem>
 
-    const emojiMood = moods[moodInt - 1];
-    const emojiStress = stresses[stressInt - 1];
-    const emojiAnxiety = anxietys[anxietyInt - 1];
+                <ActionSheetItem onClick={queryDeletePost} autoclose mode="destructive">
+                    <Text> Удалить запись </Text>
+                </ActionSheetItem>
+
+                {platform() === IOS && <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
+            </ActionSheet>);
+    }
+
+    const parametrField = () => {
+        const style = {
+            'color': 'var(--text_secondary)',
+        };
+        return (
+            <div className={s.parametresField}>
+
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Настроение </Caption> <div /> </div>
+                <div className={s.parametrProgress}> <div /> <ProgressBar param="mood" value={mood} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
+
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Тревожность </Caption> <div /> </div>
+                <div className={s.parametrProgress}> <div /> <ProgressBar param="anxiety" value={anxiety} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
+
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Стресс </Caption> <div /> </div>
+                <div className={s.parametrProgress}> <div /> <ProgressBar param="stress" value={stress} /> <div /> </div>
+                <div className={s.parametrEmoji}> <div /> <img src={emojiStress} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
+
+            </div>
+        );
+    };
+
+    const description = () => {
+        return <div className={s.description}>
+            <Text> {dateField} </Text>
+            <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock />}  </div>
+        </div>
+    };
 
     return (
-        <CardGrid className={s.content}>
-            <Card size="l" mode="shadow">
-                <Cell className={s.reference} description={`${date.day} ${date.month} ${date.hour}:${date.minute}`}
-                      before={<Avatar size={40} src={userAva}/>}
-                    //indicator={<PanelHeaderButton className={s.drop} onClick={() => { alert("YES"); }}>
-                    //    <Icon24MoreVertical /> </PanelHeaderButton>} 
-                >
-                    {`${user.first_name} ${user.last_name}`}
+        <Card size="l" mode="shadow" className="TextPost">
+            <div className={s.content}>
+                <Cell description={description()}
+                    before={<Avatar size={48} src={avatar} />}
+                    asideContent={(currentUser && user.id === currentUser.id) ?
+                        <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
+                    {<Text> {user.first_name} {user.last_name} </Text>}
                 </Cell>
-                <Title level='3' weight='semibold' className={s.description}>
-                    {description}
-                </Title>
-                <Text weight='medium' className={s.postText}>
-                    {text}
-                </Text>
 
-                <div className={s.par}>
-                    <div className={s.parName}><Text weight='medium' className={s.parText}> Настроение </Text></div>
-                    <div className={s.parProgress}><Progress value={mood}/></div>
-                    <div className={s.emoji}>
-                        <img src={emojiMood} alt=""/>
-                    </div>
-
-                    <div className={s.parName}><Text weight='medium' className={s.parText}> Стресс </Text></div>
-                    <div className={s.parProgress}><Progress value={stress}/></div>
-                    <div className={s.emoji}>
-                        <img src={emojiStress} alt=""/>
-                    </div>
-
-                    <div className={s.parName}><Text weight='medium' className={s.parText}> Тревожность </Text></div>
-                    <div className={s.parProgress}><Progress value={anxiety}/></div>
-                    <div className={s.emoji}>
-                        <img src={emojiAnxiety} alt=""/>
-                    </div>
-                </div>
-
-                <div style={{height: 25}}/>
-            </Card>
-        </CardGrid>
-    );
+                {postData.visible && <Subhead weight='bold' className={s.title}>
+                    {title}
+                </Subhead>
+                }
+                {postData.visible && <Text weight='regular' className={s.note}>
+                    {note}
+                </Text>}
+                {parametrField()}
+            </div>
+        </Card>
+    )
 }
 
 export default TextPost;
 
+
 /*
- *  <Progress value={mood} />
+ * теги настроения
+ *
+ *  <div className={s.emojiTegsField}>
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiMood} className={s.emoji}>
+                            </img>
+                            <Text className={s.emojiTegText}>
+                                Настроение
+                            </Text>
+                        </div>
+
+
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiStress} className={s.emoji}>
+                            </img>
+                            <Text className={s.emojiTegText}>
+                                Стресс
+                            </Text>
+                        </div>
+
+                        <div className={s.emojiTegContainer}>
+                            <img src={emojiAnxiety} className={s.emoji}>
+                            </img>
+                            <Text className={s.emojiTegText}>
+                                Тревожность
+                            </Text>
+                        </div>
+                    </div>
  *
  */

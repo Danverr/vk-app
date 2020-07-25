@@ -1,44 +1,95 @@
-.content {
-    padding: 15px;
+
+
+.TextPost{
 }
 
-.reference {
-    padding: 10px;
+:global(.TextPost .Cell__in){
+    padding: 0 !important
+}
+
+:global(.TextPost .Card__in) {
+    padding: 12px 16px !important;
 }
 
 .description {
-    margin-left: 20px;
+    display: flex;
 }
 
-.postText {
-    word-break: break-all;
-    margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 16px;
+.lockIcon {
+    margin-left: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.par {
+.settingIcon{
+    display: flex;
+}
+
+.title{
+    margin-top: 12px;
+}
+
+.note{
+    margin-top: 6px;
+}
+
+/*  ------------------------------ */
+.emojiTegContainer {
+    margin-right: 8px;
+    margin-top: 8px;
+    display: inline-flex;
+    border: 1px solid rgb(144,148,153);
+    width: auto;
+    flex-direction: row;
+    border-radius: 50px;
+    height: 25px;
+}
+
+.emoji {
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-top: 2px;
+    width: 20px;
+    height: 20px;
+}
+
+.emojiTegText {
+    font-size: 85%;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: rgb(144,148,153);
+    margin-right: 5px;
+}
+
+.emojiTegsField{
+    flex-wrap: wrap;
+    margin-top: 10px;
+    display: flex;
+}
+
+/*  ----------------------   */
+
+.parametrText {
+    margin-right: 8px;
     display: grid;
-    grid-template-columns: 1fr 5fr 45px;
-    grid-auto-columns: minmax(90px, 500px);
+    grid-template-rows: 1fr 1fr 1fr;
 }
 
-.parName{
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 10px;
+.parametrProgress{
+    display: grid;
+    grid-template-rows: 1fr 4px 1fr;
 }
 
-.parProgress {
-    margin-top: 7px;
-    margin-right: 10px;
+.parametrEmoji {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    margin-left: auto;
 }
 
-.parText{
-    font-size: 75%;
-}
-
-.emoji{
-    margin-top: -4px;
+.parametresField {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 9fr 31px;
+    grid-template-rows: 35px 35px 35px;
 }
