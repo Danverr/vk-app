@@ -1,9 +1,13 @@
 
-.TextPost :global(.Cell__in) {
+
+.TextPost{
+}
+
+:global(.TextPost .Cell__in){
     padding: 0 !important
 }
 
-.TextPost :global(.Card__in) {
+:global(.TextPost .Card__in) {
     padding: 12px 16px !important;
 }
 
@@ -30,7 +34,7 @@
     margin-top: 6px;
 }
 
-/*  все, что относится к тегам */
+/*  ------------------------------ */
 .emojiTegContainer {
     margin-right: 8px;
     margin-top: 8px;

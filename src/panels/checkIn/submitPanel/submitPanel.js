@@ -7,9 +7,10 @@ import api from "../../../utils/api";
 import getAnswer from "../getAnswer";
 
 import QuestionSection from "../questionSection/questionSection";
+import entryWrapper from "../../../components/entryWrapper";
 
 const SubmitPanel = (props) => {
-    const {answer, setAnswer} = props;
+    const {answer, setAnswer} = props; 
     const [isChecked, setCheck] = useState(answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
@@ -75,16 +76,24 @@ const SubmitPanel = (props) => {
             } else {
                 for (const key in answer) {
                     if (key !== "entryId") data[key] = answer[key].val;
-                }
+                }   
 
                 data.date = answer.date.val.clone().utc().format("YYYY-MM-DD HH:mm:ss");
                 data = {entries: JSON.stringify([data])};
             }
 
             api(method, "/entries/", data)
-                .then(() => {
+                .then((result) => {
+                    if (entryWrapper.editFunction){
+                        entryWrapper.editFunction();
+                        entryWrapper.editFunction = null;
+                    }
+                    let entryData = Object.assign({}, answer);
+                    if (result.data){
+                        entryData.entryId.val = result.data;
+                    }
+                    entryWrapper.addEntryToFeedList(entryData);
                     setAnswer(getAnswer());
-
                     props.nav.panelHistory.checkIn = [0];
                     props.setEntryAdded(true);
                     props.nav.goTo("feed");

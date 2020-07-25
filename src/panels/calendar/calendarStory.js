@@ -4,18 +4,82 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import moment from 'moment';
 import Calendar from './Calendar/Calendar';
-import states from '../../components/entryWrapper';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
+import TextPost from '../../components/TextPost/TextPost';
+import api from '../../utils/api.js'
+import entryWrapper from '../../components/entryWrapper'
+
+function calendarStateUpdate() {
+    const temp = {};
+    localState.allEntries.forEach((entry) => {
+        let date = moment.utc(entry.date);
+        let now = date.local().format("YYYY-MM-DD");
+
+        if (temp[now] == null) temp[now] = [entry];
+        else temp[now] = [...temp[now], entry];
+    });
+    localState.entriesOfDate = temp;
+
+    let stats = {};
+
+    for (let day in temp) {
+        let mood = 0, stress = 0, anxiety = 0;
+
+        temp[day].forEach((entry) => {
+            mood += entry.mood;
+            stress += entry.stress;
+            anxiety += entry.anxiety;
+        });
+
+        mood /= temp[day].length;
+        stress /= temp[day].length;
+        anxiety /= temp[day].length;
+        mood = Math.floor(mood + 0.5);
+        stress = Math.floor(stress + 0.5);
+        anxiety = Math.floor(anxiety + 0.5);
+        stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
+    }
+    localState.userStats = stats;
+    localState.setUserStats(stats);
+    localState.setFetching(0);
+}
+
+function fetchCalendar() {
+    localState.usersMap[localState.userInfo.id] = localState.userInfo;
+    const Promise = api("GET", "/entries/", { users: localState.userInfo.id });
+    Promise.catch((error) => { localState.setError(error) });
+    Promise.then((result) => {
+        localState.allEntries = result.data;
+        localState.calendarStateUpdate();
+    });
+}
+
+function deleteEntryFromBase(entryData) {
+    const Promise = api("DELETE", "/entries/", { entryId: entryData.post.entryId });
+    Promise.catch((error) => { localState.setError(error) });
+}
+
+function deleteEntryFromList(entryData) {
+    localState.entries.splice(localState.entries.findIndex((e) => { return e === entryData.post }), 1);
+    localState.allEntries.splice(localState.allEntries.findIndex((e) => { return e === entryData.post }), 1);
+    localState.calendarStateUpdate();
+}
 
 let localState = {
-    ...states.calendar, 
+    mode: 'calendar',
+    usersMap: {},
+    entries: [],
+    calendarStateUpdate: calendarStateUpdate,
+    deleteEntryFromBase: deleteEntryFromBase,
+    deleteEntryFromList: deleteEntryFromList,
+    fetchCalendar: fetchCalendar,
     calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
     curDate: null
 };
 
 const CalendarStory = (props) => {
     const [calendarField, setCalendarField] = useState(localState.calendarField);
-    const [entriesField, setEntriesField] = useState(localState.renderedEntries);
+    const [entriesField, setEntriesField] = useState(localState.entries);
     const [userStats, setUserStats] = useState(localState.userStats);
     const [curDate, setCurDate] = useState(moment(localState.curDate));
     const [popout, setPopout] = useState(null);
@@ -31,18 +95,13 @@ const CalendarStory = (props) => {
 
         localState = {
             ...localState,
-            setDeletedEntryField: setDeletedEntryField,
-            setPopout: setPopout,
-            setDisplayEntries: setEntriesField,
             userInfo: userInfo,
             setFetching: setFetching,
-            nav: props.nav,
-            setUpdatingEntryData: props.state.setUpdatingEntryData,
             setUserStats: setUserStats,
             setError: setError,
         }
 
-        localState.updateState();
+        localState.fetchCalendar();
     }, [userInfo]);
 
 
@@ -51,22 +110,14 @@ const CalendarStory = (props) => {
         if (!userInfo || !curDate || fetching)
             return;
 
+        localState.entries = []
+
         if (localState.entriesOfDate[curDate.format("YYYY-MM-DD")]) {
-            let temp = [];
-            let objs = [];
-            localState.entriesOfDate[curDate.format("YYYY-MM-DD")].forEach((entry) => {
-                const obj = {
-                    user: userInfo,
-                    post: entry,
-                    currentUser: userInfo,
-                    states: localState,
-                };
-                objs.push(obj);
-            });
-            localState.setEntries(1, objs);
-        } else {
-            localState.setEntries(1, null);
+            localState.entries = localState.entriesOfDate[curDate.format("YYYY-MM-DD")].slice(0);
         }
+
+        setEntriesField(localState.entries);
+
     }, [userInfo, fetching, curDate]);
 
     useEffect(() => {
@@ -80,6 +131,22 @@ const CalendarStory = (props) => {
         setCalendarField(temp);
         localState.calendarField = temp;
     }, [userStats])
+
+    const renderData = (entry) => {
+        const dat = {
+            post: entry, user: localState.usersMap[entry.userId],
+            currentUser: localState.userInfo,
+            setDeletedEntryField: setDeletedEntryField,
+            setPopout: setPopout,
+            setDisplayEntries: setEntriesField,
+            setUpdatingEntryData: props.state.setUpdatingEntryData,
+            wrapper: localState,
+            nav: props.nav,
+            deleteEntryFromFeedList: entryWrapper.deleteEntryFromFeedList,
+            visible : 1,
+        };
+        return <TextPost postData={dat} key={entry.entryId} />
+    };
 
     return error ? <ErrorPlaceholder error={error} /> : (
         <View id={props.id}
@@ -96,8 +163,8 @@ const CalendarStory = (props) => {
                     </Div>
                 </Group>
                 <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    <CardGrid className="grid">
-                        {entriesField}
+                    <CardGrid className="entriesGrid">
+                        {entriesField.map(renderData)}
                     </CardGrid>
                 </Group>
                 {deletedEntryField}

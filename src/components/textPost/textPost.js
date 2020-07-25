@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Cell, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
 import s from './TextPost.module.css'
@@ -10,9 +11,10 @@ import { platform, IOS } from '@vkontakte/vkui';
 
 import moment from 'moment';
 import ProgressBar from '../ProgressBar/ProgressBar'
-import DeleteBar from '../DeleteBar/DeleteBar'
-
 import emojiList from '../../assets/emoji/emojiList.js';
+import DeleteBar from '../DeleteBar/DeleteBar'
+import getDateDescription from '../../utils/chrono';
+import entryWrapper from '../entryWrapper'
 
 const TextPost = (props) => {
     const postData = props.postData;
@@ -32,32 +34,31 @@ const TextPost = (props) => {
     const emojiStress = emojiList.stress[postData.post.stress - 1];
     const emojiAnxiety = emojiList.anxiety[postData.post.anxiety - 1];
 
-    const postDate = moment.utc(postData.post.date); 
+    const postDate = moment.utc(postData.post.date);
 
-    const [dateField, setDateField] = useState(postDate.local().fromNow());
-    const [upd, setUpd] = useState(0);
-
-    /* пост каждую минуту обновляет свое время */
-    const updateDateField = () => {
-        setTimeout(() => {
-            setDateField(postDate.local().fromNow());
-            setUpd(!upd);
-        }, 60 * 1000);
-    };
+    const [dateField, setDateField] = useState(getDateDescription(postDate.local(), moment()));
 
     const editPost = () => {
-        postData.states.setUpdatingEntryData({ ...postData.post, date: postDate });
-        postData.states.nav.goTo("checkIn");
+        entryWrapper.editFunction = () => { postData.wrapper.deleteEntryFromList(postData); }
+        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
+        if (postData.deleteEntryFromFeedList) {
+            postData.deleteEntryFromFeedList(postData);
+        }
+        postData.nav.goTo("checkIn");
     };
 
     const deletePost = () => {
-        postData.states.deleteEntryFromList(postData);
-        postData.states.deleteEntryFromBase(postData.post.entryId);
-        postData.states.setDeletedEntryField(<DeleteBar onClose={postData.states.setPopout} />)
+        postData.wrapper.deleteEntryFromBase(postData);
+        postData.wrapper.deleteEntryFromList(postData);
+        if (postData.deleteEntryFromFeedList) {
+            postData.deleteEntryFromFeedList(postData);
+        }
+        postData.setDisplayEntries(postData.wrapper.entries);
+        postData.setDeletedEntryField(<DeleteBar onClose={postData.setDeletedEntryField} />)
     };
 
     const queryDeletePost = () => {
-        postData.states.setPopout(
+        postData.setPopout(
             <Alert
                 actions={
                     [{
@@ -71,7 +72,7 @@ const TextPost = (props) => {
                         action: deletePost
                     }]
                 }
-                onClose={() => { postData.states.setPopout(null); }}
+                onClose={() => { postData.setPopout(null); }}
             >
                 <h2> <Text> Подтверждение </Text> </h2>
                 <p> <Text> Вы действительно хотите удалить эту запись? </Text> </p>
@@ -80,9 +81,9 @@ const TextPost = (props) => {
     }
 
     const onSettingClick = () => {
-        postData.states.setDeletedEntryField(null);
-        postData.states.setPopout(
-            <ActionSheet onClose={() => { postData.states.setPopout(null); }}>
+        postData.setDeletedEntryField(null);
+        postData.setPopout(
+            <ActionSheet onClose={() => { postData.setPopout(null); }}>
                 <ActionSheetItem onClick={editPost} autoclose>
                     <Text> Редактировать запись </Text>
                 </ActionSheetItem>
@@ -96,18 +97,21 @@ const TextPost = (props) => {
     }
 
     const parametrField = () => {
+        const style = {
+            'color': 'var(--text_secondary)',
+        };
         return (
             <div className={s.parametresField}>
 
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={{ color: 'var(--text_secondary)' }}> Настроение </Caption> <div /> </div>
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Настроение </Caption> <div /> </div>
                 <div className={s.parametrProgress}> <div /> <ProgressBar param="mood" value={mood} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiMood} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={{ color: 'var(--text_secondary)' }}> Тревожность </Caption> <div /> </div>
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Тревожность </Caption> <div /> </div>
                 <div className={s.parametrProgress}> <div /> <ProgressBar param="anxiety" value={anxiety} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiAnxiety} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
-                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={{ color: 'var(--text_secondary)' }}> Стресс </Caption> <div /> </div>
+                <div className={s.parametrText}> <div /> <Caption level="2" weight='regular' style={style}> Стресс </Caption> <div /> </div>
                 <div className={s.parametrProgress}> <div /> <ProgressBar param="stress" value={stress} /> <div /> </div>
                 <div className={s.parametrEmoji}> <div /> <img src={emojiStress} style={{ 'height': '24px', 'width': '24px' }} /> <div /> </div>
 
@@ -119,54 +123,34 @@ const TextPost = (props) => {
         return <div className={s.description}>
             <Text> {dateField} </Text>
             <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock />}  </div>
-            </div>
+        </div>
     };
 
     return (
-        <Card size="l" mode="shadow" className={s.TextPost} >
+        <Card size="l" mode="shadow" className="TextPost">
             <div className={s.content}>
                 <Cell description={description()}
                     before={<Avatar size={48} src={avatar} />}
-                    asideContent={(user.id === currentUser.id) ?
+                    asideContent={(currentUser && user.id === currentUser.id) ?
                         <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
                     {<Text> {user.first_name} {user.last_name} </Text>}
                 </Cell>
-                <Subhead weight='bold' className={s.title}>
+
+                {postData.visible && <Subhead weight='bold' className={s.title}>
                     {title}
                 </Subhead>
-                <Text weight='regular' className={s.note}>
+                }
+                {postData.visible && <Text weight='regular' className={s.note}>
                     {note}
-                </Text>
+                </Text>}
                 {parametrField()}
             </div>
-            {updateDateField()}
         </Card>
-    );
+    )
 }
 
 export default TextPost;
 
-/*
- * <Cell className={s.reference} description={<Text> {dateField} </Text>}
-                before={<Avatar size={40} src={userAva} />}
-                asideContent={(user.id === currentUser.id) ?
-                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
-                {<Text> {user.first_name} {user.last_name} </Text>}
-            </Cell>
-            {(description !== "" || text !== "") ? <div className={s.content}>
-                <Subhead weight='bold' className={s.title}>
-                    {description}
-                </Subhead>
-                <Text weight='regular'>
-                    {text}
-                </Text>
-            </div> : null}
-            {parametrField()}
-            {updateDateField()}
- *
- *
- *
- */
 
 /*
  * теги настроения

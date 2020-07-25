@@ -1,9 +1,15 @@
 
 
-.grid{
+:global(.entriesGrid ){
     padding: 15px;
+} 
+
+.date {
+    color: var(--text_secondary);
+    margin: 0 auto;
 }
 
-.header {
-    z-index: 500;
+.dateField{
+    display: flex;
+    width: 100%;
 }
