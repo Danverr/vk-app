@@ -16,7 +16,7 @@ import api from '../../utils/api';
 import moment from 'moment';
 import s from './feedStory.module.css';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
-import TextPost from '../../components/TextPost/TextPost';
+import TextPost from '../../components/TextPost/textPost';
 import AccessEntry from '../../components/AccessEntry/AccessEntry';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import entryWrapper from '../../components/entryWrapper';
@@ -132,6 +132,7 @@ let DAT = {
     },
 
     fetchEntriesPack: (PACK_SZ, lastDate) => {
+        debugger;
         const queryData = {
             lastDate: lastDate,
             count: PACK_SZ,
@@ -179,6 +180,7 @@ let DAT = {
 
         const Promise = DAT.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime);
 
+        debugger;
         Promise.then((result) => {
             let newEntries = result.data;
             DAT.queue = DAT.queue.concat(newEntries);

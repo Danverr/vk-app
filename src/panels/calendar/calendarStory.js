@@ -5,7 +5,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import moment from 'moment';
 import Calendar from './Calendar/Calendar';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
-import TextPost from '../../components/TextPost/TextPost';
+import TextPost from '../../components/TextPost/textPost';
 import api from '../../utils/api.js'
 import entryWrapper from '../../components/entryWrapper'
 
@@ -122,7 +122,6 @@ const CalendarStory = (props) => {
     }, [userInfo, fetching, curDate]);
 
     useEffect(() => {
-        if (!userStats || !userEntries) return;
         let temp = <Calendar
             setPopout={setPopout}
             onDateChange={(date) => {
@@ -132,7 +131,7 @@ const CalendarStory = (props) => {
             stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
-    }, [userStats, userEntries])
+    }, [userStats])
 
     const renderData = (entry) => {
         const dat = {

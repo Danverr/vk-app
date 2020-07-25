@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Cell, Avatar, Card, Text, Subhead, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
-import s from './TextPost.module.css'
+import s from './textPost.module.css'
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
