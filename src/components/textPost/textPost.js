@@ -23,9 +23,9 @@ const TextPost = (props) => {
 
     const avatar = user.photo_100;
 
-    const mood = postData.post.mood * 20;
-    const stress = postData.post.stress * 20;
-    const anxiety = postData.post.anxiety * 20;
+    const mood = postData.post.mood;
+    const stress = postData.post.stress;
+    const anxiety = postData.post.anxiety;
 
     const emojiMood = postData.post.mood ? emojiList.mood[Math.round(postData.post.mood) - 1] : emojiList.placeholder;
     const emojiStress = postData.post.stress ? emojiList.stress[Math.round(postData.post.stress) - 1] : emojiList.placeholder;
@@ -36,24 +36,22 @@ const TextPost = (props) => {
     const [dateField] = useState(getDateDescription(postDate.local(), moment()));
 
     const editPost = () => {
-        entryWrapper.editFunction = () => {
-            postData.wrapper.deleteEntryFromList(postData);
-        }
-        postData.setUpdatingEntryData({...postData.post, date: postDate});
+        entryWrapper.editingEntry = postData;
+        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
         if (postData.deleteEntryFromFeedList) {
             postData.deleteEntryFromFeedList(postData);
         }
         postData.nav.goTo("checkIn");
     };
 
-    const deletePost = () => {
-        postData.wrapper.deleteEntryFromBase(postData);
+    const deletePost = async () => {
+        await postData.wrapper.deleteEntryFromBase(postData);
         postData.wrapper.deleteEntryFromList(postData);
         if (postData.deleteEntryFromFeedList) {
             postData.deleteEntryFromFeedList(postData);
         }
         postData.setDisplayEntries(postData.wrapper.entries);
-        postData.setDeletedEntryField(<DeleteSnackbar onClose={postData.setDeletedEntryField}/>)
+        postData.setSnackField(<DeleteBar onClose={postData.setSnackField} />)
     };
 
     const queryDeletePost = () => {
@@ -75,28 +73,27 @@ const TextPost = (props) => {
                     postData.setPopout(null);
                 }}
             >
-                <h2><Text> Подтверждение </Text></h2>
-                <p><Text> Вы действительно хотите удалить эту запись? </Text></p>
+                <h2> Подтверждение  </h2>
+                <p>  Вы действительно хотите удалить эту запись? </p>
             </Alert>
         );
     }
 
     const onSettingClick = () => {
-        postData.setDeletedEntryField(null);
+        postData.setSnackField(null);
         postData.setPopout(
             <ActionSheet onClose={() => {
                 postData.setPopout(null);
             }}>
                 <ActionSheetItem onClick={editPost} autoclose>
-                    <Text> Редактировать запись </Text>
+                    Редактировать запись
                 </ActionSheetItem>
 
                 <ActionSheetItem onClick={queryDeletePost} autoclose mode="destructive">
-                    <Text> Удалить запись </Text>
+                    Удалить запись
                 </ActionSheetItem>
 
-                {platform() === IOS &&
-                <ActionSheetItem autoclose mode="cancel"> <Text> Отменить </Text> </ActionSheetItem>}
+                {platform() === IOS && <ActionSheetItem autoclose mode="cancel">  Отменить  </ActionSheetItem>}
             </ActionSheet>);
     }
 

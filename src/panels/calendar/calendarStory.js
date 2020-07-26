@@ -91,7 +91,7 @@ const CalendarStory = (props) => {
     const [curDate, setCurDate] = useState(moment(localState.curDate));
     const [popout, setPopout] = useState(null);
     const [fetching, setFetching] = useState(1);
-    const [deletedEntryField, setDeletedEntryField] = useState(null);
+    const [snackField, setSnackField] = useState(null);
     const [error, setError] = useState(null);
 
     const {userInfo} = props.state;
@@ -144,14 +144,13 @@ const CalendarStory = (props) => {
         const dat = {
             post: entry, user: localState.usersMap[entry.userId],
             currentUser: localState.userInfo,
-            setDeletedEntryField: setDeletedEntryField,
+            setSnackField: setSnackField,
             setPopout: setPopout,
             setDisplayEntries: setEntriesField,
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: localState,
             nav: props.nav,
             deleteEntryFromFeedList: entryWrapper.deleteEntryFromFeedList,
-            visible: 1,
         };
         return <TextPost postData={dat} key={entry.entryId}/>
     };
@@ -175,7 +174,7 @@ const CalendarStory = (props) => {
                         {entriesField.map(renderData)}
                     </CardGrid>
                 </Group>
-                {deletedEntryField}
+                {snackField}
             </Panel>
         </View>
     );
