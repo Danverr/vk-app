@@ -84,15 +84,11 @@ const SubmitPanel = (props) => {
 
             api(method, "/entries/", data)
                 .then((result) => {
-                    if (entryWrapper.editFunction){
-                        entryWrapper.editFunction();
-                        entryWrapper.editFunction = null;
-                    }
                     let entryData = Object.assign({}, answer);
                     if (result.data){
                         entryData.entryId.val = result.data;
                     }
-                    entryWrapper.addEntryToFeedList(entryData);
+                    entryWrapper.editEntryFromFeedList(entryData);
                     setAnswer(getAnswer());
                     props.nav.panelHistory.checkIn = [0];
                     props.setEntryAdded(true);

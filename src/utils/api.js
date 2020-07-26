@@ -2,7 +2,7 @@ import axios from "axios";
 import qs from "qs";
 
 const instance = axios.create({
-    baseURL: "https://vk-app-server.herokuapp.com/",
+    baseURL: "https://vkapp-mood.ru/",
     responseType: "json",
     timeout: 10 * 1000,
     headers: {

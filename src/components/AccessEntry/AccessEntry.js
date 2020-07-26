@@ -21,8 +21,8 @@ const AccesEntry = (props) => {
             </Cell>
             <Button onClick={() => { nav.goTo("settings"); nav.goTo("settings", "friends") }}
                 size="xl" disabled={haveEdge} style={{ 'marginTop': '12px' }}>
-                {haveEdge && <Text> Вы уже дали доступ </Text>}
-                {!haveEdge && <Text> Дать доступ в ответ </Text>}
+                {haveEdge &&  "Вы уже дали доступ" }
+                {!haveEdge && "Дать доступ в ответ"}
             </Button>
         </Card>
     );

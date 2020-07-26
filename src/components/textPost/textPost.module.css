@@ -1,6 +1,6 @@
 
-
-.TextPost{
+.content {
+    margin-bottom: 12px;
 }
 
 :global(.TextPost .Cell__in){
@@ -88,7 +88,6 @@
 }
 
 .parametresField {
-    margin-top: 12px;
     display: grid;
     grid-template-columns: 1fr 9fr 31px;
     grid-template-rows: 35px 35px 35px;
