@@ -1,27 +1,37 @@
-import React from 'react';
-import {RichCell, Avatar, Card, Button} from '@vkontakte/vkui';
+import React, {useState} from 'react';
+import { RichCell, Avatar, Card, Button } from '@vkontakte/vkui';
 import "./accessPost.module.css";
+import ErrorSnackbar from '../errorSnackbar/errorSnackbar';
+import Done from '../done/done';
 
 const AccessPost = (props) => {
-    const user = props.postData.user;
-    const nav = props.postData.nav;
+    const postData = props.postData;
+
+    const user = postData.user;
     const phr = ["Дала", "Дал"];
-    const haveEdge = props.postData.haveEdge;
+    const [haveEdge, setHaveEdge] = useState(postData.haveEdge);
+
+    const addEdge = async () => {
+        try {
+            await postData.postEdge(user.id);
+            postData.setSnackField(<Done onClose={()=>{postData.setSnackField(null)}}/>);
+            setHaveEdge(1);
+        }
+        catch (error){
+            postData.setSnackField(<ErrorSnackbar onClose={()=>{postData.setSnackField(null)}}/>);
+        }
+    };
 
     return (
         <Card size="l" mode="shadow" className="TextPost">
             <RichCell
-                before={<Avatar size={72} src={user.photo_100}/>}
+                before={<Avatar size={72} src={user.photo_100} />}
                 caption={`${phr[(user.sex === 2) ? 1 : 0]} вам доступ к записям`}
             >
                 {`${user.first_name} ${user.last_name}`}
             </RichCell>
-            <Button
+            <Button onClick={addEdge}
                 size="xl" disabled={haveEdge}
-                onClick={() => {
-                    nav.goTo("settings");
-                    nav.goTo("settings", "friends")
-                }}
             >
                 {haveEdge && "Вы уже дали доступ"}
                 {!haveEdge && "Дать доступ в ответ"}

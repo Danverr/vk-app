@@ -1,7 +1,8 @@
 
 
 :global(.entriesGrid ){
-    padding: 15px;
+    margin-bottom: 12px;
+    margin-top: 6px;
 } 
 
 .date {

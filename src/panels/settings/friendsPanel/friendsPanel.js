@@ -8,6 +8,7 @@ import api from '../../../utils/api'
 import CanAddGroup from './canAddGroup/canAddGroup'
 import AddedGroup from './addedGroup/addedGroup'
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
+import entryWrapper from '../../../components/entryWrapper';
 
 var localState = {
     canAdd: null,
@@ -90,6 +91,7 @@ const FriendsPanel = (props) => {
 
     const postEdges = async () => {
         if (!userInfo) return;
+        waitToAdd.forEach((friend) => {entryWrapper.pseudoFriends[friend.id] = 1});
         props.setPopout(<ScreenSpinner />);
         api("POST", "/statAccess/", {
             toId: waitToAdd.map((friend) => { return friend.id; }).join(', ')
@@ -106,6 +108,7 @@ const FriendsPanel = (props) => {
 
     const deleteEdge = async (friend) => {
         if (!added || !VKfriends) return;
+        entryWrapper.pseudoFriends[friend.id] = null;
         props.setPopout(<ScreenSpinner />);
         api("DELETE", "/statAccess/", {
             toId: friend.id

@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption} from '@vkontakte/vkui';
+import React, { useState } from 'react';
+import { Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
 import s from './textPost.module.css';
-import {platform, IOS} from '@vkontakte/vkui';
+import { platform, IOS } from '@vkontakte/vkui';
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -11,7 +11,7 @@ import ProgressBar from '../progressBar/progressBar'
 import emojiList from "../../utils/getEmoji";
 import DeleteSnackbar from '../deleteSnackbar/deleteSnackbar'
 import getDateDescription from '../../utils/chrono';
-import entryWrapper from '../entryWrapper'
+import ErrorSnackbar from '../errorSnackbar/errorSnackbar';
 
 const TextPost = (props) => {
     const postData = props.postData;
@@ -32,26 +32,32 @@ const TextPost = (props) => {
     const emojiAnxiety = postData.post.anxiety ? emojiList.anxiety[Math.round(postData.post.anxiety) - 1] : emojiList.placeholder;
 
     const postDate = moment.utc(postData.post.date);
+    const dateField = getDateDescription(postDate.local(), moment())[0];
 
-    const [dateField] = useState(getDateDescription(postDate.local(), moment()));
+    const [upd, setUpd] = useState(null);
+
+    const recursion = () => {
+        const shift = getDateDescription(postDate.local(), moment())[1];
+        setTimeout(()=>{setUpd(!upd)}, shift);
+    };
 
     const editPost = () => {
-        entryWrapper.editingEntry = postData;
         postData.setUpdatingEntryData({ ...postData.post, date: postDate });
-        if (postData.deleteEntryFromFeedList) {
-            postData.deleteEntryFromFeedList(postData);
-        }
         postData.nav.goTo("checkIn");
     };
 
     const deletePost = async () => {
-        await postData.wrapper.deleteEntryFromBase(postData);
-        postData.wrapper.deleteEntryFromList(postData);
-        if (postData.deleteEntryFromFeedList) {
-            postData.deleteEntryFromFeedList(postData);
+        try {
+            await postData.wrapper.deleteEntryFromBase(postData);
+            postData.wrapper.deleteEntryFromList(postData);
+            if (postData.deleteEntryFromFeedList) {
+                postData.deleteEntryFromFeedList(postData);
+            }
+            postData.setDisplayEntries(postData.wrapper.entries);
+            postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField} />)
+        } catch (error){
+            postData.setSnackField(<ErrorSnackbar onClose={()=>{postData.setSnackField(null)}}/>);
         }
-        postData.setDisplayEntries(postData.wrapper.entries);
-        postData.setSnackField(<DeleteBar onClose={postData.setSnackField} />)
     };
 
     const queryDeletePost = () => {
@@ -63,11 +69,11 @@ const TextPost = (props) => {
                         autoclose: true,
                         mode: 'cancel'
                     },
-                        {
-                            title: 'Да',
-                            autoclose: true,
-                            action: deletePost
-                        }]
+                    {
+                        title: 'Да',
+                        autoclose: true,
+                        action: deletePost
+                    }]
                 }
                 onClose={() => {
                     postData.setPopout(null);
@@ -107,15 +113,15 @@ const TextPost = (props) => {
                 </div>
 
                 <div className={s.progressBarsCol}>
-                    <div><ProgressBar param="mood" value={mood}/></div>
-                    <div><ProgressBar param="anxiety" value={anxiety}/></div>
-                    <div><ProgressBar param="stress" value={stress}/></div>
+                    <div><ProgressBar param="mood" value={mood * 20} /></div>
+                    <div><ProgressBar param="anxiety" value={anxiety * 20} /></div>
+                    <div><ProgressBar param="stress" value={stress * 20} /></div>
                 </div>
 
                 <div>
-                    <img src={emojiMood} alt=""/>
-                    <img src={emojiAnxiety} alt=""/>
-                    <img src={emojiStress} alt=""/>
+                    <img src={emojiMood} alt="" />
+                    <img src={emojiAnxiety} alt="" />
+                    <img src={emojiStress} alt="" />
                 </div>
             </div>
         );
@@ -129,7 +135,7 @@ const TextPost = (props) => {
         if (postData.post.date) {
             return <>
                 {dateField}
-                <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock/>}</div>
+                <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock />}</div>
             </>;
         }
 
@@ -147,14 +153,15 @@ const TextPost = (props) => {
         <Card size="l" mode="shadow" className="TextPost" onClick={props.onClick}>
             <Cell
                 description={description()}
-                before={<Avatar size={48} src={avatar}/>}
+                before={<Avatar size={48} src={avatar} />}
                 asideContent={(currentUser && user.id === currentUser.id) ?
-                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon}/> : null}>
+                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
                 {`${user.first_name} ${user.last_name}`}
             </Cell>
 
             {postText()}
             {parametrField()}
+            {recursion()}
         </Card>
     )
 }

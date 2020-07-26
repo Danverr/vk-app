@@ -1,13 +1,16 @@
-import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid} from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid, Button } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import moment from 'moment';
 import Calendar from './Calendar/Calendar';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
 import TextPost from '../../components/textPost/textPost';
-import api from '../../utils/api.js'
-import entryWrapper from '../../components/entryWrapper'
+import api from '../../utils/api.js';
+import entryWrapper from '../../components/entryWrapper';
+import Done from '../../components/done/done';
+
+
 function calendarStateUpdate() {
     const temp = {};
     localState.allEntries.forEach((entry) => {
@@ -36,7 +39,7 @@ function calendarStateUpdate() {
         mood = Math.floor(mood + 0.5);
         stress = Math.floor(stress + 0.5);
         anxiety = Math.floor(anxiety + 0.5);
-        stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
+        stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
     }
     localState.userStats = stats;
     localState.setUserStats(stats);
@@ -45,7 +48,7 @@ function calendarStateUpdate() {
 
 function fetchCalendar() {
     localState.usersMap[localState.userInfo.id] = localState.userInfo;
-    api("GET", "/entries/", {users: localState.userInfo.id}).catch((error) => {
+    api("GET", "/entries/", { users: localState.userInfo.id }).catch((error) => {
         localState.setError(error)
     }).then((result) => {
         localState.allEntries = result.data;
@@ -54,7 +57,7 @@ function fetchCalendar() {
 }
 
 function deleteEntryFromBase(entryData) {
-    api("DELETE", "/entries/", {entryId: entryData.post.entryId}).catch((error) => {
+    api("DELETE", "/entries/", { entryId: entryData.post.entryId }).catch((error) => {
         localState.setError(error)
     });
 }
@@ -77,7 +80,7 @@ let localState = {
     deleteEntryFromBase: deleteEntryFromBase,
     deleteEntryFromList: deleteEntryFromList,
     fetchCalendar: fetchCalendar,
-    calendarField: <Spinner size="large" style={{marginTop: 20}}/>,
+    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
     curDate: null
 };
 
@@ -91,7 +94,14 @@ const CalendarStory = (props) => {
     const [snackField, setSnackField] = useState(null);
     const [error, setError] = useState(null);
 
-    const {userInfo} = props.state;
+    const { userInfo } = props.state;
+
+    useEffect(() => {
+        if (props.state.entryAdded) {
+            props.state.setEntryAdded(null);
+            setSnackField(<Done onClose={() => { setSnackField(null) }} />)
+        }
+    }, [props.state])
 
     useEffect(() => {
         if (!userInfo.id)
@@ -113,7 +123,7 @@ const CalendarStory = (props) => {
     useEffect(() => {
         if (!userInfo || !curDate || fetching)
             return;
-        setEntriesField(<Spinner size="large"/>);
+        setEntriesField(<Spinner size="large" />);
 
         localState.entries = []
 
@@ -132,7 +142,7 @@ const CalendarStory = (props) => {
                 setCurDate(moment(date));
                 localState.curDate = moment(date);
             }}
-            stats={userStats}/>;
+            stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
     }, [userStats])
@@ -149,32 +159,33 @@ const CalendarStory = (props) => {
             nav: props.nav,
             deleteEntryFromFeedList: entryWrapper.deleteEntryFromFeedList,
         };
-        return <TextPost postData={dat} key={entry.entryId}/>
+        return <TextPost postData={dat} key={entry.entryId} />
     };
 
-    return error ? <ErrorPlaceholder error={error}/> : (
-        <View id={props.id}
-              popout={popout}
-              activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
-              onSwipeBack={props.nav.goBack}
-        >
-            <Panel id="main">
-                <PanelHeader separator={false}>Календарь</PanelHeader>
-                <Group separator="show">
-                    <Div style={{paddingTop: "0", paddingBottom: "0"}}>
-                        {calendarField}
-                    </Div>
-                </Group>
-                <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    <CardGrid className="entriesGrid">
-                        {entriesField.map(renderData)}
-                    </CardGrid>
-                </Group>
-                {snackField}
-            </Panel>
-        </View>
-    );
+    return error ? <ErrorPlaceholder error={error}
+        action={<Button onClick={() => { setError(null); fetchCalendar() }}> Попробовать снова </Button>} /> : (
+            <View id={props.id}
+                popout={popout}
+                activePanel={props.nav.activePanel}
+                history={props.nav.viewHistory}
+                onSwipeBack={props.nav.goBack}
+            >
+                <Panel id="main">
+                    <PanelHeader separator={false}>Календарь</PanelHeader>
+                    <Group separator="show">
+                        <Div style={{ paddingTop: "0", paddingBottom: "0" }}>
+                            {calendarField}
+                        </Div>
+                    </Group>
+                    <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
+                        <CardGrid className="entriesGrid">
+                            {entriesField.map(renderData)}
+                        </CardGrid>
+                    </Group>
+                    {snackField}
+                </Panel>
+            </View>
+        );
 };
 
 export default CalendarStory;

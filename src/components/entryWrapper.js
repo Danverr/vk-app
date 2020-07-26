@@ -2,7 +2,7 @@ import bridge from "@vkontakte/vk-bridge";
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
-import { Spinner } from '@vkontakte/vkui';
+import { Spinner, Placeholder, Button } from '@vkontakte/vkui';
 
 const UPLOADED_QUANTITY = 1000;
 const FIRST_BLOCK_SIZE = 15;
@@ -35,53 +35,32 @@ export let entryWrapper = {
     deleteEntryFromFeedList: deleteEntryFromFeedList,
     deleteEntryFromList: deleteEntryFromFeedList,
 
-    editEntryFromFeedList: (entryData) => {
-        if (!entryWrapper.editingEntry) {
-            entryWrapper.addEntryToFeedList(entryData);
-        } else {
-            let entry = {};
-            for (let key in entryData) {
-                entry[key] = entryData[key].val;
-            }
-            entry.userId = entryWrapper.userInfo.id;
-            entry.date = entry.date.utc().format("YYYY-MM-DD HH:mm:ss");
-            entryWrapper.entries[entryWrapper.entries.findIndex((e) => { return e === entryWrapper.editingEntry.post })] = entry;
-        }
-        entryWrapper.editingEntry = null;
-    },
-
-    addEntryToFeedList: (entryData) => {
+    getEntry: (entryData) => {
         let entry = {};
         for (let key in entryData) {
             entry[key] = entryData[key].val;
         }
         entry.userId = entryWrapper.userInfo.id;
-
         entry.date = entry.date.utc().format("YYYY-MM-DD HH:mm:ss");
+        return entry;
+    },
 
-        for (let key in entryWrapper.entries) {
-            if (cmp(entry, entryWrapper.entries[key]) === -1) {
-                entryWrapper.entries.splice(key, 0, entry);
-                return;
-            }
-        }
+    editEntryFromFeedList: (entryData) => {
+        let entry = entryWrapper.getEntry(entryData);
+        const cmp = e => { return e.entryId === entry.entryId };
+        entryWrapper.entries[entryWrapper.entries.findIndex(cmp)] = entry;
+    },
 
-        if (!entryWrapper.hasMore) {
-            entryWrapper.entries.push(entry);
-        } else {
-            for (let key in entryWrapper.queue) {
-                if (cmp(entry, entryWrapper.queue[key]) === -1) {
-                    entryWrapper.queue.splice(key, 0, entry);
-                    return;
-                }
-            }
-        }
+    addEntryToFeedList: (entryData) => {
+        entryWrapper.entries.splice(0, 0, entryWrapper.getEntry(entryData));
     },
 
     deleteEntryFromBase: (entryData) => {
-        const Promise = api("DELETE", "/entries/", { entryId: entryData.post.entryId })
-            .catch((error) => { entryWrapper.setErrorSnackbar(error) });
-        return Promise;
+        return api("DELETE", "/entries/", { entryId: entryData.post.entryId });
+    },
+
+    postEdge: (id) => {
+        return api("POST", "/statAccess/", { toId: id });
     },
 
     fetchFriendsInfo: async () => {
@@ -116,6 +95,7 @@ export let entryWrapper = {
             }
 
         } catch (error) {
+            entryWrapper.wantUpdate = 1;
             entryWrapper.setErrorPlaceholder(error);
         }
     },
@@ -130,27 +110,20 @@ export let entryWrapper = {
             });
         } catch (error) {
             entryWrapper.setErrorPlaceholder(error);
+            entryWrapper.wantUpdate = 1;
         }
     },
 
-    fetchEntriesPack: async (PACK_SZ, lastDate, isFirstTime) => {
-        try {
-            const queryData = {
-                lastDate: lastDate,
-                count: PACK_SZ,
-                users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
-            };
-            return await api("GET", "/entries/", queryData);
-        } catch (error) {
-            if (isFirstTime) {
-                entryWrapper.setErrorPlaceholder(error);
-            } else {
-                entryWrapper.setErrorSnackbar(error);
-            }
-        }
+    fetchEntriesPack: (PACK_SZ, lastDate) => {
+        const queryData = {
+            lastDate: lastDate,
+            count: PACK_SZ,
+            users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
+        };
+        return api("GET", "/entries/", queryData);
     },
 
-    fetchEntries: async (isFirstTime = null, afterPull = null) => {
+    fetchEntries: async (isFirstTime = null) => {
         const Pop = (POP_LIMIT = 2) => {
             let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
             let obj = entryWrapper.entries.slice(0);
@@ -167,7 +140,7 @@ export let entryWrapper = {
                 i++;
             }
             entryWrapper.setDisplayEntries(obj);
-            if (afterPull && entryWrapper.hasMore) {
+            if (entryWrapper.hasMore) {
                 entryWrapper.setLoading(<Spinner size='large' />);
             }
             entryWrapper.queue.splice(0, cur);
@@ -191,9 +164,10 @@ export let entryWrapper = {
 
         try {
             const newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime)).data;
+            entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;
-            if (coming == 0 || (isFirstTime && coming < FIRST_BLOCK_SIZE)) {
+            if (coming === 0 || (isFirstTime && coming < FIRST_BLOCK_SIZE)) {
                 entryWrapper.setLoading(null);
                 entryWrapper.hasMore = false;
             }
@@ -212,11 +186,21 @@ export let entryWrapper = {
         }
         catch (error) {
             if (isFirstTime) {
+                entryWrapper.setDisplayEntries([]);
                 entryWrapper.setErrorPlaceholder(error);
-            } else {
-                entryWrapper.setErrorSnackbar(error);
+                entryWrapper.wantUpdate = 1;
             }
-            setTimeout(entryWrapper.fetchEntries, 10000);
+            else {
+                entryWrapper.wasError = 1;
+                entryWrapper.setLoading(<Placeholder
+                    header="Упс, что-то пошло не так!"
+                    action={<Button size="xl" onClick={() => {
+                        entryWrapper.setLoading(<Spinner size='large' />);
+                        setTimeout(entryWrapper.fetchEntries, 1000);
+                    }}> Попробовать снова </Button>}
+                >
+                </Placeholder>);
+            }
         }
     },
 

@@ -2,7 +2,7 @@ import {
     FormLayout, FormStatus, Input, Textarea,
     Switch, Button, ScreenSpinner, Cell
 } from "@vkontakte/vkui";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
 import getAnswer from "../../../utils/getAnswer";
@@ -13,7 +13,7 @@ import QuestionSection from "../questionSection/questionSection";
 import entryWrapper from "../../../components/entryWrapper";
 
 const SubmitPanel = (props) => {
-    const {answer, setAnswer} = props;
+    const { answer, setAnswer } = props;
     const [isChecked, setCheck] = useState(!answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
@@ -59,7 +59,7 @@ const SubmitPanel = (props) => {
                 mode: "error"
             });
         } else {
-            props.setPopout(<ScreenSpinner/>);
+            props.setPopout(<ScreenSpinner />);
             setFormStatus({
                 title: "",
                 text: "",
@@ -81,7 +81,7 @@ const SubmitPanel = (props) => {
                 }
 
                 data.date = answer.date.val.clone().utc().format("YYYY-MM-DD HH:mm:ss");
-                data = {entries: JSON.stringify([data])};
+                data = { entries: JSON.stringify([data]) };
             }
 
             api(method, "/entries/", data)
@@ -90,13 +90,18 @@ const SubmitPanel = (props) => {
 
                     if (result.data) {
                         entryData.entryId.val = result.data;
+                        entryWrapper.addEntryToFeedList(entryData);
+                    } else {
+                        entryWrapper.editEntryFromFeedList(entryData);
                     }
-                    entryWrapper.editEntryFromFeedList(entryData);
                     setAnswer(getAnswer());
                     props.nav.panelHistory.checkIn = [0];
                     props.nav.goBack();
 
-                    if (!props.isEntryUpdate) props.setEntryAdded(true);
+                    if (!props.isEntryUpdate){
+                        props.nav.scrollHistory["feed__main"] = 0;
+                    }
+                    props.setEntryAdded(true);
                 })
                 .catch((error) => {
                     setFormStatus({
@@ -113,7 +118,7 @@ const SubmitPanel = (props) => {
 
     return (
         <div>
-            <QuestionSection question={"Что вам запомнилось?"} date={answer.date.val}/>
+            <QuestionSection question={"Что вам запомнилось?"} date={answer.date.val} />
             <FormLayout className={styles.formLayout}>
                 {
                     formStatus.text.length === 0 ? null :
@@ -138,11 +143,11 @@ const SubmitPanel = (props) => {
                 />
                 <Cell
                     className={styles.privacySwitch}
-                    asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>}
+                    asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null} />}
                     description="Заметка будет доступна только вам"
                 >
                     <span>Приватная запись</span>
-                    <Icon12Lock className={styles.lockIcon}/>
+                    <Icon12Lock className={styles.lockIcon} />
                 </Cell>
 
                 <Button

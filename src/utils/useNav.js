@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import bridge from "@vkontakte/vk-bridge";
-import {Tabbar, TabbarItem} from "@vkontakte/vkui";
+import { Tabbar, TabbarItem } from "@vkontakte/vkui";
 
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28SmileOutline from '@vkontakte/icons/dist/28/smile_outline';
@@ -64,7 +64,7 @@ const useNav = () => {
         } else { // Переход между историями
             if (viewHistory.length === 1) {
                 // Отправляем bridge на закрытие сервиса.
-                bridge.send("VKWebAppClose", {"status": "success"});
+                bridge.send("VKWebAppClose", { "status": "success" });
             } else {
                 viewHistory.pop();
             }
@@ -138,27 +138,28 @@ const useNav = () => {
         goBack: goBack,
         goTo: goTo,
         setNavbarVis: setNavbarVis,
+        scrollHistory: scrollHistory,
         navbar: isNavbarVis ? (<Tabbar>
             <TabbarItem
                 onClick={() => goTo("feed")}
                 selected={getActiveStory() === "feed"}
-            ><Icon28NewsfeedOutline/></TabbarItem>
+            ><Icon28NewsfeedOutline /></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("profiles")}
                 selected={getActiveStory() === "profiles"}
-            ><Icon28SmileOutline/></TabbarItem>
+            ><Icon28SmileOutline /></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("checkIn")}
                 selected={getActiveStory() === "checkIn"}
-            ><Icon28AddCircleOutline/></TabbarItem>
+            ><Icon28AddCircleOutline /></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("calendar")}
                 selected={getActiveStory() === "calendar"}
-            ><Icon28CalendarOutline/></TabbarItem>
+            ><Icon28CalendarOutline /></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("settings")}
                 selected={getActiveStory() === "settings"}
-            ><Icon28SettingsOutline/></TabbarItem>
+            ><Icon28SettingsOutline /></TabbarItem>
         </Tabbar>) : null,
     });
 
