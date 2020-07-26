@@ -5,7 +5,7 @@ import {
 import React, {useState} from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
-import getAnswer from "../getAnswer";
+import getAnswer from "../../../utils/getAnswer";
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 
@@ -46,9 +46,8 @@ const SubmitPanel = (props) => {
 
     // Проверяем и отправляем данные
     const saveAnswer = () => {
-        if (!answer.mood.val || !answer.stress.val || !answer.anxiety.val || !answer.date.val) {
+        if (!answer.mood.val || !answer.stress.val || !answer.anxiety.val) {
             let text = "Не указаны параметры:";
-            if (!answer.date.val) text += ", дата";
             if (!answer.mood.val) text += ", настроение";
             if (!answer.stress.val) text += ", стресс";
             if (!answer.anxiety.val) text += ", тревожность";

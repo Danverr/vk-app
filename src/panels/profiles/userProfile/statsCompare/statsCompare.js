@@ -3,8 +3,8 @@ import {Div, Placeholder} from "@vkontakte/vkui";
 import styles from "./statsCompare.module.css";
 import moment from "moment";
 
-import StatsCompareLegend from "./statsCompareChart/statsCompareLegend";
-import StatsCompareChart from "./statsCompareChart/statsCompareChart";
+import StatsCompareLegend from "../../../../components/statsCompareChart/statsCompareLegend";
+import StatsCompareChart from "../../../../components/statsCompareChart/statsCompareChart";
 
 moment.locale("ru");
 
