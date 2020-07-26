@@ -44,9 +44,7 @@ const FriendsPanel = (props) => {
         setWaitToAdd(data);
     }
 
-    useEffect(() => {
-        if (!userToken) return;
-
+    const fetchData = () => {
         bridge.send("VKWebAppCallAPIMethod", {
             method: "friends.get",
             params: {
@@ -57,6 +55,7 @@ const FriendsPanel = (props) => {
             }
         }).then((friends) => {
             setVKfriends(friends.response.items);
+
             api("GET", "/statAccess/", {
                 type: "toId"
             }).then((edges) => {
@@ -74,14 +73,19 @@ const FriendsPanel = (props) => {
                     updateCanAdd(a.filter((friend) => !b.find((curFriend) => curFriend.id === friend.id)));
                     updateAdded(b);
                 }).catch((error) => {
-                    setError(error);
+                    setError({error: error, reload: fetchData});
                 });
             }).catch((error) => {
-                setError(error);
+                setError({error: error, reload: fetchData});
             });
         }).catch((error) => {
-            setError(error);
+            setError({error: error, reload: fetchData});
         });
+    }
+
+    useEffect(() => {
+        if (!userToken) return;
+        fetchData();
     }, [userToken, updateCanAdd, updateAdded]);
 
     const postEdges = async () => {
@@ -94,7 +98,7 @@ const FriendsPanel = (props) => {
             updateCanAdd(canAdd.filter((friend) => !waitToAdd.find((curFriend) => curFriend.id === friend.id)));
             updateWaitToAdd([]);
         }).catch((error) => {
-            setError(error);
+            setError({error: error, reload: postEdges});
         }).finally(() => {
             props.setPopout(null);
         });
@@ -110,7 +114,7 @@ const FriendsPanel = (props) => {
             if(VKfriends.find((curFriend) => curFriend.id === friend.id))
                 updateCanAdd([...canAdd, friend]);
         }).catch((error) => {
-            setError(error);
+            setError({error: error, reload: () => deleteEdge(friend)});
         }).finally(() => {
             props.setPopout(null);
         });
@@ -119,7 +123,7 @@ const FriendsPanel = (props) => {
     var content = <Spinner size="large" />;
 
     if (error)
-        content = <ErrorPlaceholder error={error} />;
+        content = <ErrorPlaceholder error={error.error} action = {<Button onClick = {() => {setError(null); error.reload();}}> Попробовать снова </Button>} />;
     else if (added && canAdd)
         content = (<div>
             <AddedGroup

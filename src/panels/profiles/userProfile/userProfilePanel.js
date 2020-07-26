@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {
     Panel, PanelHeader, PanelHeaderBack, PanelHeaderContext, PanelHeaderContent,
-    Cell, Header, Avatar, Group, List, Spinner, usePlatform, getClassName,
+    Cell, Header, Avatar, Group, List, Spinner, usePlatform, getClassName, Button
 } from "@vkontakte/vkui";
 import styles from "./userProfilePanel.module.css";
 import emoji from "../../../utils/getEmoji";
@@ -47,17 +47,21 @@ const UserProfilePanel = (props) => {
         };
     }, [stats, activeParam, userInfo, contextOpened]);
 
-    // Загрузка статистики пользователя
-    useEffect(() => {
-        if (userInfo === null) return;
 
+    const fetchData = () => {
         api("GET", "/entries/stats/", {
             users: userInfo.id,
         }).then((res) => {
             setStats(formatStats(res.data[userInfo.id]));
         }).catch((error) => {
-            setError(error);
+            setError({error: error, reload: fetchData});
         });
+    }
+
+    // Загрузка статистики пользователя
+    useEffect(() => {
+        if (userInfo === null) return;
+        fetchData();
     }, [userInfo, formatStats]);
 
     const platform = usePlatform();
@@ -87,7 +91,7 @@ const UserProfilePanel = (props) => {
     let content = <Spinner size="large" className={styles.loadingSpinner}/>;
 
     if (error) {
-        content = <ErrorPlaceholder error={error}/>;
+        content = <ErrorPlaceholder error={error.error} action = {<Button onClick = {() => {setError(null); error.reload();}}> Попробовать снова </Button>} />;
     } else if (stats) {
         content = <>
             <Group>

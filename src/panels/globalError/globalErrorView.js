@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Panel, View} from "@vkontakte/vkui";
+import {Panel, View, Button} from "@vkontakte/vkui";
 
 import ErrorPlaceholder from "../../components/errorPlaceholder/errorPlaceholder";
 
@@ -15,7 +15,7 @@ const GlobalErrorView = (props) => {
     return (
         <View id={props.id} activePanel="main">
             <Panel id="main">
-                <ErrorPlaceholder error={props.error}/>
+                <ErrorPlaceholder action = {<Button onClick = {() => window.location.reload()}> Перезагрузить приложение </Button>} error={props.error}/>
             </Panel>
         </View>
     );

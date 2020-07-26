@@ -122,16 +122,16 @@ const StatsAreaChart = (props) => {
                 {getColor("strokeColor", data, param, true)}
             </defs>
             <Area
-                animationDuration={1000} connectNulls={true} type="monotoneX" dataKey="val"
+                animationDuration={1000} connectNulls type="monotoneX" dataKey="val"
                 stroke="url(#strokeColor)" strokeWidth={2} fill="url(#fillColor)"
                 dot={{fill: "var(--background_content)", stroke: 'var(--light_accent)'}}
                 activeDot={{fill: "var(--background_content)", stroke: 'var(--accent)'}}
             />
             <XAxis
-                height={40} dataKey="date" reversed={true}
+                height={40} dataKey="date" reversed
                 tick={<AxisTick/>} interval={0} axisLine={false} tickMargin={12}
             />
-            <YAxis dataKey="val" hide={true} domain={[0.5, 5.5]}/>
+            <YAxis dataKey="val" hide domain={[0.5, 5.5]}/>
             <Tooltip
                 content={<TooltipCard emoji={emoji[param]}/>}
                 cursor={false} coordinate={{x: 100, y: 140}}

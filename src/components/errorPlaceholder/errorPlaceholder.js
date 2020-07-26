@@ -7,12 +7,12 @@ const ErrorPlaceholder = (props) => {
     const {error} = props;
     let header = "Упс, что-то пошло не так!";
     let text = error.message;
-    let action = null;
+    let action = props.action;
 
     return (
         <Placeholder
             header={header}
-            stretched={true}
+            stretched
             icon={<Icon56ErrorOutline/>}
             action={action}
         >

@@ -29,7 +29,7 @@ const callPicker = (props, setPopout, callback, ...callbackArgs) => {
                 dateConfig={config}
                 value={props.startDate}
                 max={props.type === "date" ? props.maxDate : new Date(2050, 0, 1)}
-                isOpen={true}
+                isOpen
                 confirmText={"ОК"}
                 cancelText={"Отмена"}
                 showHeader={false}

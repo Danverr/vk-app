@@ -45,19 +45,16 @@ function calendarStateUpdate() {
 
 function fetchCalendar() {
     localState.usersMap[localState.userInfo.id] = localState.userInfo;
-    const Promise = api("GET", "/entries/", {users: localState.userInfo.id});
-    Promise.catch((error) => {
+    api("GET", "/entries/", {users: localState.userInfo.id}).catch((error) => {
         localState.setError(error)
-    });
-    Promise.then((result) => {
+    }).then((result) => {
         localState.allEntries = result.data;
         localState.calendarStateUpdate();
     });
 }
 
 function deleteEntryFromBase(entryData) {
-    const Promise = api("DELETE", "/entries/", {entryId: entryData.post.entryId});
-    Promise.catch((error) => {
+    api("DELETE", "/entries/", {entryId: entryData.post.entryId}).catch((error) => {
         localState.setError(error)
     });
 }
