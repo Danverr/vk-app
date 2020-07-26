@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Spinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Spinner, Snackbar, Avatar, Button } from '@vkontakte/vkui';
 import moment from 'moment';
 import callPicker from '../../../utils/callPicker';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -19,82 +19,82 @@ const NotificationsPanel = (props) => {
 
     const changesSaved = () => {
         setSnackbar(<Snackbar layout="vertical"
-            onClose={() => {setSnackbar(null);}}
-            before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done fill="#fff" width={14} height={14} /></Avatar>}
+            onClose={() => { setSnackbar(null); }}
+            before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done fill="#fff" width={14} height={14} /></Avatar>}
         >
             Изменения сохранены
         </Snackbar>);
     }
-    
-    const changeCheckin = (e) => {
-        const s = e.target.checked;
+
+    const changeCheckin = (s) => {
         setCheckinNotif(s);
-        api((s ? "POST" : "DELETE"), "/entryNotifications/", 
-        (s ? {time: moment(curTime).utc().format("HH:mm")} : {})).then((res) => {
-            changesSaved();
-        }).catch((error) => {
-            setCheckinNotif(!s);
-            setError(error);
-        });
+        api((s ? "POST" : "DELETE"), "/entryNotifications/",
+            (s ? { time: moment(curTime).utc().format("HH:mm") } : {})).then((res) => {
+                changesSaved();
+            }).catch((error) => {
+                setCheckinNotif(!s);
+                setError({ error: error, reload: () => changeCheckin(s) });
+            });
     }
 
-    const changeHealth = (e) => {
-        const s = e.target.checked;
+    const changeHealth = (s) => {
         setHealthNotif(s);
         api((s ? "POST" : "DELETE"), "/statNotifications/", {}).then((res) => {
             changesSaved();
         }).catch((error) => {
             setHealthNotif(!s);
-            setError(error);
+            setError({ error: error, reload: () => changeHealth(s) });
         });
     }
 
     const changeTime = () => {
-        callPicker({type: "time", startDate: curTime.toDate(), maxDate: new Date(2050, 0, 1)}, props.setPopout, (res) => {
-            api("PUT", "/entryNotifications/", { time: moment(res).utc().format("HH:mm")}).then(() => {
+        const updateTime = (res) => {
+            api("PUT", "/entryNotifications/", { time: moment(res).utc().format("HH:mm") }).then(() => {
                 setCurTime(res);
                 changesSaved();
             }).catch((error) => {
-                setError(error);
+                setError({ error: error, reload: () => updateTime(res) });
             });
+        }
+        callPicker({ type: "time", startDate: curTime.toDate(), maxDate: new Date(2050, 0, 1) }, props.setPopout, updateTime);
+    }
+
+    const fetchData = () => {
+        api("GET", "/entryNotifications/", {}).then((res) => {
+            let time;
+            if (res.data == null) {
+                setCheckinNotif(false);
+                time = moment(`2000-01-01 22:00`).utc();
+            }
+            else {
+                setCheckinNotif(true);
+                time = moment.utc(`2000-01-01 ${res.data}`);
+            }
+            setCurTime(moment(time).local());
+        }).catch((error) => {
+            setError({ error: error, reload: fetchData });
+        });
+
+        api("GET", "/statNotifications/", {}).then((res) => {
+            setHealthNotif(res.data);
+        }).catch((error) => {
+            setError({ error: error, reload: fetchData });
         });
     }
 
     useEffect(() => {
-        const fetchSettings = () => {
-            api("GET", "/entryNotifications/", {}).then((res) => {
-                let time;
-                if(res.data == null){
-                    setCheckinNotif(false);
-                    time = moment(`2000-01-01 22:00`).utc();
-                }
-                else{ 
-                    setCheckinNotif(true);
-                    time = moment.utc(`2000-01-01 ${res.data}`);
-                }
-                setCurTime(moment(time).local());
-            }).catch((error) => {
-                setError(error);
-            });
-
-            api("GET", "/statNotifications/", {}).then((res) => {
-                setHealthNotif(res.data);
-            }).catch((error) => {
-                setError(error);
-            });
-        }
-        fetchSettings();
+        fetchData();
     }, []);
 
     var content = <Spinner size="large" />;
     if (!notifications)
-        content = (<NotificationsPlaceholder allowNotifications = {() => {bridge.send("VKWebAppAllowNotifications", {});}}/>);
+        content = (<NotificationsPlaceholder allowNotifications={() => { bridge.send("VKWebAppAllowNotifications", {}); }} />);
     else if (error)
-        content = <ErrorPlaceholder error={error} />;
+        content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => { setError(null); error.reload(); }}> Попробовать снова </Button>} />;
     else if (healthNotif != null && checkinNotif != null && curTime != null) {
         content = (<div>
             <Group>
-                <Cell asideContent={<Switch checked={checkinNotif} onChange={changeCheckin} />}>
+                <Cell asideContent={<Switch checked={checkinNotif} onChange={(e) => changeCheckin(e.target.checked)} />}>
                     <Text weight="regular">Напоминание о чекине</Text>
                 </Cell>
                 {checkinNotif && <Cell asideContent={<Text weight="regular" onClick={changeTime}> {moment(curTime).format("HH:mm")} </Text>}>
@@ -102,7 +102,7 @@ const NotificationsPanel = (props) => {
                 </Cell>}
             </Group>
             <Group description="Если у пользователя появится запись с низким уровнем настроения, тревожности или стресса - мы уведомим вас">
-                <Cell asideContent={<Switch checked={healthNotif} onChange={changeHealth} />}>
+                <Cell asideContent={<Switch checked={healthNotif} onChange={(e) => changeHealth(e.target.checked)} />}>
                     <Text weight="regular">Низкие показатели друга</Text>
                 </Cell>
             </Group>

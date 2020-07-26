@@ -25,12 +25,13 @@ const App = () => {
     useEffect(() => {
         window.addEventListener('popstate', goBack);
     }, [goBack]);
-
+    
     if (state.globalError) nav.goTo("globalError");
+
     if (state.showIntro) nav.goTo("intro");
 
     return (
-        <ConfigProvider isWebView={true}>
+        <ConfigProvider isWebView>
             <Root activeView="Epic">
                 <Epic id="Epic" activeStory={state.loading ? "loadingScreen" : nav.activeStory} tabbar={nav.navbar}>
                     <GlobalErrorView id="globalError" error={state.globalError} state={state} nav={nav}/>

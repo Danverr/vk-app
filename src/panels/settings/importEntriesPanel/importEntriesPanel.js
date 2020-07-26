@@ -8,6 +8,7 @@ import api from '../../../utils/api'
 import ImportPlaceholder from './importPlaceholder'
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
 import bridge from "@vkontakte/vk-bridge";
+import moment from 'moment';
 
 const osname = platform();
 
@@ -24,6 +25,11 @@ const ImportEntriesPanel = (props) => {
         if (!files || files.length === 0)
             return;
 
+        if(files[0].name.split('.').pop() !== 'csv'){
+            setTop("Некорректный формат файла");
+            return;
+        }
+
         let reader = new FileReader();
         reader.readAsText(files[0]);
 
@@ -31,16 +37,23 @@ const ImportEntriesPanel = (props) => {
             if (!userInfo)
                 return;
 
+            const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
+            
             const csvparse = require('js-csvparser');
             let entries = csvparse(reader.result).data;
-            entries = entries.filter((entry) => { return (entry.length === 7); });
-            
+
+            for (const entry of entries){
+                if(entry.length !== 7 || moods.indexOf(entry[4]) === -1 || !moment(`${entry[0]} ${entry[3]}:00`).isValid){
+                    setTop("Некорректный формат файла");
+                    return;
+                }
+            }
+
             if(entries.length > 500){
                 setTop("Нельзя импортировать более 500 записей за раз");
                 return;
             }
             
-            const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
             props.setPopout(<ScreenSpinner />);
 
             api("POST", "/entries/", {
@@ -65,13 +78,13 @@ const ImportEntriesPanel = (props) => {
                         access_token: userToken,
                         v: "5.103",
                         key: "import",
-                        value: ((importCount === 1) ? "-" : importCount - 1)
+                        value: ((importCount === 1) ? "#" : importCount - 1)
                     }
                 }).then((res) => {
                     setImportCount(importCount - 1);
                 });
             }).catch((error) => {
-                setBanner(<ErrorPlaceholder error={error} />);
+                setTop("Произошла ошибка. Попробуйте еще");
             }).finally(() => {
                 props.setPopout(null);
             });
@@ -95,7 +108,7 @@ const ImportEntriesPanel = (props) => {
             }).then((res) => {
                 if (res.response[0].value === "")
                     setImportCount(2);
-                else if(res.response[0].value === "-")
+                else if(res.response[0].value === "#")
                     setImportCount(0);
                 else
                     setImportCount(res.response[0].value);
