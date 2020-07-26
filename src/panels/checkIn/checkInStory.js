@@ -1,15 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {View, Gallery, Panel, PanelHeaderBack, PanelHeader} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import {platform, IOS} from '@vkontakte/vkui';
 import styles from "./checkInStory.module.css";
+import moment from "moment";
 
-import getAnswer from "./getAnswer";
+import getAnswer from "../../utils/getAnswer";
 import questionPanelsData from "./questionPanelsData";
 
 import QuestionPanel from "./questionPanel/questionPanel";
 import SubmitPanel from "./submitPanel/submitPanel";
-
-import { platform, IOS } from '@vkontakte/vkui';
 
 const getBullets = (questionPanels, index) => {
     let bullets = [];
@@ -47,6 +47,12 @@ const CheckInStory = (props) => {
         setNavbarVis(false);
         return () => setNavbarVis(true);
     }, [setNavbarVis]);
+
+    useEffect(() => {
+        let newAnswer = {...answer};
+        newAnswer.date.val = moment();
+        setAnswer(newAnswer);
+    }, []);
 
     // Обновляем ответ в localState
     useEffect(() => {

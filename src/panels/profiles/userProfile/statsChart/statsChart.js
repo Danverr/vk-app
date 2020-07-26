@@ -3,7 +3,7 @@ import {Div, Placeholder, Button} from '@vkontakte/vkui';
 import moment from 'moment';
 import styles from "./statsChart.module.css";
 
-import StatsAreaChart from "./statsAreaChart/statsAreaChart";
+import StatsAreaChart from "../../../../components/statsAreaChart/statsAreaChart";
 
 const getChartData = (allStats, selectedDate) => {
     let data = [];

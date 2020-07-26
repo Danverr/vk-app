@@ -5,8 +5,8 @@ import styles from "./statsAreaChart.module.css";
 import moment from "moment";
 import momentLocale from 'moment/locale/ru';
 
-import getColors from "../../../../../utils/getColors";
-import emoji from "../../../../../utils/getEmoji";
+import getColors from "../../utils/getColors";
+import emoji from "../../utils/getEmoji";
 
 moment.locale("ru", momentLocale);
 

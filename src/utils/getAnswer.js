@@ -1,8 +1,7 @@
-import {getValueIndex} from "./questionPanelsData";
+import {getValueIndex} from "../panels/checkIn/questionPanelsData";
 import moment from "moment";
 
 const getAnswer = (data = null) => {
-
     let answer = {
         entryId: {val: null},
         mood: {val: null, index: null},

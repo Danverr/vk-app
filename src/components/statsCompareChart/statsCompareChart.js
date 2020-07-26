@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./statsCompareChart.module.css";
 import {Button, Subhead} from "@vkontakte/vkui";
-import getColors from "../../../../../utils/getColors";
+import getColors from "../../utils/getColors";
 import moment from "moment";
 
 import Icon24BrowserBack from '@vkontakte/icons/dist/24/browser_back';
