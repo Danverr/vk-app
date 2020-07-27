@@ -16,7 +16,7 @@ import TextPost from '../../components/textPost/textPost';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import entryWrapper from '../../components/entryWrapper';
 import AccessPost from '../../components/accessPost/accessPost';
-import Done from '../../components/done/done';
+import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
 
 const Feed = (props) => {
@@ -61,7 +61,7 @@ const Feed = (props) => {
         const pState = props.state;
         if (pState.entryAdded) {
             pState.setEntryAdded(null);
-            setSnackField(<Done onClose={() => { setSnackField(null) }} />);
+            setSnackField(<DoneSnackbar onClose={() => { setSnackField(null) }} />);
         }
         if (!pState.userInfo || !pState.userToken || !entryWrapper.wantUpdate) return;
         entryWrapper.userInfo = pState.userInfo;

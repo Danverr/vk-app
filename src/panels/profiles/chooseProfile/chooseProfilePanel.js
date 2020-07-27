@@ -21,7 +21,7 @@ const fetchFriendsInfo = async (userToken) => {
         method: "users.get",
         params: {
             access_token: userToken,
-            v: "5.103",
+            v: "5.120",
             user_ids: friendsIdsPromise.data.map(item => item.id).join(","),
             fields: "photo_50, photo_100"
         }

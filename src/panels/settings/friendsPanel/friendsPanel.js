@@ -63,7 +63,7 @@ const FriendsPanel = (props) => {
                 method: "friends.get",
                 params: {
                     access_token: userToken,
-                    v: "5.103",
+                    v: "5.120",
                     order: "name",
                     fields: "photo_50, photo_100"
                 }
@@ -78,7 +78,7 @@ const FriendsPanel = (props) => {
                         method: "users.get",
                         params: {
                             access_token: userToken,
-                            v: "5.103",
+                            v: "5.120",
                             user_ids: edges.data.map((friend) => {
                                 return friend.id;
                             }).join(","),

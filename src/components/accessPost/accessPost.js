@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { RichCell, Avatar, Card, Button } from '@vkontakte/vkui';
 import "./accessPost.module.css";
 import ErrorSnackbar from '../errorSnackbar/errorSnackbar';
-import Done from '../done/done';
+import DoneSnackbar from '../doneSnackbar/doneSnackbar';
 
 const AccessPost = (props) => {
     const postData = props.postData;
@@ -14,7 +14,7 @@ const AccessPost = (props) => {
     const addEdge = async () => {
         try {
             await postData.postEdge(user.id);
-            postData.setSnackField(<Done onClose={()=>{postData.setSnackField(null)}}/>);
+            postData.setSnackField(<DoneSnackbar onClose={()=>{postData.setSnackField(null)}}/>);
             setHaveEdge(1);
         }
         catch (error){

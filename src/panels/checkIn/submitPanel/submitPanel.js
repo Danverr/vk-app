@@ -133,14 +133,14 @@ const SubmitPanel = (props) => {
 
                 <Input
                     top="Заголовок"
-                    placeholder="Назовите этот день"
+                    placeholder="Можно оставить пустым"
                     maxLength="64"
                     value={titleText}
                     onChange={handleTitle}
                 />
                 <Textarea
                     top="Текст заметки"
-                    placeholder="Просто начните писать"
+                    placeholder="Можно оставить пустым"
                     maxLength="2048"
                     value={noteText}
                     onChange={handleNote}

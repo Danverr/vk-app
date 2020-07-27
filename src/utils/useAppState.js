@@ -22,8 +22,8 @@ const sendUserParams = (userInfo) => {
     let userParams = {
         UserID: userInfo.id,
         city: userInfo.city ? userInfo.city.title : "-",
-        country: userInfo.country ? userInfo.city.country : "-",
-        timezone: userInfo.timezone,
+        country: userInfo.country ? userInfo.country.title : "-",
+        timezone: userInfo.timezone ? userInfo.timezone : "-",
         sex: "-",
         age: "-",
         ref: launchParams.vk_ref,

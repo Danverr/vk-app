@@ -7,11 +7,12 @@ const ImportPlaceholder = (props) => {
     return (
         <Placeholder
             icon={<Icon56DownloadOutline/>}
-            action={<Button href="vk.com/@vkapp_mood-import-zapisei" align="center" mode="tertiary">
+            action={<Button href="https://m.vk.com/@vkapp_mood-import-zapisei" align="center" mode="tertiary">
                 Подробнее об импорте записей
             </Button>}>
             Импортируйте записи из Daylio в виде .csv файла всего в один клик
         </Placeholder>
     );
-}
+};
+
 export default ImportPlaceholder;
