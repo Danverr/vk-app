@@ -64,8 +64,6 @@ const Feed = (props) => {
             setSnackField(<DoneSnackbar onClose={() => { setSnackField(null) }} />);
         }
         if (!pState.userInfo || !pState.userToken || !entryWrapper.wantUpdate) return;
-        entryWrapper.userInfo = pState.userInfo;
-        entryWrapper.userToken = pState.userToken;
         setLoading(<Spinner size='large' />);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
@@ -89,6 +87,11 @@ const Feed = (props) => {
     const toggleRefresh = () => {
         setFetching(1);
         setTimeout(() => { entryWrapper.fetchEntries(1) }, 1000);
+    };
+
+    const buttonRefresh = () => {
+        setLoading(<Spinner size='large' />);
+        entryWrapper.fetchEntries(1)
     };
 
     const renderData = (entry, id) => {
@@ -118,6 +121,7 @@ const Feed = (props) => {
             icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
             header="Нет записей"
             stretched={true}
+            action= {<Button onClick={buttonRefresh}> {(entryWrapper.mode==='feed')? "Обновить ленту" : "Обновить дневник" } </Button>}
         >
             {entryWrapper.mode === 'feed' ?
                 "Попросите друга дать вам доступ, импортируйте записи из Daylio или создайте их самостоятельно" :
@@ -165,19 +169,24 @@ const Feed = (props) => {
                     </List>
                 </PanelHeaderContext>
 
-                <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
-                    <InfiniteScroll
-                        hasMore={true}
-                        dataLength={displayEntries.length}
-                        next={entryWrapper.fetchEntries}
-                        scrollThreshold={1}
-                    >
-                        <CardGrid className="entriesGrid">
-                            {displayEntries.map(renderData)}
-                        </CardGrid>
+                {(entryWrapper.hasMore || displayEntries.length) ?
+                    <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
+                        <InfiniteScroll
+                            hasMore={true}
+                            dataLength={displayEntries.length}
+                            next={entryWrapper.fetchEntries}
+                            scrollThreshold={1}
+                        >
+                            <CardGrid className="entriesGrid">
+                                {displayEntries.map(renderData)}
+                            </CardGrid>
+                        </InfiniteScroll>
                         {(!entryWrapper.hasMore && !displayEntries.length) && Empty()}
-                    </InfiniteScroll>
-                </PullToRefresh>
+                    </PullToRefresh> : null
+                }
+                {(!entryWrapper.hasMore && !displayEntries.length) ?
+                    Empty() : null
+                }
                 {loading}
                 {snackField}
             </Panel>

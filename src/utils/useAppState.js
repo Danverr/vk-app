@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import bridge from "@vkontakte/vk-bridge";
 import moment from "moment";
+import entryWrapper from "../components/entryWrapper";
 
 const APP_ID = 7424071;
 
@@ -86,6 +87,7 @@ const useAppState = () => {
         }).then((res) => {
             // Обновляем токен
             if (res.scope === "friends") {
+                entryWrapper.userToken = res.access_token;
                 setUserToken(res.access_token);
                 if (callback) callback();
             } else {
@@ -103,6 +105,7 @@ const useAppState = () => {
     const fetchUserInfo = () => {
         return bridge.send('VKWebAppGetUserInfo')
             .then((userInfo) => {
+                entryWrapper.userInfo = userInfo;
                 userInfo["isCurrentUser"] = true;
                 sendUserParams(userInfo);
                 setUserInfo(userInfo);
