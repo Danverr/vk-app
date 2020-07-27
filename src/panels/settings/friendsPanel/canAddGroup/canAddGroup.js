@@ -20,28 +20,29 @@ const CanAddGroup = (props) => {
     return (
         <Group header={<Header mode="secondary"> предоставить доступ </Header>}>
             <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
-            <div className = {s.container}> {
-                (!searchedFriends || searchedFriends.length === 0) ? 
-                (<Placeholder className = {s.placeHolder}> {placeholderText} </Placeholder>) : (
-                    <List>
-                        {searchedFriends.map(friend =>
-                        <Cell selectable
-                            checked={props.waitToAdd.find((waitFriend) => { return waitFriend.id === friend.id; }) != null}
-                            onChange={(e) => {
-                                if (e.target.checked)
-                                    props.updateWaitToAdd([...waitToAdd, friend]);
-                                else
-                                    props.updateWaitToAdd(waitToAdd.filter((waitFriend) => waitFriend.id !== friend.id));
-                            }}
-                            key={friend.id}
-                            before={<Avatar size={48}
-                                src={friend.photo_100} />}
-                        >
-                            {`${friend.first_name} ${friend.last_name}`}
-                        </Cell>)}
-                        <div style={{ height: '68px' }} />
-                    </List>
-                )}
+            <div className={s.container}> {
+                (!searchedFriends || searchedFriends.length === 0) ?
+                    (<Placeholder> {placeholderText} </Placeholder>) : (
+                        <List style = {{width: '100%'}}>
+                            {searchedFriends.map(friend =>
+                                <Cell selectable
+                                    checked={props.waitToAdd.find((waitFriend) => { return waitFriend.id === friend.id; }) != null}
+                                    onChange={(e) => {
+                                        if (e.target.checked)
+                                            props.updateWaitToAdd([...waitToAdd, friend]);
+                                        else
+                                            props.updateWaitToAdd(waitToAdd.filter((waitFriend) => waitFriend.id !== friend.id));
+                                    }}
+                                    key={friend.id}
+                                    before={<Avatar size={48}
+                                        src={friend.photo_100} />}
+                                >
+                                    {`${friend.first_name} ${friend.last_name}`}
+                                </Cell>
+                            )}
+                            <div style={{ height: '68px' }} />
+                        </List>
+                    )}
             </div>
         </Group>
     );

@@ -1,9 +1,9 @@
 .container{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
     min-height: 400px;
 }
-.placeHolder{
-    position: absolute;
+.item{
     width: 100%;
-    left: 50%;
-    transform: translate(-50%, 0);
 }
