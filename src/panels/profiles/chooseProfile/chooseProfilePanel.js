@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, Group, CardGrid, Spinner, Button } from "@vkontakte/vkui";
+import React, {useState, useEffect} from 'react';
+import {Panel, PanelHeader, Group, CardGrid, Spinner, Button} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import api from "../../../utils/api";
 import bridge from "@vkontakte/vk-bridge";
@@ -30,7 +30,7 @@ const fetchFriendsInfo = async (userToken) => {
     });
 
     return friendsInfoPromise.response.map((info) => {
-        return { ...info, "isCurrentUser": false };
+        return {...info, "isCurrentUser": false};
     });
 };
 
@@ -66,32 +66,33 @@ const ChooseProfilePanel = (props) => {
         };
     }, [stats, usersInfo]);
 
-    const fetchData = () => {
-        fetchFriendsInfo(userToken).then((friendsInfo) => {
-            setUsersInfo([userInfo, ...friendsInfo]);
-        }).catch((error) => {
-            setError({error: error, reload: fetchData});
-        });
-
-        // Загрузка статистики пользователей для карточек
-        api("GET", "/entries/stats/", {
-            startDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
-        }).then((res) => {
-            let newStats = {};
-
-            for (const userId in res.data) {
-                newStats[userId] = formatStats(res.data[userId]);
-            }
-
-            setStats(newStats);
-        }).catch((error) => {
-            setError({error: error, reload: fetchData});
-        });
-    }
-
     // Загружаем данные о друзьях
     useEffect(() => {
         if (!userInfo || activePanel !== panelId) return;
+
+        const fetchData = () => {
+            fetchFriendsInfo(userToken).then((friendsInfo) => {
+                setUsersInfo([userInfo, ...friendsInfo]);
+            }).catch((error) => {
+                setError({error: error, reload: fetchData});
+            });
+
+            // Загрузка статистики пользователей для карточек
+            api("GET", "/entries/stats/", {
+                startDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
+            }).then((res) => {
+                let newStats = {};
+
+                for (const userId in res.data) {
+                    newStats[userId] = formatStats(res.data[userId]);
+                }
+
+                setStats(newStats);
+            }).catch((error) => {
+                setError({error: error, reload: fetchData});
+            });
+        };
+
         fetchData();
     }, [userToken, userInfo, activePanel, formatStats, panelId]);
 
@@ -116,10 +117,13 @@ const ChooseProfilePanel = (props) => {
         );
     }
 
-    let content = <Spinner size="large" />;
+    let content = <Spinner size="large"/>;
 
     if (error) {
-        content = <ErrorPlaceholder error={error.error} action = {<Button onClick = {() => {setError(null); error.reload();}}> Попробовать снова </Button>} />;
+        content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
+            setError(null);
+            error.reload();
+        }}> Попробовать снова </Button>}/>;
     } else if (usersInfo && stats) {
         content = <CardGrid>{profileCards}</CardGrid>
     }

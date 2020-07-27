@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { View, Gallery, Panel, PanelHeaderBack, PanelHeader } from '@vkontakte/vkui';
+import React, {useState, useEffect} from 'react';
+import {View, Gallery, Panel, PanelHeaderBack, PanelHeader} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import { platform, IOS } from '@vkontakte/vkui';
+import {platform, IOS} from '@vkontakte/vkui';
 import styles from "./checkInStory.module.css";
 import moment from "moment";
 
@@ -21,7 +21,7 @@ const getBullets = (questionPanels, index) => {
             bulletStyles += " " + styles.bulletSelected;
         }
 
-        bullets.push(<div key={i} className={bulletStyles} />);
+        bullets.push(<div key={i} className={bulletStyles}/>);
     }
 
     return (<div className={styles.bulletsContainer}>{bullets}</div>);
@@ -34,13 +34,13 @@ const localState = {
 const osname = platform();
 
 const CheckInStory = (props) => {
-    const { updatingEntryData, setUpdatingEntryData } = props.state;
+    const {updatingEntryData, setUpdatingEntryData} = props.state;
     const isEntryUpdate = updatingEntryData !== null;
 
     const [answer, setAnswer] = useState(isEntryUpdate ? getAnswer(updatingEntryData) : localState.answer);
     const [popout, setPopout] = useState(null);
     const activeSlideIndex = props.nav.activePanel;
-    const { setNavbarVis } = props.nav;
+    const {setNavbarVis} = props.nav;
 
     // Включаем и отключаем BottomNavBar (Epic)
     useEffect(() => {
@@ -49,11 +49,12 @@ const CheckInStory = (props) => {
     }, [setNavbarVis]);
 
     useEffect(() => {
-        let newAnswer = { ...answer };
         if (!isEntryUpdate) {
+            let newAnswer = {...answer};
             newAnswer.date.val = moment();
+            setAnswer(newAnswer);
         }
-        setAnswer(newAnswer);
+        // eslint-disable-next-line
     }, []);
 
     // Обновляем ответ в localState
@@ -86,13 +87,13 @@ const CheckInStory = (props) => {
 
     return (
         <View id={props.id}
-            activePanel={"mainCheckInPanel"}
-            popout={popout}
+              activePanel={"mainCheckInPanel"}
+              popout={popout}
         >
             <Panel id="mainCheckInPanel">
                 <PanelHeader
                     separator={false}
-                    left={<PanelHeaderBack onClick={() => window.history.back()} />}
+                    left={<PanelHeaderBack onClick={() => window.history.back()}/>}
                 >
                     {getBullets(questionPanels, activeSlideIndex)}
                 </PanelHeader>

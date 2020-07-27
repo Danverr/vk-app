@@ -81,6 +81,7 @@ const ImportEntriesPanel = (props) => {
                         value: ((importCount === 1) ? "#" : importCount - 1)
                     }
                 }).then((res) => {
+                    window['yaCounter65896372'].reachGoal("importCompleted");
                     setImportCount(importCount - 1);
                 });
             }).catch((error) => {

@@ -25,10 +25,11 @@ const App = () => {
     useEffect(() => {
         window.addEventListener('popstate', goBack);
     }, [goBack]);
-    
-    if (state.globalError) nav.goTo("globalError");
 
-    if (state.showIntro) nav.goTo("intro");
+    if (!state.loading) {
+        if (state.globalError) nav.goTo("globalError");
+        if (state.showIntro) nav.goTo("intro");
+    }
 
     return (
         <ConfigProvider isWebView>

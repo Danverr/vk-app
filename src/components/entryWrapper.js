@@ -2,10 +2,10 @@ import bridge from "@vkontakte/vk-bridge";
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
-import { Spinner, Placeholder, Button } from '@vkontakte/vkui';
+import {Spinner, Placeholder, Button} from '@vkontakte/vkui';
 
-const UPLOADED_QUANTITY = 1000;
-const FIRST_BLOCK_SIZE = 15;
+const UPLOADED_QUANTITY = 200;
+const FIRST_BLOCK_SIZE = 25;
 
 function back(ar) {
     return ar[ar.length - 1];
@@ -18,7 +18,9 @@ function cmp(l, r) {
 }
 
 let deleteEntryFromFeedList = (entryData) => {
-    entryWrapper.entries.splice(entryWrapper.entries.findIndex((e) => { return e.entryId === entryData.post.entryId }), 1);
+    entryWrapper.entries.splice(entryWrapper.entries.findIndex((e) => {
+        return e.entryId === entryData.post.entryId
+    }), 1);
 }
 
 export let entryWrapper = {
@@ -47,7 +49,9 @@ export let entryWrapper = {
 
     editEntryFromFeedList: (entryData) => {
         let entry = entryWrapper.getEntry(entryData);
-        const cmp = e => { return e.entryId === entry.entryId };
+        const cmp = e => {
+            return e.entryId === entry.entryId
+        };
         entryWrapper.entries[entryWrapper.entries.findIndex(cmp)] = entry;
     },
 
@@ -56,21 +60,22 @@ export let entryWrapper = {
     },
 
     deleteEntryFromBase: (entryData) => {
-        return api("DELETE", "/entries/", { entryId: entryData.post.entryId });
+        return api("DELETE", "/entries/", {entryId: entryData.post.entryId});
     },
 
     postEdge: (id) => {
-        return api("POST", "/statAccess/", { toId: id });
+        return api("POST", "/statAccess/", {toId: id});
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/statAccess", { type: 'fromId' })).data;
+            entryWrapper.accessEntries = (await api("GET", "/statAccess", {type: 'fromId'})).data;
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
-                accessEntry.systemFlag = 1; entryWrapper.friends.push(accessEntry.id)
+                accessEntry.systemFlag = 1;
+                entryWrapper.friends.push(accessEntry.id)
             });
 
             entryWrapper.friends.push(entryWrapper.userInfo.id);
@@ -91,7 +96,9 @@ export let entryWrapper = {
                         fields: "photo_50, photo_100, sex"
                     }
                 })).response;
-                newFriendsData.forEach((friend) => { entryWrapper.usersMap[friend.id] = friend; });
+                newFriendsData.forEach((friend) => {
+                    entryWrapper.usersMap[friend.id] = friend;
+                });
             }
 
         } catch (error) {
@@ -105,7 +112,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/statAccess", { type: 'toId' })).data.forEach((friend) => {
+            (await api("GET", "/statAccess", {type: 'toId'})).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -124,7 +131,7 @@ export let entryWrapper = {
     },
 
     fetchEntries: async (isFirstTime = null) => {
-        const Pop = (POP_LIMIT = 2) => {
+        const Pop = (POP_LIMIT = 25) => {
             let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
             let obj = entryWrapper.entries.slice(0);
             for (let i = 0; i < cur;) {
@@ -141,7 +148,7 @@ export let entryWrapper = {
             }
             entryWrapper.setDisplayEntries(obj);
             if (entryWrapper.hasMore) {
-                entryWrapper.setLoading(<Spinner size='large' />);
+                entryWrapper.setLoading(<Spinner size='large'/>);
             }
             entryWrapper.queue.splice(0, cur);
         }
@@ -157,7 +164,10 @@ export let entryWrapper = {
             await entryWrapper.fetchPseudoFriends();
         }
 
-        if (entryWrapper.queue.length) { Pop(); return }
+        if (entryWrapper.queue.length) {
+            Pop();
+            return
+        }
 
         let lastDate = (entryWrapper.entries.length) ? back(entryWrapper.entries).date :
             moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
@@ -183,19 +193,17 @@ export let entryWrapper = {
                 Pop(FIRST_BLOCK_SIZE);
                 entryWrapper.setFetching(null);
             }
-        }
-        catch (error) {
+        } catch (error) {
             if (isFirstTime) {
                 entryWrapper.setDisplayEntries([]);
                 entryWrapper.setErrorPlaceholder(error);
                 entryWrapper.wantUpdate = 1;
-            }
-            else {
+            } else {
                 entryWrapper.wasError = 1;
                 entryWrapper.setLoading(<Placeholder
                     header="Упс, что-то пошло не так!"
                     action={<Button size="xl" onClick={() => {
-                        entryWrapper.setLoading(<Spinner size='large' />);
+                        entryWrapper.setLoading(<Spinner size='large'/>);
                         setTimeout(entryWrapper.fetchEntries, 1000);
                     }}> Попробовать снова </Button>}
                 >

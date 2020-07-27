@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import bridge from "@vkontakte/vk-bridge";
+import moment from "moment";
 
 const APP_ID = 7424071;
 
@@ -17,15 +18,39 @@ const getLaunchParams = () => {
 
 const launchParams = getLaunchParams();
 
+const sendUserParams = (userInfo) => {
+    let userParams = {
+        UserID: userInfo.id,
+        city: userInfo.city ? userInfo.city.title : "-",
+        country: userInfo.country ? userInfo.city.country : "-",
+        timezone: userInfo.timezone,
+        sex: "-",
+        age: "-",
+        ref: launchParams.vk_ref,
+        notif: launchParams.vk_are_notifications_enabled,
+        fav: launchParams.vk_is_favorite
+    };
+
+    if (userInfo.bdate && (userInfo.bdate.match(/\./g) || []).length === 2) {
+        userParams.age = moment().diff(moment(userInfo.bdate, "D.M.YYYY"), 'years');
+    }
+
+    if (userInfo.sex === 1) userParams.sex = "Female";
+    else if (userInfo.sex === 2) userParams.sex = "Male";
+
+    window['yaCounter65896372'].setUserID(`${userInfo.id}`);
+    window['yaCounter65896372'].userParams(userParams);
+};
+
 const useAppState = () => {
     const [loading, setLoading] = useState(true);
     const [globalError, setGlobalError] = useState(null);
-    const [notifications, setNotifications] = useState(launchParams["vk_are_notifications_enabled"] === '1');
+    const [notifications, setNotifications] = useState(launchParams.vk_are_notifications_enabled === '1');
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
     const [updatingEntryData, setUpdatingEntryData] = useState(null);
-    const [showIntro, setShowIntro] = useState(launchParams["vk_access_token_settings"] === "");
+    const [showIntro, setShowIntro] = useState(launchParams.vk_access_token_settings === "");
 
     useEffect(() => {
         bridge.subscribe((e) => {
@@ -79,6 +104,7 @@ const useAppState = () => {
         return bridge.send('VKWebAppGetUserInfo')
             .then((userInfo) => {
                 userInfo["isCurrentUser"] = true;
+                sendUserParams(userInfo);
                 setUserInfo(userInfo);
                 return userInfo;
             }).catch((error) => {
@@ -89,12 +115,16 @@ const useAppState = () => {
 
     useEffect(() => {
         const initApp = async () => {
+            const start = moment();
+
             if (!showIntro) {
                 await fetchUserToken();
             }
 
             await fetchUserInfo();
-            setLoading(false);
+
+            const timeout = Math.max(1000 - moment().diff(start), 0);
+            setTimeout(() => setLoading(false), timeout);
         };
 
         initApp();

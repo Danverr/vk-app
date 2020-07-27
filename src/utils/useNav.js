@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import bridge from "@vkontakte/vk-bridge";
-import { Tabbar, TabbarItem } from "@vkontakte/vkui";
+import {Tabbar, TabbarItem} from "@vkontakte/vkui";
 
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28SmileOutline from '@vkontakte/icons/dist/28/smile_outline';
@@ -41,10 +41,12 @@ const useNav = () => {
     const getActiveStory = () => viewHistory[viewHistory.length - 1];
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
-    const getScrollName = () => `${getActiveStory()}__${getActivePanel()}`;
-    const saveScroll = () => scrollHistory[getScrollName()] = document.scrollingElement.scrollTop;
+    const sendHit = () => window['yaCounter65896372'].hit(window.location.host + "/" + getActiveStory() + "/" + getActivePanel());
+
+    const getCurrentPath = () => `${getActiveStory()}__${getActivePanel()}`;
+    const saveScroll = () => scrollHistory[getCurrentPath()] = document.scrollingElement.scrollTop;
     const setSavedScroll = () => {
-        const name = getScrollName();
+        const name = getCurrentPath();
         const scrollTop = name in scrollHistory ? scrollHistory[name] : 0;
         document.scrollingElement.scrollTop = Math.min(scrollTop, document.scrollingElement.scrollHeight);
     };
@@ -64,7 +66,7 @@ const useNav = () => {
         } else { // Переход между историями
             if (viewHistory.length === 1) {
                 // Отправляем bridge на закрытие сервиса.
-                bridge.send("VKWebAppClose", { "status": "success" });
+                bridge.send("VKWebAppClose", {"status": "success"});
             } else {
                 viewHistory.pop();
             }
@@ -76,6 +78,7 @@ const useNav = () => {
             }
         }
 
+        sendHit();
         setNav(getNav());
     };
 
@@ -111,6 +114,7 @@ const useNav = () => {
             panelHistory[getActiveStory()].push(panel);
         }
 
+        sendHit();
         setNav(getNav());
     };
 
@@ -143,23 +147,23 @@ const useNav = () => {
             <TabbarItem
                 onClick={() => goTo("feed")}
                 selected={getActiveStory() === "feed"}
-            ><Icon28NewsfeedOutline /></TabbarItem>
+            ><Icon28NewsfeedOutline/></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("profiles")}
                 selected={getActiveStory() === "profiles"}
-            ><Icon28SmileOutline /></TabbarItem>
+            ><Icon28SmileOutline/></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("checkIn")}
                 selected={getActiveStory() === "checkIn"}
-            ><Icon28AddCircleOutline /></TabbarItem>
+            ><Icon28AddCircleOutline/></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("calendar")}
                 selected={getActiveStory() === "calendar"}
-            ><Icon28CalendarOutline /></TabbarItem>
+            ><Icon28CalendarOutline/></TabbarItem>
             <TabbarItem
                 onClick={() => goTo("settings")}
                 selected={getActiveStory() === "settings"}
-            ><Icon28SettingsOutline /></TabbarItem>
+            ><Icon28SettingsOutline/></TabbarItem>
         </Tabbar>) : null,
     });
 

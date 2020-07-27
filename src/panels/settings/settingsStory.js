@@ -35,8 +35,16 @@ const SettingsStory = (props) => {
                     }}> Импорт из Daylio </Cell>
                 </Group>
                 <Group header={<Header mode="secondary">Прочее</Header>}>
-                    <CellButton onClick={() => bridge.send("VKWebAppShare", {})}> Поделиться приложением </CellButton>
-                    <CellButton href="https://vk.com/club197288604"> Перейти в группу ВК </CellButton>
+                    <CellButton onClick={() => {
+                        bridge.send("VKWebAppShare", {}).then(() => window['yaCounter65896372'].reachGoal("appShared"));
+                    }}>
+                        Поделиться приложением
+                    </CellButton>
+                    <CellButton href="https://vk.com/club197288604" onClick={() => {
+                        window['yaCounter65896372'].reachGoal("groupVisit");
+                    }}>
+                        Перейти в группу ВК
+                    </CellButton>
                 </Group>
             </Panel>
             <NotificationsPanel id="notifications" nav={props.nav} state={props.state} setPopout={setPopout}/>

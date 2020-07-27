@@ -47,20 +47,20 @@ const UserProfilePanel = (props) => {
         };
     }, [stats, activeParam, userInfo, contextOpened]);
 
-
-    const fetchData = () => {
-        api("GET", "/entries/stats/", {
-            users: userInfo.id,
-        }).then((res) => {
-            setStats(formatStats(res.data[userInfo.id]));
-        }).catch((error) => {
-            setError({error: error, reload: fetchData});
-        });
-    }
-
     // Загрузка статистики пользователя
     useEffect(() => {
         if (userInfo === null) return;
+
+        const fetchData = () => {
+            api("GET", "/entries/stats/", {
+                users: userInfo.id,
+            }).then((res) => {
+                setStats(formatStats(res.data[userInfo.id]));
+            }).catch((error) => {
+                setError({error: error, reload: fetchData});
+            });
+        };
+
         fetchData();
     }, [userInfo, formatStats]);
 
@@ -91,7 +91,10 @@ const UserProfilePanel = (props) => {
     let content = <Spinner size="large" className={styles.loadingSpinner}/>;
 
     if (error) {
-        content = <ErrorPlaceholder error={error.error} action = {<Button onClick = {() => {setError(null); error.reload();}}> Попробовать снова </Button>} />;
+        content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
+            setError(null);
+            error.reload();
+        }}> Попробовать снова </Button>}/>;
     } else if (stats) {
         content = <>
             <Group>
