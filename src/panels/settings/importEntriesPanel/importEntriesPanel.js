@@ -76,7 +76,7 @@ const ImportEntriesPanel = (props) => {
                     method: "storage.set",
                     params: {
                         access_token: userToken,
-                        v: "5.103",
+                        v: "5.120",
                         key: "import",
                         value: ((importCount === 1) ? "#" : importCount - 1)
                     }
@@ -103,7 +103,7 @@ const ImportEntriesPanel = (props) => {
                 method: "storage.get",
                 params: {
                     access_token: userToken,
-                    v: "5.103",
+                    v: "5.120",
                     keys: "import"
                 }
             }).then((res) => {

@@ -91,11 +91,12 @@ export let entryWrapper = {
                     method: "users.get",
                     params: {
                         access_token: entryWrapper.userToken,
-                        v: "5.103",
+                        v: "5.120",
                         user_ids: newFriends.join(","),
                         fields: "photo_50, photo_100, sex"
                     }
                 })).response;
+
                 newFriendsData.forEach((friend) => {
                     entryWrapper.usersMap[friend.id] = friend;
                 });

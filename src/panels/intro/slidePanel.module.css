@@ -37,6 +37,10 @@
     margin-bottom: 8px;
 }
 
+.textContainer a {
+    color: white;
+}
+
 .slideProgress {
     border-radius: 6px;
     background: #00000080;

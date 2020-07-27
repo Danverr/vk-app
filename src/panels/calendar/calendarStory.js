@@ -8,7 +8,7 @@ import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder
 import TextPost from '../../components/textPost/textPost';
 import api from '../../utils/api.js';
 import entryWrapper from '../../components/entryWrapper';
-import Done from '../../components/done/done';
+import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 
 
 function calendarStateUpdate() {
@@ -99,7 +99,7 @@ const CalendarStory = (props) => {
     useEffect(() => {
         if (props.state.entryAdded) {
             props.state.setEntryAdded(null);
-            setSnackField(<Done onClose={() => { setSnackField(null) }} />)
+            setSnackField(<DoneSnackbar onClose={() => { setSnackField(null) }} />)
         }
     }, [props.state])
 
