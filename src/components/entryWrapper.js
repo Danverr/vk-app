@@ -174,7 +174,11 @@ export let entryWrapper = {
             moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
 
         try {
-            const newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime)).data;
+            let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime)).data;
+
+            // newEntries = newEntries.slice(0, 3);
+            // entryWrapper.accessEntries = entryWrapper.accessEntries.slice(0, 1);
+            
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;
@@ -182,7 +186,7 @@ export let entryWrapper = {
                 entryWrapper.setLoading(null);
                 entryWrapper.hasMore = false;
             }
-            if (!newEntries.length) {
+            if (!newEntries.length || (isFirstTime && coming < FIRST_BLOCK_SIZE)) {
                 while (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length) {
                     entryWrapper.queue.push(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++]);
                 }
