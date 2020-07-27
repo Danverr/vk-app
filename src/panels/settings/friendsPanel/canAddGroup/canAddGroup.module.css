@@ -1,0 +1,9 @@
+.container{
+    min-height: 400px;
+}
+.placeHolder{
+    position: absolute;
+    width: 100%;
+    left: 50%;
+    transform: translate(-50%, 0);
+}

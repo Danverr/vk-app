@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Cell, Avatar, Search, List, Group, Header } from '@vkontakte/vkui';
+import { Cell, Avatar, Search, List, Group, Header, Placeholder } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import s from './canAddGroup.module.css'
 
 const CanAddGroup = (props) => {
     var [search, setSearch] = useState('');
-    const {waitToAdd} = props;
+    const { waitToAdd } = props;
     const searchFriends = () => {
         const searchStr = search.toLowerCase();
 
@@ -14,15 +15,18 @@ const CanAddGroup = (props) => {
     }
 
     const searchedFriends = searchFriends();
+    const placeholderText = (props.canAdd.length === 0) ? "Список друзей пуст" : "Пользователи не найдены";
+
     return (
         <Group header={<Header mode="secondary"> предоставить доступ </Header>}>
             <Search value={search} onChange={(e) => { setSearch(e.target.value); }} after={null} />
-            {
-                searchedFriends && searchedFriends.length > 0 &&
-                <List>
-                    {searchedFriends.map(friend =>
+            <div className = {s.container}> {
+                (!searchedFriends || searchedFriends.length === 0) ? 
+                (<Placeholder className = {s.placeHolder}> {placeholderText} </Placeholder>) : (
+                    <List>
+                        {searchedFriends.map(friend =>
                         <Cell selectable
-                            checked = {props.waitToAdd.find((waitFriend) => {return waitFriend.id === friend.id;}) != null}
+                            checked={props.waitToAdd.find((waitFriend) => { return waitFriend.id === friend.id; }) != null}
                             onChange={(e) => {
                                 if (e.target.checked)
                                     props.updateWaitToAdd([...waitToAdd, friend]);
@@ -35,9 +39,10 @@ const CanAddGroup = (props) => {
                         >
                             {`${friend.first_name} ${friend.last_name}`}
                         </Cell>)}
-                    <div style = {{height: '68px'}}/>
-                </List>
-            }
+                        <div style={{ height: '68px' }} />
+                    </List>
+                )}
+            </div>
         </Group>
     );
 };
