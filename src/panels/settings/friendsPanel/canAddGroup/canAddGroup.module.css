@@ -1,0 +1,9 @@
+.container{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 400px;
+}
+.item{
+    width: 100%;
+}

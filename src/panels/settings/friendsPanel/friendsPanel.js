@@ -103,7 +103,7 @@ const FriendsPanel = (props) => {
     }, [userToken, updateCanAdd, updateAdded]);
 
     const postEdges = async () => {
-        if (!userInfo) return;
+        if (!userInfo || waitToAdd.length === 0) return;
         waitToAdd.forEach((friend) => {
             entryWrapper.pseudoFriends[friend.id] = 1
         });
