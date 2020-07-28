@@ -73,7 +73,7 @@ const SubmitPanel = (props) => {
 
             if (props.isEntryUpdate) {
                 for (const key in answer) {
-                    if (answer[key].val && key !== "date") data[key] = answer[key].val;
+                    if (key !== "date") data[key] = answer[key].val;
                 }
             } else {
                 for (const key in answer) {

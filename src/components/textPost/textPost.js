@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption } from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption, ScreenSpinner } from '@vkontakte/vkui';
 import s from './textPost.module.css';
 import { platform, IOS } from '@vkontakte/vkui';
 
@@ -12,6 +12,8 @@ import emojiList from "../../utils/getEmoji";
 import DeleteSnackbar from '../deleteSnackbar/deleteSnackbar'
 import getDateDescription from '../../utils/chrono';
 import ErrorSnackbar from '../errorSnackbar/errorSnackbar';
+import entryWrapper from '../entryWrapper';
+import DoneSnackbar from '../doneSnackbar/doneSnackbar';
 
 const TextPost = (props) => {
     const postData = props.postData;
@@ -21,6 +23,7 @@ const TextPost = (props) => {
     const note = postData.post.note;
     const currentUser = postData.currentUser;
 
+    const entryId = postData.post.entryId;
     const avatar = user.photo_100;
 
     const mood = postData.post.mood;
@@ -31,6 +34,8 @@ const TextPost = (props) => {
     const emojiStress = postData.post.stress ? emojiList.stress[Math.round(postData.post.stress) - 1] : emojiList.placeholder;
     const emojiAnxiety = postData.post.anxiety ? emojiList.anxiety[Math.round(postData.post.anxiety) - 1] : emojiList.placeholder;
 
+    const isMyPost = (currentUser && currentUser.id === user.id);
+
     const postDate = moment.utc(postData.post.date);
     const dateField = getDateDescription(postDate.local(), moment())[0];
 
@@ -38,7 +43,7 @@ const TextPost = (props) => {
 
     const recursion = () => {
         const shift = getDateDescription(postDate.local(), moment())[1];
-        setTimeout(()=>{setUpd(!upd)}, shift);
+        setTimeout(() => { setUpd(!upd) }, shift);
     };
 
     const editPost = () => {
@@ -46,21 +51,36 @@ const TextPost = (props) => {
         postData.nav.goTo("checkIn");
     };
 
-    const deletePost = async () => {
+    const reportPost = async () => {
+        postData.setPopout(<ScreenSpinner />);
         try {
-            await postData.wrapper.deleteEntryFromBase(postData);
-            postData.wrapper.deleteEntryFromList(postData);
+            await entryWrapper.postComplaint(entryId);
+            postData.setPopout(null);
+            postData.setSnackField(<DoneSnackbar onClose={() => { postData.setSnackField(null) }} text="Успешно" />);
+        } catch (error) {
+            postData.setPopout(null);
+            postData.setSnackField(<ErrorSnackbar onClose={() => { postData.setSnackField(null) }} />)
+        }
+    }
+
+    const deletePost = async () => {
+        postData.setPopout(<ScreenSpinner />);
+        try {
+            await entryWrapper.deleteEntryFromBase(entryId);
+            postData.wrapper.deleteEntryFromList(entryId);
             if (postData.deleteEntryFromFeedList) {
-                postData.deleteEntryFromFeedList(postData);
+                postData.deleteEntryFromFeedList(entryId);
             }
             postData.setDisplayEntries(postData.wrapper.entries);
+            postData.setPopout(null);
             postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField} />)
-        } catch (error){
-            postData.setSnackField(<ErrorSnackbar onClose={()=>{postData.setSnackField(null)}}/>);
+        } catch (error) {
+            postData.setPopout(null);
+            postData.setSnackField(<ErrorSnackbar onClose={() => { postData.setSnackField(null) }} />);
         }
     };
 
-    const queryDeletePost = () => {
+    const confirm = (text, action) => {
         postData.setPopout(
             <Alert
                 actions={
@@ -72,7 +92,7 @@ const TextPost = (props) => {
                     {
                         title: 'Да',
                         autoclose: true,
-                        action: deletePost
+                        action: action
                     }]
                 }
                 onClose={() => {
@@ -80,7 +100,7 @@ const TextPost = (props) => {
                 }}
             >
                 <h2> Подтверждение  </h2>
-                <p>  Вы действительно хотите удалить эту запись? </p>
+                <p> {text} </p>
             </Alert>
         );
     }
@@ -91,13 +111,20 @@ const TextPost = (props) => {
             <ActionSheet onClose={() => {
                 postData.setPopout(null);
             }}>
-                <ActionSheetItem onClick={editPost} autoclose>
+                {isMyPost && <ActionSheetItem onClick={editPost} autoclose>
                     Редактировать запись
-                </ActionSheetItem>
+                </ActionSheetItem>}
 
-                <ActionSheetItem onClick={queryDeletePost} autoclose mode="destructive">
-                    Удалить запись
-                </ActionSheetItem>
+                {!isMyPost && <ActionSheetItem autoclose
+                    onClick={() => { confirm("Вы действительно хотите пожаловаться на этого пользователя?", reportPost) }}>
+                    Пожаловаться
+                </ActionSheetItem>}
+
+                {isMyPost &&
+                    <ActionSheetItem
+                        onClick={() => { confirm("Вы действительно хотите удалить эту запись?", deletePost) }} autoclose mode="destructive">
+                        Удалить запись
+                </ActionSheetItem>}
 
                 {platform() === IOS && <ActionSheetItem autoclose mode="cancel">  Отменить  </ActionSheetItem>}
             </ActionSheet>);
@@ -135,16 +162,27 @@ const TextPost = (props) => {
         if (postData.post.date) {
             return <>
                 {dateField}
-                <div className={s.lockIcon}> {postData.post.isPublic ? null : <Icon12Lock />}</div>
+                <div className={s.lockIcon}> {(isMyPost && !postData.post.isPublic) && <Icon12Lock />}</div>
             </>;
         }
 
         return null;
     };
 
+    const renderText = (s, i) => {
+        if (s == '\n')
+            return <br key={i} />
+        return <React.Fragment key={i}>
+            {s}
+        </React.Fragment>
+    }
+
     const postText = () => {
-        const titleNode = !title || title.length === 0 ? null : <Headline weight='medium'>{title}</Headline>;
-        const noteNode = !note || note.length === 0 ? null : <Text weight='regular'>{note}</Text>;
+        const titleNode = !title || title.length === 0 ? null :
+            <Headline weight='medium'>{title.split('').map(renderText)}</Headline>;
+
+        const noteNode = !note || note.length === 0 ? null :
+            <Text weight='regular'>  {note.split('').map(renderText)} </Text>; 
 
         return noteNode || titleNode ? <div className={s.postText}>{titleNode}{noteNode}</div> : null;
     };
@@ -154,8 +192,7 @@ const TextPost = (props) => {
             <Cell
                 description={description()}
                 before={<Avatar size={48} src={avatar} />}
-                asideContent={(currentUser && user.id === currentUser.id) ?
-                    <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} /> : null}>
+                asideContent={currentUser && <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} />}>
                 {`${user.first_name} ${user.last_name}`}
             </Cell>
 

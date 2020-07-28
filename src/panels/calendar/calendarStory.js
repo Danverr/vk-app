@@ -56,18 +56,12 @@ function fetchCalendar() {
     });
 }
 
-function deleteEntryFromBase(entryData) {
-    api("DELETE", "/entries/", { entryId: entryData.post.entryId }).catch((error) => {
-        localState.setError(error)
-    });
-}
-
-function deleteEntryFromList(entryData) {
+function deleteEntryFromList(entryId) {
     localState.entries.splice(localState.entries.findIndex((e) => {
-        return e === entryData.post
+        return e.entryId === entryId;
     }), 1);
     localState.allEntries.splice(localState.allEntries.findIndex((e) => {
-        return e === entryData.post
+        return e.entryId === entryId;
     }), 1);
     localState.calendarStateUpdate();
 }
@@ -77,7 +71,6 @@ let localState = {
     usersMap: {},
     entries: [],
     calendarStateUpdate: calendarStateUpdate,
-    deleteEntryFromBase: deleteEntryFromBase,
     deleteEntryFromList: deleteEntryFromList,
     fetchCalendar: fetchCalendar,
     calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,

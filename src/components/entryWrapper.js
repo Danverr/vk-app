@@ -2,7 +2,7 @@ import bridge from "@vkontakte/vk-bridge";
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
-import {Spinner, Placeholder, Button} from '@vkontakte/vkui';
+import { Spinner, Placeholder, Button } from '@vkontakte/vkui';
 
 const UPLOADED_QUANTITY = 200;
 const FIRST_BLOCK_SIZE = 25;
@@ -17,10 +17,8 @@ function cmp(l, r) {
     return 0;
 }
 
-let deleteEntryFromFeedList = (entryData) => {
-    entryWrapper.entries.splice(entryWrapper.entries.findIndex((e) => {
-        return e.entryId === entryData.post.entryId
-    }), 1);
+let deleteEntryFromFeedList = (entryId) => {
+    entryWrapper.entries.splice(entryWrapper.entries.findIndex(e => e.entryId === entryId), 1);
 }
 
 export let entryWrapper = {
@@ -49,29 +47,31 @@ export let entryWrapper = {
 
     editEntryFromFeedList: (entryData) => {
         let entry = entryWrapper.getEntry(entryData);
-        const cmp = e => {
-            return e.entryId === entry.entryId
-        };
-        entryWrapper.entries[entryWrapper.entries.findIndex(cmp)] = entry;
+        entryWrapper.entries[entryWrapper.entries.findIndex(e => e.entryId === entry.entryId)] = entry;
     },
 
     addEntryToFeedList: (entryData) => {
         entryWrapper.entries.splice(0, 0, entryWrapper.getEntry(entryData));
     },
 
-    deleteEntryFromBase: (entryData) => {
-        return api("DELETE", "/entries/", {entryId: entryData.post.entryId});
+    deleteEntryFromBase: (entryId) => {
+        return api("DELETE", "/entries/", { entryId: entryId });
     },
 
     postEdge: (id) => {
-        return api("POST", "/statAccess/", {toId: id});
+        return api("POST", "/statAccess/", { toId: id });
+    },
+
+    postComplaint: (entryId) => {
+        return api("POST", "/complaints/", { entryId: entryId });
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/statAccess", {type: 'fromId'})).data;
+            entryWrapper.accessEntries = (await api("GET", "/statAccess", { type: 'fromId' })).data;
+
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
                 accessEntry.systemFlag = 1;
@@ -113,7 +113,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/statAccess", {type: 'toId'})).data.forEach((friend) => {
+            (await api("GET", "/statAccess", { type: 'toId' })).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -149,7 +149,7 @@ export let entryWrapper = {
             }
             entryWrapper.setDisplayEntries(obj);
             if (entryWrapper.hasMore) {
-                entryWrapper.setLoading(<Spinner size='large'/>);
+                entryWrapper.setLoading(<Spinner size='large' />);
             }
             entryWrapper.queue.splice(0, cur);
         }
@@ -175,10 +175,6 @@ export let entryWrapper = {
 
         try {
             let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime)).data;
-
-            // newEntries = newEntries.slice(0, 3);
-            // entryWrapper.accessEntries = entryWrapper.accessEntries.slice(0, 1);
-            
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;
@@ -208,7 +204,7 @@ export let entryWrapper = {
                 entryWrapper.setLoading(<Placeholder
                     header="Упс, что-то пошло не так!"
                     action={<Button size="xl" onClick={() => {
-                        entryWrapper.setLoading(<Spinner size='large'/>);
+                        entryWrapper.setLoading(<Spinner size='large' />);
                         setTimeout(entryWrapper.fetchEntries, 1000);
                     }}> Попробовать снова </Button>}
                 >

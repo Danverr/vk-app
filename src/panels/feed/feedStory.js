@@ -82,6 +82,7 @@ const Feed = (props) => {
             toggleContext();
             return;
         }
+        setDisplayEntries([]);
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
@@ -108,7 +109,8 @@ const Feed = (props) => {
                 haveEdge: entryWrapper.pseudoFriends[entry.id],
                 postEdge: entryWrapper.postEdge,
                 setSnackField: setSnackField,
-            }} key={id}/>
+                setPopout : setPopout,
+            }} key={id} />
         }
         return <TextPost postData={{
             post: entry,
@@ -137,16 +139,13 @@ const Feed = (props) => {
         </Placeholder>
     }
 
-    return error ? <ErrorPlaceholder
-            error={error}
-            action={
-                <Button onClick={() => {
-                    setError(null);
-                    entryWrapper.fetchEntries(1)
-                }}>
-                    Попробовать снова
-                </Button>
-            }/> :
+    const Next = () => {
+        if (!displayEntries.length) return;
+        entryWrapper.fetchEntries();
+    }
+
+    return error ? <ErrorPlaceholder error={error}
+        action={<Button onClick={() => { setError(null); entryWrapper.fetchEntries(1) }}> Попробовать снова  </Button>} /> :
         <View
             id={props.id}
             popout={popout}
@@ -190,7 +189,7 @@ const Feed = (props) => {
                         <InfiniteScroll
                             hasMore={true}
                             dataLength={displayEntries.length}
-                            next={entryWrapper.fetchEntries}
+                            next={Next}
                             scrollThreshold={1}
                         >
                             <CardGrid className="entriesGrid">

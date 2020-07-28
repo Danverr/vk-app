@@ -30,7 +30,7 @@ const IntroView = (props) => {
         {
             title: "Нужен доступ к друзьям",
             text: <>Для того, чтобы вы могли поделится своим настроением, нам нужно знать, с кем вы дружите. Продолжая,
-                вы принимаете <a href="https://vk.com/dev/uterms">пользовательское соглашение</a>.</>,
+                вы принимаете <a href="https://m.vk.com/@vkapp_mood-polzovatelskoe-soglashenie">пользовательское соглашение</a>.</>,
             img: intro3,
             buttonText: "Дать доступ",
             action: () => {

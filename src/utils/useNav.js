@@ -51,6 +51,10 @@ const useNav = () => {
         document.scrollingElement.scrollTop = Math.min(scrollTop, document.scrollingElement.scrollHeight);
     };
 
+    const setScroll = (val) => {
+        document.scrollingElement.scrollTop = Math.min(val, document.scrollingElement.scrollHeight);
+    }
+
     useEffect(() => {
         setSavedScroll();
     });
@@ -135,6 +139,7 @@ const useNav = () => {
     };
 
     const getNav = () => ({
+        setScroll : setScroll,
         activeStory: getActiveStory(),
         activePanel: getActivePanel(),
         panelHistory: panelHistory,
