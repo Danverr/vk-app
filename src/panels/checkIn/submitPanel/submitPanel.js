@@ -101,7 +101,7 @@ const SubmitPanel = (props) => {
 
                     if (!props.isEntryUpdate) {
                         props.nav.scrollHistory["feed__main"] = 0;
-                        window['yaCounter65896372'].reachGoal("entryCreated", data);
+                        window['yaCounter65896372'].reachGoal("entryCreated");
                         props.nav.goTo("feed");
                     } else {
                         props.nav.goBack();
@@ -148,7 +148,7 @@ const SubmitPanel = (props) => {
                 <Cell
                     className={styles.privacySwitch}
                     asideContent={<Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>}
-                    description="Заметка будет доступна только вам"
+                    description="Заголовок и текст будут скрыты"
                 >
                     <span>Приватная запись</span>
                     <Icon12Lock className={styles.lockIcon}/>

@@ -41,7 +41,7 @@ const useNav = () => {
     const getActiveStory = () => viewHistory[viewHistory.length - 1];
     const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
-    const sendHit = () => window['yaCounter65896372'].hit("/" + getActiveStory() + "/" + getActivePanel());
+    const sendHit = () => window['yaCounter65896372'].hit("https://vk.com/app7424071/" + getActiveStory() + "/" + getActivePanel());
 
     const getCurrentPath = () => `${getActiveStory()}__${getActivePanel()}`;
     const saveScroll = () => scrollHistory[getCurrentPath()] = document.scrollingElement.scrollTop;

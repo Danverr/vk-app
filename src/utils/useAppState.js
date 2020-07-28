@@ -19,30 +19,6 @@ const getLaunchParams = () => {
 
 const launchParams = getLaunchParams();
 
-const sendUserParams = (userInfo) => {
-    let userParams = {
-        UserID: userInfo.id,
-        city: userInfo.city ? userInfo.city.title : "-",
-        country: userInfo.country ? userInfo.country.title : "-",
-        timezone: userInfo.timezone ? userInfo.timezone : "-",
-        sex: "-",
-        age: "-",
-        ref: launchParams.vk_ref,
-        notif: launchParams.vk_are_notifications_enabled,
-        fav: launchParams.vk_is_favorite
-    };
-
-    if (userInfo.bdate && (userInfo.bdate.match(/\./g) || []).length === 2) {
-        userParams.age = moment().diff(moment(userInfo.bdate, "D.M.YYYY"), 'years');
-    }
-
-    if (userInfo.sex === 1) userParams.sex = "Female";
-    else if (userInfo.sex === 2) userParams.sex = "Male";
-
-    window['yaCounter65896372'].setUserID(`${userInfo.id}`);
-    window['yaCounter65896372'].userParams(userParams);
-};
-
 const useAppState = () => {
     const [loading, setLoading] = useState(true);
     const [globalError, setGlobalError] = useState(null);
@@ -75,10 +51,10 @@ const useAppState = () => {
                 });
         };
 
-        if (showIntro === false) {
+        if (!showIntro && !loading) {
             showNativeAds();
         }
-    }, [showIntro]);
+    }, [showIntro, loading]);
 
     const fetchUserToken = (callback = null) => {
         bridge.send("VKWebAppGetAuthToken", {
@@ -107,7 +83,6 @@ const useAppState = () => {
             .then((userInfo) => {
                 entryWrapper.userInfo = userInfo;
                 userInfo["isCurrentUser"] = true;
-                sendUserParams(userInfo);
                 setUserInfo(userInfo);
                 return userInfo;
             }).catch((error) => {
@@ -120,14 +95,19 @@ const useAppState = () => {
         const initApp = async () => {
             const start = moment();
 
-            if (!showIntro) {
-                await fetchUserToken();
-            }
-
+            if (!showIntro) await fetchUserToken();
             await fetchUserInfo();
 
-            const timeout = Math.max(1000 - moment().diff(start), 0);
-            setTimeout(() => setLoading(false), timeout);
+            const waitYmInit = () => {
+                if (window['yaCounter65896372'] !== undefined) {
+                    const timeout = Math.max(1000 - moment().diff(start), 0);
+                    setTimeout(() => setLoading(false), timeout);
+                } else {
+                    setTimeout(waitYmInit, 100);
+                }
+            };
+
+            waitYmInit();
         };
 
         initApp();

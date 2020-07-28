@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
-import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
-import { Button, Placeholder } from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
+import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
+import {Button, Placeholder} from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -30,14 +30,15 @@ const Feed = (props) => {
         return <Placeholder
             header="Упс, что-то пошло не так!"
             action={<Button size="xl" onClick={() => {
-                setLoading(<Spinner size='large' />);
+                setLoading(<Spinner size='large'/>);
                 setTimeout(entryWrapper.fetchEntries, 1000);
             }}> Попробовать снова </Button>}
         >
         </Placeholder>
     };
 
-    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder /> : entryWrapper.hasMore ? <Spinner size='large' /> : null);
+    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
+        <Spinner size='large'/> : null);
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
     const [error, setError] = useState(null);
 
@@ -46,8 +47,10 @@ const Feed = (props) => {
     };
 
     const setErrorSnackbar = (error) => {
-        setSnackField(<ErrorSnackbar onClose={() => { setSnackField(null); }} />);
-    }
+        setSnackField(<ErrorSnackbar onClose={() => {
+            setSnackField(null);
+        }}/>);
+    };
 
     useEffect(() => {
         entryWrapper.setErrorSnackbar = setErrorSnackbar;
@@ -55,16 +58,18 @@ const Feed = (props) => {
         entryWrapper.setDisplayEntries = setDisplayEntries;
         entryWrapper.setLoading = setLoading;
         entryWrapper.setFetching = setFetching;
-    }, [])
+    }, []);
 
     useEffect(() => {
         const pState = props.state;
         if (pState.entryAdded) {
             pState.setEntryAdded(null);
-            setSnackField(<DoneSnackbar onClose={() => { setSnackField(null) }} />);
+            setSnackField(<DoneSnackbar onClose={() => {
+                setSnackField(null)
+            }}/>);
         }
         if (!pState.userInfo || !pState.userToken || !entryWrapper.wantUpdate) return;
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='large'/>);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
 
@@ -80,17 +85,19 @@ const Feed = (props) => {
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='large'/>);
         entryWrapper.fetchEntries(1)
     };
 
     const toggleRefresh = () => {
         setFetching(1);
-        setTimeout(() => { entryWrapper.fetchEntries(1) }, 1000);
+        setTimeout(() => {
+            entryWrapper.fetchEntries(1)
+        }, 1000);
     };
 
     const buttonRefresh = () => {
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='large'/>);
         entryWrapper.fetchEntries(1)
     };
 
@@ -101,7 +108,7 @@ const Feed = (props) => {
                 haveEdge: entryWrapper.pseudoFriends[entry.id],
                 postEdge: entryWrapper.postEdge,
                 setSnackField: setSnackField,
-            }} key={id} />
+            }} key={id}/>
         }
         return <TextPost postData={{
             post: entry,
@@ -113,24 +120,33 @@ const Feed = (props) => {
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: entryWrapper,
             nav: props.nav,
-        }} key={id} />
+        }} key={id}/>
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
             header="Нет записей"
             stretched={true}
-            action= {<Button onClick={buttonRefresh}> {(entryWrapper.mode==='feed')? "Обновить ленту" : "Обновить дневник" } </Button>}
+            action={<Button
+                onClick={buttonRefresh}> {(entryWrapper.mode === 'feed') ? "Обновить ленту" : "Обновить дневник"} </Button>}
         >
             {entryWrapper.mode === 'feed' ?
-                "Попросите друга дать вам доступ, импортируйте записи из Daylio или создайте их самостоятельно" :
-                "Импортируйте записи из Daylio или создайте их самостоятельно"}
+                "Попросите друга дать вам доступ, импортируйте записи или создайте их самостоятельно" :
+                "Импортируйте записи или создайте их самостоятельно"}
         </Placeholder>
     }
 
-    return error ? <ErrorPlaceholder error={error}
-        action={<Button onClick={() => { setError(null); entryWrapper.fetchEntries(1) }}> Попробовать снова  </Button>} /> :
+    return error ? <ErrorPlaceholder
+            error={error}
+            action={
+                <Button onClick={() => {
+                    setError(null);
+                    entryWrapper.fetchEntries(1)
+                }}>
+                    Попробовать снова
+                </Button>
+            }/> :
         <View
             id={props.id}
             popout={popout}
@@ -142,27 +158,27 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
+                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed />}
-                            onClick={() => {
-                                select('feed')
-                            }}
-                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Все записи"
+                        <Cell before={<Icon28Newsfeed/>}
+                              onClick={() => {
+                                  select('feed')
+                              }}
+                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Все записи"
                         >
                             Лента
                         </Cell>
-                        <Cell before={<Icon28ArticleOutline />}
-                            onClick={() => {
-                                select('diary')
-                            }}
-                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Только мои записи"
+                        <Cell before={<Icon28ArticleOutline/>}
+                              onClick={() => {
+                                  select('diary')
+                              }}
+                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Только мои записи"
                         >
                             Мой дневник
                         </Cell>
