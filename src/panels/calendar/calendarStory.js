@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid, Button } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid, Button, Placeholder } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import moment from 'moment';
@@ -155,6 +155,12 @@ const CalendarStory = (props) => {
         return <TextPost postData={dat} key={entry.entryId} />
     };
 
+    const Empty = () => {
+        return <Placeholder>
+            У Вас нет записей за этот день
+        </Placeholder>
+    }
+
     return error ? <ErrorPlaceholder error={error}
         action={<Button onClick={() => { setError(null); fetchCalendar() }}> Попробовать снова </Button>} /> : (
             <View id={props.id}
@@ -174,6 +180,7 @@ const CalendarStory = (props) => {
                         <CardGrid className="entriesGrid">
                             {entriesField.map(renderData)}
                         </CardGrid>
+                        {(!fetching && !localState.entries.length) && Empty()}
                     </Group>
                     {snackField}
                 </Panel>
