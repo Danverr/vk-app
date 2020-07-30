@@ -55,22 +55,22 @@ export let entryWrapper = {
     },
 
     deleteEntryFromBase: (entryId) => {
-        return api("DELETE", "/entries/", { entryId: entryId });
+        return api("DELETE", "/v1.0/entries/", { entryId: entryId });
     },
 
     postEdge: (id) => {
-        return api("POST", "/statAccess/", { toId: id });
+        return api("POST", "/v1.0/statAccess/", { toId: id });
     },
 
     postComplaint: (entryId) => {
-        return api("POST", "/complaints/", { entryId: entryId });
+        return api("POST", "/v1.0/complaints/", { entryId: entryId });
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/statAccess", { type: 'fromId' })).data;
+            entryWrapper.accessEntries = (await api("GET", "/v1.0/statAccess", { type: 'fromId' })).data;
 
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
@@ -113,7 +113,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/statAccess", { type: 'toId' })).data.forEach((friend) => {
+            (await api("GET", "/v1.0/statAccess", { type: 'toId' })).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -128,7 +128,7 @@ export let entryWrapper = {
             count: PACK_SZ,
             users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
         };
-        return api("GET", "/entries/", queryData);
+        return api("GET", "/v1.0/entries/", queryData);
     },
 
     fetchEntries: async (isFirstTime = null) => {

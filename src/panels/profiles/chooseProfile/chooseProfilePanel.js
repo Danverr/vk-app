@@ -10,7 +10,7 @@ import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlacehol
 
 const fetchFriendsInfo = async (userToken) => {
     // ID друзей к которым есть доступ
-    const friendsIdsPromise = await api("GET", "/statAccess/", {
+    const friendsIdsPromise = await api("GET", "/v1.0/statAccess/", {
         type: "fromId",
     }).catch((error) => {
         throw error;
@@ -78,7 +78,7 @@ const ChooseProfilePanel = (props) => {
             });
 
             // Загрузка статистики пользователей для карточек
-            api("GET", "/entries/stats/", {
+            api("GET", "/v1.0/entries/stats/", {
                 startDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
             }).then((res) => {
                 let newStats = {};

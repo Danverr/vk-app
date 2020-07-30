@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Cell, Avatar, Card, Text, Headline, ActionSheet, ActionSheetItem, Alert, Caption, ScreenSpinner } from '@vkontakte/vkui';
+import React, {useState} from 'react';
+import {
+    Cell,
+    Avatar,
+    Card,
+    Text,
+    Headline,
+    ActionSheet,
+    ActionSheetItem,
+    Alert,
+    Caption,
+    ScreenSpinner
+} from '@vkontakte/vkui';
 import s from './textPost.module.css';
-import { platform, IOS } from '@vkontakte/vkui';
+import {platform, IOS} from '@vkontakte/vkui';
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -43,28 +54,34 @@ const TextPost = (props) => {
 
     const recursion = () => {
         const shift = getDateDescription(postDate.local(), moment())[1];
-        setTimeout(() => { setUpd(!upd) }, shift);
+        setTimeout(() => {
+            setUpd(!upd)
+        }, shift);
     };
 
     const editPost = () => {
-        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
+        postData.setUpdatingEntryData({...postData.post, date: postDate});
         postData.nav.goTo("checkIn");
     };
 
     const reportPost = async () => {
-        postData.setPopout(<ScreenSpinner />);
+        postData.setPopout(<ScreenSpinner/>);
         try {
             await entryWrapper.postComplaint(entryId);
             postData.setPopout(null);
-            postData.setSnackField(<DoneSnackbar onClose={() => { postData.setSnackField(null) }} text="Успешно" />);
+            postData.setSnackField(<DoneSnackbar onClose={() => {
+                postData.setSnackField(null)
+            }} text="Успешно"/>);
         } catch (error) {
             postData.setPopout(null);
-            postData.setSnackField(<ErrorSnackbar onClose={() => { postData.setSnackField(null) }} />)
+            postData.setSnackField(<ErrorSnackbar onClose={() => {
+                postData.setSnackField(null)
+            }}/>)
         }
     }
 
     const deletePost = async () => {
-        postData.setPopout(<ScreenSpinner />);
+        postData.setPopout(<ScreenSpinner/>);
         try {
             await entryWrapper.deleteEntryFromBase(entryId);
             postData.wrapper.deleteEntryFromList(entryId);
@@ -73,10 +90,12 @@ const TextPost = (props) => {
             }
             postData.setDisplayEntries(postData.wrapper.entries);
             postData.setPopout(null);
-            postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField} />)
+            postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField}/>)
         } catch (error) {
             postData.setPopout(null);
-            postData.setSnackField(<ErrorSnackbar onClose={() => { postData.setSnackField(null) }} />);
+            postData.setSnackField(<ErrorSnackbar onClose={() => {
+                postData.setSnackField(null)
+            }}/>);
         }
     };
 
@@ -89,17 +108,17 @@ const TextPost = (props) => {
                         autoclose: true,
                         mode: 'cancel'
                     },
-                    {
-                        title: 'Да',
-                        autoclose: true,
-                        action: action
-                    }]
+                        {
+                            title: 'Да',
+                            autoclose: true,
+                            action: action
+                        }]
                 }
                 onClose={() => {
                     postData.setPopout(null);
                 }}
             >
-                <h2> Подтверждение  </h2>
+                <h2> Подтверждение </h2>
                 <p> {text} </p>
             </Alert>
         );
@@ -116,17 +135,21 @@ const TextPost = (props) => {
                 </ActionSheetItem>}
 
                 {!isMyPost && <ActionSheetItem autoclose
-                    onClick={() => { confirm("Вы действительно хотите пожаловаться на этого пользователя?", reportPost) }}>
+                                               onClick={() => {
+                                                   confirm("Вы действительно хотите пожаловаться на этого пользователя?", reportPost)
+                                               }}>
                     Пожаловаться
                 </ActionSheetItem>}
 
                 {isMyPost &&
-                    <ActionSheetItem
-                        onClick={() => { confirm("Вы действительно хотите удалить эту запись?", deletePost) }} autoclose mode="destructive">
-                        Удалить запись
+                <ActionSheetItem
+                    onClick={() => {
+                        confirm("Вы действительно хотите удалить эту запись?", deletePost)
+                    }} autoclose mode="destructive">
+                    Удалить запись
                 </ActionSheetItem>}
 
-                {platform() === IOS && <ActionSheetItem autoclose mode="cancel">  Отменить  </ActionSheetItem>}
+                {platform() === IOS && <ActionSheetItem autoclose mode="cancel"> Отменить </ActionSheetItem>}
             </ActionSheet>);
     }
 
@@ -140,15 +163,15 @@ const TextPost = (props) => {
                 </div>
 
                 <div className={s.progressBarsCol}>
-                    <div><ProgressBar param="mood" value={mood * 20} /></div>
-                    <div><ProgressBar param="anxiety" value={anxiety * 20} /></div>
-                    <div><ProgressBar param="stress" value={stress * 20} /></div>
+                    <div><ProgressBar param="mood" value={mood * 20}/></div>
+                    <div><ProgressBar param="anxiety" value={anxiety * 20}/></div>
+                    <div><ProgressBar param="stress" value={stress * 20}/></div>
                 </div>
 
                 <div>
-                    <img src={emojiMood} alt="" />
-                    <img src={emojiAnxiety} alt="" />
-                    <img src={emojiStress} alt="" />
+                    <img src={emojiMood} alt=""/>
+                    <img src={emojiAnxiety} alt=""/>
+                    <img src={emojiStress} alt=""/>
                 </div>
             </div>
         );
@@ -162,7 +185,7 @@ const TextPost = (props) => {
         if (postData.post.date) {
             return <>
                 {dateField}
-                <div className={s.lockIcon}> {(isMyPost && !postData.post.isPublic) && <Icon12Lock />}</div>
+                <div className={s.lockIcon}> {(isMyPost && !postData.post.isPublic) && <Icon12Lock/>}</div>
             </>;
         }
 
@@ -170,8 +193,8 @@ const TextPost = (props) => {
     };
 
     const renderText = (s, i) => {
-        if (s == '\n')
-            return <br key={i} />
+        if (s === '\n')
+            return <br key={i}/>
         return <React.Fragment key={i}>
             {s}
         </React.Fragment>
@@ -182,7 +205,7 @@ const TextPost = (props) => {
             <Headline weight='medium'>{title.split('').map(renderText)}</Headline>;
 
         const noteNode = !note || note.length === 0 ? null :
-            <Text weight='regular'>  {note.split('').map(renderText)} </Text>; 
+            <Text weight='regular'>  {note.split('').map(renderText)} </Text>;
 
         return noteNode || titleNode ? <div className={s.postText}>{titleNode}{noteNode}</div> : null;
     };
@@ -191,8 +214,8 @@ const TextPost = (props) => {
         <Card size="l" mode="shadow" className="TextPost" onClick={props.onClick}>
             <Cell
                 description={description()}
-                before={<Avatar size={48} src={avatar} />}
-                asideContent={currentUser && <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} />}>
+                before={<Avatar size={48} src={avatar}/>}
+                asideContent={currentUser && <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon}/>}>
                 {`${user.first_name} ${user.last_name}`}
             </Cell>
 

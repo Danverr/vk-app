@@ -48,7 +48,7 @@ function calendarStateUpdate() {
 
 function fetchCalendar() {
     localState.usersMap[localState.userInfo.id] = localState.userInfo;
-    api("GET", "/entries/", { users: localState.userInfo.id }).catch((error) => {
+    api("GET", "/v1.0/entries/", { users: localState.userInfo.id }).catch((error) => {
         localState.setError(error)
     }).then((result) => {
         localState.allEntries = result.data;

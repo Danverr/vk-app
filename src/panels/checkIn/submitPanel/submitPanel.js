@@ -84,7 +84,7 @@ const SubmitPanel = (props) => {
                 data = {entries: JSON.stringify([data])};
             }
 
-            api(method, "/entries/", data)
+            api(method, "/v1.0/entries/", data)
                 .then((result) => {
                     let entryData = Object.assign({}, answer);
 

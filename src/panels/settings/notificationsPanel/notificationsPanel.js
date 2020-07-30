@@ -43,7 +43,7 @@ const NotificationsPanel = (props) => {
 
     const changeCheckin = (s) => {
         setCheckinNotif(s);
-        api((s ? "POST" : "DELETE"), "/entryNotifications/",
+        api((s ? "POST" : "DELETE"), "/v1.0/entryNotifications/",
             (s ? {time: moment(curTime).utc().format("HH:mm")} : {})).then((res) => {
             changesSaved();
         }).catch((error) => {
@@ -54,7 +54,7 @@ const NotificationsPanel = (props) => {
 
     const changeHealth = (s) => {
         setHealthNotif(s);
-        api((s ? "POST" : "DELETE"), "/statNotifications/", {}).then((res) => {
+        api((s ? "POST" : "DELETE"), "/v1.0/statNotifications/", {}).then((res) => {
             changesSaved();
         }).catch((error) => {
             setHealthNotif(!s);
@@ -64,7 +64,7 @@ const NotificationsPanel = (props) => {
 
     const changeTime = () => {
         const updateTime = (res) => {
-            api("PUT", "/entryNotifications/", {time: moment(res).utc().format("HH:mm")}).then(() => {
+            api("PUT", "/v1.0/entryNotifications/", {time: moment(res).utc().format("HH:mm")}).then(() => {
                 setCurTime(res);
                 changesSaved();
             }).catch((error) => {
@@ -80,7 +80,7 @@ const NotificationsPanel = (props) => {
 
     useEffect(() => {
         const fetchData = () => {
-            api("GET", "/entryNotifications/", {}).then((res) => {
+            api("GET", "/v1.0/entryNotifications/", {}).then((res) => {
                 let time;
                 if (res.data == null) {
                     setCheckinNotif(false);
@@ -94,7 +94,7 @@ const NotificationsPanel = (props) => {
                 setError({error: error, reload: fetchData});
             });
 
-            api("GET", "/statNotifications/", {}).then((res) => {
+            api("GET", "/v1.0/statNotifications/", {}).then((res) => {
                 setHealthNotif(res.data);
             }).catch((error) => {
                 setError({error: error, reload: fetchData});

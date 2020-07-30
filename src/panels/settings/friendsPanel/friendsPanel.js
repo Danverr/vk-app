@@ -70,7 +70,7 @@ const FriendsPanel = (props) => {
             }).then((friends) => {
                 setVKfriends(friends.response.items);
 
-                api("GET", "/statAccess/", {
+                api("GET", "/v1.0/statAccess/", {
                     type: "toId"
                 }).then((edges) => {
                     // Информация о друзьях
@@ -108,7 +108,7 @@ const FriendsPanel = (props) => {
             entryWrapper.pseudoFriends[friend.id] = 1
         });
         props.setPopout(<ScreenSpinner/>);
-        api("POST", "/statAccess/", {
+        api("POST", "/v1.0/statAccess/", {
             toId: waitToAdd.map((friend) => {
                 return friend.id;
             }).join(', ')
@@ -127,7 +127,7 @@ const FriendsPanel = (props) => {
         if (!added || !VKfriends) return;
         entryWrapper.pseudoFriends[friend.id] = null;
         props.setPopout(<ScreenSpinner/>);
-        api("DELETE", "/statAccess/", {
+        api("DELETE", "/v1.0/statAccess/", {
             toId: friend.id
         }).then((res) => {
             updateAdded(added.filter((addedFriend) => addedFriend.id !== friend.id));

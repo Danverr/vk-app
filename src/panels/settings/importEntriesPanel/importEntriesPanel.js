@@ -56,7 +56,7 @@ const ImportEntriesPanel = (props) => {
             
             props.setPopout(<ScreenSpinner />);
 
-            api("POST", "/entries/", {
+            api("POST", "/v1.0/entries/", {
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = moods.indexOf(entry[4]) + 1;
                     return ({
