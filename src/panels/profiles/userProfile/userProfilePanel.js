@@ -52,10 +52,10 @@ const UserProfilePanel = (props) => {
         if (userInfo === null) return;
 
         const fetchData = () => {
-            api("GET", "/v1.0/entries/stats/", {
+            api("GET", "/v1.1/entries/", {
                 users: userInfo.id,
             }).then((res) => {
-                setStats(formatStats(res.data[userInfo.id]));
+                setStats(formatStats(res.data));
             }).catch((error) => {
                 setError({error: error, reload: fetchData});
             });

@@ -2,26 +2,23 @@ import React, {useState, useEffect} from 'react';
 import {Panel, PanelHeader, Group, CardGrid, Spinner, Button} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import api from "../../../utils/api";
-import bridge from "@vkontakte/vk-bridge";
 import moment from "moment";
 
 import TextPost from "../../../components/textPost/textPost";
 import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlaceholder";
 
-const fetchFriendsInfo = async (userToken) => {
+const fetchFriendsInfo = async () => {
     // ID друзей к которым есть доступ
-    const friendsIdsPromise = await api("GET", "/v1.0/statAccess/", {
+    const friendsIdsPromise = await api("GET", "/v1.1/statAccess/", {
         type: "fromId",
     }).catch((error) => {
         throw error;
     });
 
     // Информация о друзьях
-    const friendsInfoPromise = await bridge.send("VKWebAppCallAPIMethod", {
+    const friendsInfoPromise = await api("GET", "/v1.1/vkApi/", {
         method: "users.get",
         params: {
-            access_token: userToken,
-            v: "5.120",
             user_ids: friendsIdsPromise.data.map(item => item.id).join(","),
             fields: "photo_50, photo_100"
         }
@@ -29,7 +26,7 @@ const fetchFriendsInfo = async (userToken) => {
         throw error;
     });
 
-    return friendsInfoPromise.response.map((info) => {
+    return friendsInfoPromise.data.response.map((info) => {
         return {...info, "isCurrentUser": false};
     });
 };
@@ -78,13 +75,21 @@ const ChooseProfilePanel = (props) => {
             });
 
             // Загрузка статистики пользователей для карточек
-            api("GET", "/v1.0/entries/stats/", {
-                startDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
+            api("GET", "/v1.1/entries/", {
+                afterDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
             }).then((res) => {
                 let newStats = {};
 
-                for (const userId in res.data) {
-                    newStats[userId] = formatStats(res.data[userId]);
+                for (const post of res.data) {
+                    if (newStats[post.userId]) {
+                        newStats[post.userId].push(post);
+                    } else {
+                        newStats[post.userId] = [post];
+                    }
+                }
+
+                for (const userId in newStats) {
+                    newStats[userId] = formatStats(newStats[userId]);
                 }
 
                 setStats(newStats);

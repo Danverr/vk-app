@@ -24,21 +24,19 @@ const IntroView = (props) => {
         },
         {
             title: "Как это работает?",
-            text: "Откройте доступ к своей статистике, проходите опросы, создавайте заметки и смотрите, как это делают ваши друзья!",
+            text: <>Откройте доступ к своей статистике, проходите опросы, создавайте заметки и смотрите, как это делают
+                ваши друзья! Продолжая,
+                вы принимаете <a href="https://m.vk.com/@vkapp_mood-polzovatelskoe-soglashenie">пользовательское
+                    соглашение</a>.</>,
+            buttonText: "Приступим!",
             img: intro2,
-        },
-        {
-            title: "Нужен доступ к друзьям",
-            text: <>Для того, чтобы вы могли поделится своим настроением, нам нужно знать, с кем вы дружите. Продолжая,
-                вы принимаете <a href="https://m.vk.com/@vkapp_mood-polzovatelskoe-soglashenie">пользовательское соглашение</a>.</>,
-            img: intro3,
-            buttonText: "Дать доступ",
             action: () => {
-                props.state.fetchUserToken(() => {
-                    props.state.setShowIntro(false);
-                    window['yaCounter65896372'].reachGoal("introCompleted");
-                    props.nav.clearStory(props.id);
-                });
+                localStorage.showIntro = false;
+                props.state.setShowIntro(false);
+
+                window['yaCounter65896372'].reachGoal("introCompleted");
+
+                props.nav.clearStory(props.id);
             },
         }
     ];
