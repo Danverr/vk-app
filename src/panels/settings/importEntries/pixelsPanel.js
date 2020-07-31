@@ -49,6 +49,8 @@ const PixelsPanel = (props) => {
             api("POST", "/v1.0/entries/", {
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = entry.mood;
+                    let date = moment(`${entry.date} 12:00:00`);
+
                     return ({
                         mood: mood,
                         stress: 6 - mood,
@@ -56,7 +58,7 @@ const PixelsPanel = (props) => {
                         isPublic: (+!isPrivate),
                         title: "",
                         note: entry.notes,
-                        date: `${entry.date} 9:00:00`
+                        date: date.utc().format("YYYY-MM-DD HH:mm:ss")
                     });
                 }))
             }).then((res) => {

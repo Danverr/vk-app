@@ -52,6 +52,8 @@ const DaylioPanel = (props) => {
             api("POST", "/v1.0/entries/", {
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = moods.indexOf(entry[4]) + 1;
+                    let date = moment(`${entry[0]} ${entry[3]}:00`);
+   
                     return ({
                         mood: mood,
                         stress: 6 - mood,
@@ -59,7 +61,7 @@ const DaylioPanel = (props) => {
                         isPublic: (+!isPrivate),
                         title: "",
                         note: entry[6],
-                        date: `${entry[0]} ${entry[3]}:00`
+                        date: date.utc().format("YYYY-MM-DD HH:mm:ss")
                     });
                 }))
             }).then((res) => {
