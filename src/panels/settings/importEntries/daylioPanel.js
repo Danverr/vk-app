@@ -35,7 +35,7 @@ const DaylioPanel = (props) => {
             const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
             
             const csvparse = require('js-csvparser');
-            let entries = csvparse(reader.result).data;
+            const entries = csvparse(reader.result).data;
 
             for (const entry of entries){
                 if(entry.length !== 7 || moods.indexOf(entry[4]) === -1 || !moment(`${entry[0]} ${entry[3]}:00`).isValid){
@@ -97,17 +97,17 @@ const DaylioPanel = (props) => {
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
                 Импорт
-            </PanelHeader>
+            </PanelHeader>        
+            <Group>
+                <SimpleCell disabled> <InfoRow header = "Шаг 1"> Зайдите в раздел Daylio “Больше” </InfoRow> </SimpleCell> 
+                <SimpleCell disabled> <InfoRow header = "Шаг 2"> Нажмите на “Экспорт записей” </InfoRow> </SimpleCell> 
+                <SimpleCell disabled> <InfoRow header = "Шаг 3">  Выберите формат CSV и сохраните файл </InfoRow> </SimpleCell> 
+                <SimpleCell disabled> <InfoRow header = "Шаг 4"> Загрузите файл в mood </InfoRow> </SimpleCell> 
+            </Group>
             <Group>
                 <Cell asideContent={<Switch checked = {isPrivate} onChange = {(e) => setIsPrivate(e.target.checked)}/>} description="Весь текст будет скрыт">
-                    <div style = {{display: 'flex'}}> <Text weight="semibold">Cделать приватными</Text> <Icon12Lock fill = 'var(--text_secondary)'style = {{marginLeft: '6px', marginTop: '4px'}}/></div> 
+                    <div style = {{display: 'flex'}}> <Text weight="regular">Cделать приватными</Text> <Icon12Lock fill = 'var(--text_secondary)'style = {{marginLeft: '6px', marginTop: '4px'}}/></div> 
                 </Cell>
-            </Group>
-            <Group header={<Header mode="secondary">Инструкция</Header>}>
-                <SimpleCell> <InfoRow> 1. Зайдите в раздел Daylio “Больше” </InfoRow> </SimpleCell> 
-                <SimpleCell> <InfoRow> 2. Нажмите на “Экспорт записей” </InfoRow> </SimpleCell> 
-                <SimpleCell> <InfoRow> 3. Выберите формат CSV и сохраните файл </InfoRow> </SimpleCell> 
-                <SimpleCell> <InfoRow> 4. Загрузите файл в mood </InfoRow> </SimpleCell> 
             </Group>
             <FixedLayout vertical="bottom">
                 <FormLayout>
