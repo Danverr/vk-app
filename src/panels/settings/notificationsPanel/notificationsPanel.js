@@ -25,26 +25,24 @@ const NotificationsPanel = (props) => {
     const [snackbar, setSnackbar] = useState(null);
     const [error, setError] = useState(null);
     const [healthNotif, setHealthNotif] = useState(null);
+    const [accessNotif, setAccessNotif] = useState(null);
     const [checkinNotif, setCheckinNotif] = useState(null);
     const [curTime, setCurTime] = useState(null);
     const {notifications} = props.state;
 
     const changesSaved = () => {
         setSnackbar(<Snackbar layout="vertical"
-                              onClose={() => {
-                                  setSnackbar(null);
-                              }}
-                              before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
-                                  fill="#fff" width={14} height={14}/></Avatar>}
-        >
-            Изменения сохранены
-        </Snackbar>);
+                        onClose={() => setSnackbar(null)}
+                        before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
+                        fill="#fff" width={14} height={14}/></Avatar>}>
+                    Изменения сохранены
+                </Snackbar>);
     };
 
     const changeCheckin = (s) => {
         setCheckinNotif(s);
-        api((s ? "POST" : "DELETE"), "/v1.0/entryNotifications/",
-            (s ? {time: moment(curTime).utc().format("HH:mm")} : {})).then((res) => {
+        api("PUT", "/v1.1/notifications/",
+            (s ? {createEntry: moment(curTime).utc().format("HH:mm")} : {createEntry: "null"})).then((res) => {
             changesSaved();
         }).catch((error) => {
             setCheckinNotif(!s);
@@ -52,9 +50,19 @@ const NotificationsPanel = (props) => {
         });
     };
 
+    const changeAccess = (s) => {
+        setAccessNotif(s);
+        api("PUT", "/v1.1/notifications/", {accessGiven: +s}).then((res) => {
+            changesSaved();
+        }).catch((error) => {
+            setAccessNotif(!s);
+            setError({error: error, reload: () => changeAccess(s)});
+        });
+    }
+
     const changeHealth = (s) => {
         setHealthNotif(s);
-        api((s ? "POST" : "DELETE"), "/v1.0/statNotifications/", {}).then((res) => {
+        api("PUT", "/v1.1/notifications/", {lowStats: +s}).then((res) => {
             changesSaved();
         }).catch((error) => {
             setHealthNotif(!s);
@@ -64,7 +72,7 @@ const NotificationsPanel = (props) => {
 
     const changeTime = () => {
         const updateTime = (res) => {
-            api("PUT", "/v1.0/entryNotifications/", {time: moment(res).utc().format("HH:mm")}).then(() => {
+            api("PUT", "/v1.1/notifications/", {createEntry: moment(res).utc().format("HH:mm")}).then(() => {
                 setCurTime(res);
                 changesSaved();
             }).catch((error) => {
@@ -80,22 +88,18 @@ const NotificationsPanel = (props) => {
 
     useEffect(() => {
         const fetchData = () => {
-            api("GET", "/v1.0/entryNotifications/", {}).then((res) => {
+            api("GET", "/v1.1/notifications/", {}).then((res) => {
                 let time;
-                if (res.data == null) {
+                if (res.data.createEntry == null) {
                     setCheckinNotif(false);
                     time = moment(`2000-01-01 22:00`).utc();
                 } else {
                     setCheckinNotif(true);
-                    time = moment.utc(`2000-01-01 ${res.data}`);
+                    time = moment.utc(`2000-01-01 ${res.data.createEntry}`);
                 }
                 setCurTime(moment(time).local());
-            }).catch((error) => {
-                setError({error: error, reload: fetchData});
-            });
-
-            api("GET", "/v1.0/statNotifications/", {}).then((res) => {
-                setHealthNotif(res.data);
+                setAccessNotif(res.data.accessGiven);
+                setHealthNotif(res.data.lowStats);
             }).catch((error) => {
                 setError({error: error, reload: fetchData});
             });
@@ -124,6 +128,11 @@ const NotificationsPanel = (props) => {
                                                            onClick={changeTime}> {moment(curTime).format("HH:mm")} </Text>}>
                     <Text weight="regular">Время напоминаний</Text>
                 </Cell>}
+            </Group>
+            <Group>
+                <Cell asideContent={<Switch checked={accessNotif} onChange={(e) => changeAccess(e.target.checked)}/>}>
+                    <Text weight="regular">Друг выдал вам доступ</Text>
+                </Cell>
             </Group>
             <Group
                 description="Если у пользователя появится запись с низким уровнем настроения, тревожности или стресса - мы уведомим вас">

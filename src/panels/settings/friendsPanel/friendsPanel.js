@@ -1,37 +1,39 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Div,
     FixedLayout,
-    Counter,
     Button,
     Panel,
     PanelHeader,
     PanelHeaderBack,
     Spinner,
-    ScreenSpinner
+    ScreenSpinner,
+    Search,
+    Avatar,
+    Snackbar
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from "@vkontakte/vk-bridge";
 
 import api from '../../../utils/api'
 
-import CanAddGroup from './canAddGroup/canAddGroup'
-import AddedGroup from './addedGroup/addedGroup'
+import SearchUsers from './searchUsers/searchUsers'
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
-import entryWrapper from '../../../components/entryWrapper';
 
-var localState = {
-    canAdd: null,
-    added: null,
-};
+import ModalFilter from './modalFilter'
+
+import Icon16Done from '@vkontakte/icons/dist/16/done'
+import s from './friendsPanel.module.css'
 
 const FriendsPanel = (props) => {
+    const [snackbar, setSnackbar] = useState(null);
     const [error, setError] = useState(null);
-    const [canAdd, setCanAdd] = useState(localState.canAdd);
-    const [added, setAdded] = useState(localState.added);
-    const [VKfriends, setVKfriends] = useState(null);
-    const [waitToAdd, setWaitToAdd] = useState([]);
-    const {userToken, userInfo} = props.state;
+    const [users, setUsers] = useState(null);
+    const [statAccess, setStatAccess] = useState(null);
+    const [from, setFrom] = useState('none');
+    const [to, setTo] = useState('none');
+    const [search, setSearch] = useState('');
+    const { userToken } = props.state;
 
     const cmp = (a, b) => {
         if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))
@@ -41,25 +43,17 @@ const FriendsPanel = (props) => {
         return a.id - b.id;
     }
 
-    const updateCanAdd = useCallback((data) => {
+    const updateUsers = useCallback((data) => {
         data.sort(cmp);
-        localState.canAdd = data.slice(0);
-        setCanAdd(data);
+        setUsers(data);
     }, []);
-    const updateAdded = useCallback((data) => {
-        data.sort(cmp);
-        localState.added = data.slice(0);
-        setAdded(data);
-    }, []);
-    const updateWaitToAdd = (data) => {
-        setWaitToAdd(data);
-    };
 
     useEffect(() => {
         if (!userToken) return;
 
-        const fetchData = () => {
-            bridge.send("VKWebAppCallAPIMethod", {
+        const fetchData = async () => {
+            var friendsIds, toId, fromId;
+            await bridge.send("VKWebAppCallAPIMethod", {
                 method: "friends.get",
                 params: {
                     access_token: userToken,
@@ -68,101 +62,156 @@ const FriendsPanel = (props) => {
                     fields: "photo_50, photo_100"
                 }
             }).then((friends) => {
-                setVKfriends(friends.response.items);
-
-                api("GET", "/v1.0/statAccess/", {
-                    type: "toId"
-                }).then((edges) => {
-                    // Информация о друзьях
-                    bridge.send("VKWebAppCallAPIMethod", {
-                        method: "users.get",
-                        params: {
-                            access_token: userToken,
-                            v: "5.120",
-                            user_ids: edges.data.map((friend) => {
-                                return friend.id;
-                            }).join(","),
-                            fields: "photo_50, photo_100"
-                        }
-                    }).then((edgesInfo) => {
-                        let a = friends.response.items, b = edgesInfo.response;
-                        updateCanAdd(a.filter((friend) => !b.find((curFriend) => curFriend.id === friend.id)));
-                        updateAdded(b);
-                    }).catch((error) => {
-                        setError({error: error, reload: fetchData});
-                    });
-                }).catch((error) => {
-                    setError({error: error, reload: fetchData});
-                });
+                friendsIds = friends.response.items.map(friend => friend.id);
             }).catch((error) => {
-                setError({error: error, reload: fetchData});
+                setError({ error: error, reload: fetchData });
             });
-        };
+            //кому юзер дал доступ
+            await api("GET", "/v1.1/statAccess/", {
+                type: "toId"
+            }).then((edges) => {
+                toId = edges.data.map(user => user.id);
+                setStatAccess(toId);
+            }).catch((error) => {
+                setError({ error: error, reload: fetchData });
+            });
+            //кто дал доступ юзеру
+            await api("GET", "/v1.1/statAccess/", {
+                type: "fromId"
+            }).then((edges) => {
+                fromId = edges.data.map(user => user.id);
+            }).catch((error) => {
+                setError({ error: error, reload: fetchData });
+            });
 
+            let res = [...new Set([...friendsIds, ...toId, ...fromId])];
+
+            await bridge.send("VKWebAppCallAPIMethod", {
+                method: "users.get",
+                params: {
+                    access_token: userToken,
+                    v: "5.120",
+                    user_ids: res.join(","),
+                    fields: "photo_50, photo_100, sex"
+                }
+            }).then((users) => {
+                updateUsers(users.response.map(user => {
+                    return {
+                        toId: toId.indexOf(user.id) !== -1,
+                        fromId: fromId.indexOf(user.id) !== -1,
+                        ...user
+                    };
+                }));
+            }).catch((error) => {
+                setError({ error: error, reload: fetchData });
+            });
+        }
         fetchData();
-    }, [userToken, updateCanAdd, updateAdded]);
+    }, [userToken, updateUsers]);
 
-    const postEdges = async () => {
-        if (!userInfo || waitToAdd.length === 0) return;
-        waitToAdd.forEach((friend) => {
-            entryWrapper.pseudoFriends[friend.id] = 1
-        });
-        props.setPopout(<ScreenSpinner/>);
-        api("POST", "/v1.0/statAccess/", {
-            toId: waitToAdd.map((friend) => {
-                return friend.id;
-            }).join(', ')
-        }).then((res) => {
-            updateAdded([...added, ...waitToAdd]);
-            updateCanAdd(canAdd.filter((friend) => !waitToAdd.find((curFriend) => curFriend.id === friend.id)));
-            updateWaitToAdd([]);
-        }).catch((error) => {
-            setError({error: error, reload: postEdges});
-        }).finally(() => {
-            props.setPopout(null);
-        });
-    };
+    const changeStatAccess = async (add, del, addf, delf) => {
+        try {
+            if (addf) {
+                props.setPopout(<ScreenSpinner />);
+                await api("POST", "/v1.1/statAccess/", {
+                    toId: add.join(', ')
+                }).then((res) => {
+                    addf = false;
+                    let temp = users;
+                    for (var user of temp)
+                        if (add.indexOf(user.id) !== -1)
+                            user.toId = true;
+                    updateUsers(temp);
+                    window['yaCounter65896372'].reachGoal("accessGiven");
+                }).finally(() => {
+                    props.setPopout(null);
+                });
+            }
+            if (delf) {
+                props.setPopout(<ScreenSpinner />);
+                await api("DELETE", "/v1.1/statAccess/", {
+                    toId: del.join(', ')
+                }).then((res) => {
+                    delf = false;
+                    let temp = users;
+                    for (var user of temp)
+                        if (del.indexOf(user.id) !== -1)
+                            user.toId = false;
+                    updateUsers(temp);
+                    window['yaCounter65896372'].reachGoal("accessGiven");
+                }).finally(() => {
+                    props.setPopout(null);
+                });
+            }
+            if (!addf && !delf)
+                setSnackbar(<Snackbar 
+                    className = {s.snackbar}
+                    layout="vertical"
+                    onClose={() => setSnackbar(null)}
+                    before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
+                        fill="#fff" width={14} height={14} /></Avatar>}>
+                    Изменения сохранены
+                </Snackbar>);
+        } catch (error) {
+            setError({ error: error, reload: () => changeStatAccess(add, del, addf, delf) });
+        }
+    }
 
-    const deleteEdge = async (friend) => {
-        if (!added || !VKfriends) return;
-        entryWrapper.pseudoFriends[friend.id] = null;
-        props.setPopout(<ScreenSpinner/>);
-        api("DELETE", "/v1.0/statAccess/", {
-            toId: friend.id
-        }).then((res) => {
-            updateAdded(added.filter((addedFriend) => addedFriend.id !== friend.id));
-            if (VKfriends.find((curFriend) => curFriend.id === friend.id))
-                updateCanAdd([...canAdd, friend]);
-        }).catch((error) => {
-            setError({error: error, reload: () => deleteEdge(friend)});
-        }).finally(() => {
-            props.setPopout(null);
-        });
-    };
+    const onClickSave = () => {
+        const add = [], del = [];
+        for (var user of users) {
+            if (!user.toId && statAccess.indexOf(user.id) !== -1)
+                add.push(user.id);
+            if (user.toId && statAccess.indexOf(user.id) === -1)
+                del.push(user.id);
+        }
+        if(add.length === 0 && del.length === 0)
+            return;
+        changeStatAccess(add, del, add.length > 0, del.length > 0);
+    }
 
-    var content = <Spinner size="large"/>;
+    const changeFilter = (res) => {
+        setFrom(res.from);
+        setTo(res.to);
+    }
+
+    var content = <Spinner size="large" />;
 
     if (error)
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
             setError(null);
             error.reload();
-        }}> Попробовать снова </Button>}/>;
-    else if (added && canAdd)
+        }}> Попробовать снова </Button>} />;
+    else if (users && statAccess)
         content = (<div>
-            <AddedGroup
-                added={added}
-                deleteEdge={deleteEdge}/>
-            <CanAddGroup
-                canAdd={canAdd}
-                waitToAdd={waitToAdd}
-                updateWaitToAdd={updateWaitToAdd}/>
-            <FixedLayout vertical="bottom">
-                <Div style={{background: 'white'}}>
-                    <Button size="xl" after={<Counter> {waitToAdd.length} </Counter>} onClick={() => {
-                        postEdges();
-                    }}>
-                        Сохранить
+            <div style = {{paddingTop: 52}}>
+            <SearchUsers
+                search = {search}
+                from = {from}
+                to = {to}
+                users={users}
+                statAccess={statAccess}
+                setStatAccess={setStatAccess}
+            />
+            </div>
+            {snackbar}  
+            <FixedLayout vertical="bottom">    
+                <Div style={{ display: 'flex', background: 'white' }}>
+                    <Button size="l"
+                        stretched
+                        mode="secondary"
+                        style={{ marginRight: 8 }}
+                        onClick={() => {
+                            props.setModal(<ModalFilter
+                                to={to}
+                                from={from}
+                                onClose={() => props.setModal(null)}
+                                onChange={changeFilter}
+                            />);
+                        }}>
+                        Фильтры
                     </Button>
+                    <Button size="l" stretched onClick={onClickSave}>Сохранить</Button>
                 </Div>
             </FixedLayout>
         </div>);
@@ -171,9 +220,12 @@ const FriendsPanel = (props) => {
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => {
                 props.nav.goBack();
-            }}/>}>
-                Доступ
+            }} />}>
+                Доступ 
             </PanelHeader>
+            <FixedLayout vertical="top">
+                <Search value={search} onChange={(e) => { setSearch(e.target.value); }}/>
+            </FixedLayout>
             {content}
         </Panel>
     );

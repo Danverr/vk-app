@@ -1,0 +1,10 @@
+.errorText{
+    position: absolute;
+    top: 0px;
+    font-size: 13px;
+    line-height: 16px;
+    color: var(--field_error_border);
+}
+.snackbar{
+    bottom: 62px;
+}
