@@ -27,7 +27,7 @@ const useAppState = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
     const [updatingEntryData, setUpdatingEntryData] = useState(null);
-    const [showIntro, setShowIntro] = useState(launchParams.vk_access_token_settings === "");
+    const [showIntro, setShowIntro] = useState(localStorage.showIntro === "true");
 
     useEffect(() => {
         bridge.subscribe((e) => {

@@ -11,6 +11,8 @@ import questionPanelsData from "./questionPanelsData";
 import QuestionPanel from "./questionPanel/questionPanel";
 import SubmitPanel from "./submitPanel/submitPanel";
 
+const osname = platform();
+
 const getBullets = (questionPanels, index) => {
     let bullets = [];
 
@@ -24,14 +26,12 @@ const getBullets = (questionPanels, index) => {
         bullets.push(<div key={i} className={bulletStyles}/>);
     }
 
-    return (<div className={styles.bulletsContainer}>{bullets}</div>);
+    return (<div className={`${styles.bulletsContainer} ${osname}`}>{bullets}</div>);
 };
 
 const localState = {
     answer: getAnswer(),
 };
-
-const osname = platform();
 
 const CheckInStory = (props) => {
     const {updatingEntryData, setUpdatingEntryData} = props.state;
