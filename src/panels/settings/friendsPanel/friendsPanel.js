@@ -184,7 +184,6 @@ const FriendsPanel = (props) => {
         }}> Попробовать снова </Button>} />;
     else if (users && statAccess)
         content = (<div>
-            <div style = {{paddingTop: 52}}>
             <SearchUsers
                 search = {search}
                 from = {from}
@@ -193,7 +192,6 @@ const FriendsPanel = (props) => {
                 statAccess={statAccess}
                 setStatAccess={setStatAccess}
             />
-            </div>
             {snackbar}  
             <FixedLayout vertical="bottom">    
                 <Div style={{ display: 'flex', background: 'white' }}>
@@ -226,7 +224,9 @@ const FriendsPanel = (props) => {
             <FixedLayout vertical="top">
                 <Search value={search} onChange={(e) => { setSearch(e.target.value); }}/>
             </FixedLayout>
-            {content}
+            <div style = {{paddingTop: 52}}>
+                {content}
+            </div>
         </Panel>
     );
 };
