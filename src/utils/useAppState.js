@@ -27,7 +27,7 @@ const useAppState = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
     const [updatingEntryData, setUpdatingEntryData] = useState(null);
-    const [showIntro, setShowIntro] = useState(localStorage.showIntro === "true");
+    const [showIntro, setShowIntro] = useState(localStorage.showIntro === undefined || localStorage.showIntro === "true");
 
     useEffect(() => {
         bridge.subscribe((e) => {
@@ -73,7 +73,7 @@ const useAppState = () => {
             if (error.error_data && error.error_data.error_code !== 4) { // 4: User denied
                 setGlobalError(error);
             } else {
-                setShowIntro(true);
+                fetchUserToken();
             }
         });
     };
@@ -95,7 +95,6 @@ const useAppState = () => {
         const initApp = async () => {
             const start = moment();
 
-            if (!showIntro) await fetchUserToken();
             await fetchUserInfo();
 
             const waitYmInit = () => {
@@ -120,6 +119,7 @@ const useAppState = () => {
         showIntro: showIntro,
         setShowIntro: setShowIntro,
         notifications: notifications,
+        accessTokenScope: launchParams.vk_access_token_settings,
         userToken: userToken,
         fetchUserToken: fetchUserToken,
         userInfo: userInfo,

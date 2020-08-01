@@ -10,7 +10,8 @@ import {
     ScreenSpinner,
     Search,
     Avatar,
-    Snackbar
+    Snackbar,
+    Placeholder
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from "@vkontakte/vk-bridge";
@@ -33,7 +34,7 @@ const FriendsPanel = (props) => {
     const [from, setFrom] = useState('none');
     const [to, setTo] = useState('none');
     const [search, setSearch] = useState('');
-    const { userToken } = props.state;
+    const { accessTokenScope, userToken, fetchUserToken } = props.state;
 
     const cmp = (a, b) => {
         if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))
@@ -177,14 +178,27 @@ const FriendsPanel = (props) => {
 
     var content = <Spinner size="large" />;
 
-    if (error)
+    useEffect(() => {
+        //разрешение есть, но токен еще не получен
+        if(!userToken && accessTokenScope.split(",").indexOf("friends") !== -1)
+            fetchUserToken(); //получаем, не показывая плейсхолдер
+    }, [userToken, accessTokenScope, fetchUserToken])
+
+    //токен не получен и разрешения нет
+    if(!userToken && accessTokenScope.split(",").indexOf("friends") === -1) //показываем плейсхолдер
+        content = <Placeholder 
+            header="Нужно разрешение"
+            stretched
+            action={<Button onClick = {() => fetchUserToken()}> Дать разрешение </Button>}> 
+            Для редактирования доступа к статистике нам нужен список ваших друзей 
+        </Placeholder>;
+    else if (error)
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
             setError(null);
             error.reload();
         }}> Попробовать снова </Button>} />;
     else if (users && statAccess)
         content = (<div>
-            <div style = {{paddingTop: 52}}>
             <SearchUsers
                 search = {search}
                 from = {from}
@@ -193,7 +207,6 @@ const FriendsPanel = (props) => {
                 statAccess={statAccess}
                 setStatAccess={setStatAccess}
             />
-            </div>
             {snackbar}  
             <FixedLayout vertical="bottom">    
                 <Div style={{ display: 'flex', background: 'white' }}>
@@ -226,7 +239,9 @@ const FriendsPanel = (props) => {
             <FixedLayout vertical="top">
                 <Search value={search} onChange={(e) => { setSearch(e.target.value); }}/>
             </FixedLayout>
-            {content}
+            <div style = {{paddingTop: 52}}>
+                {content}
+            </div>
         </Panel>
     );
 };

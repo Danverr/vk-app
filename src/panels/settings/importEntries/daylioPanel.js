@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Header, Button, FixedLayout, FormLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Button, FixedLayout, FormLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './import.module.css'
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';

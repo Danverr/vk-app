@@ -12,7 +12,7 @@ const SearchUsers = (props) => {
         if (users === null)
             return null;
         let res = users.filter(({ first_name, last_name }) => (`${first_name} ${last_name}`).toLowerCase().indexOf(searchStr) > -1);
-        console.log(res);
+
         if(from === 'yes')
             res = res.filter(({fromId}) => fromId);
         else if(from === 'no')

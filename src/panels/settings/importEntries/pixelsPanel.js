@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Header, Button, FixedLayout, FormLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Button, FixedLayout, FormLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './import.module.css'
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -35,7 +35,7 @@ const PixelsPanel = (props) => {
             const entries = JSON.parse(reader.result);
 
             for (const entry of entries){
-                if(entry.date == undefined || entry.mood == undefined || entry.notes == undefined || !moment(`${entry.date} 9:00:00`).isValid){
+                if(entry.date === undefined || entry.mood === undefined || entry.notes === undefined || !moment(`${entry.date} 9:00:00`).isValid){
                     setTop("Некорректный формат файла");
                     return;
                 }

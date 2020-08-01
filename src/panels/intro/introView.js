@@ -4,7 +4,6 @@ import {View} from "@vkontakte/vkui";
 import intro0 from "../../assets/introPhotos/intro0.jpg";
 import intro1 from "../../assets/introPhotos/intro1.jpg";
 import intro2 from "../../assets/introPhotos/intro2.jpg";
-import intro3 from "../../assets/introPhotos/intro3.jpg";
 
 import SlidePanel from "./slidePanel";
 
