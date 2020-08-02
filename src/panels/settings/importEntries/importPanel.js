@@ -63,7 +63,7 @@ const ImportPanel = (props) => {
     else if (importCount !== null){
         const attempts = (process.env.NODE_ENV === "development") ? 
         <Cell indicator = {<Text> {importCount} </Text>} onClick = {addAttempt}> <Title style = {{color: "var(--accent)"}}> Осталось попыток импорта </Title> </Cell> : 
-        <Cell indicator = {<Text> {importCount} </Text>}> <Title style = {{color: "var(--accent)"}}> Осталось попыток импорта </Title> </Cell>;
+        <Cell indicator = {<Text> {importCount} </Text>}> <Title> Осталось попыток импорта </Title> </Cell>;
         content = <div> 
             <Group header={<Header mode="secondary">Откуда импортировать</Header>}>
                 <Radio name="import" value="daylio" defaultChecked onChange={onChange}> Daylio </Radio>
