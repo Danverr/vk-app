@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, Group, CardGrid, Spinner, Button} from "@vkontakte/vkui";
+import React, { useState, useEffect } from 'react';
+import { Panel, PanelHeader, Group, CardGrid, Spinner, Button } from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import api from "../../../utils/api";
 import moment from "moment";
@@ -20,11 +20,13 @@ const fetchFriendsInfo = async () => {
         method: "users.get",
         params: {
             user_ids: friendsIdsPromise.data.map(item => item.id).join(","),
-            fields: "photo_50, photo_100"
+            fields: "photo_50, photo_100, sex"
         }
     }).catch((error) => {
         throw error;
     });
+
+    if (friendsIdsPromise.data.error) throw friendsIdsPromise.data.error;
 
     return friendsInfoPromise.data.response.map((info) => {
         return {...info, "isCurrentUser": false};
@@ -53,7 +55,7 @@ const ChooseProfilePanel = (props) => {
     const [error, setError] = useState(null);
     const [usersInfo, setUsersInfo] = useState(localState.usersInfo);
     const [stats, setStats] = useState(localState.stats);
-    const {activePanel, userToken, userInfo, formatStats, id: panelId} = props;
+    const { activePanel, userInfo, formatStats, id: panelId } = props;
 
     // Обновляем локальный стейт
     useEffect(() => {
@@ -68,10 +70,10 @@ const ChooseProfilePanel = (props) => {
         if (!userInfo || activePanel !== panelId) return;
 
         const fetchData = () => {
-            fetchFriendsInfo(userToken).then((friendsInfo) => {
+            fetchFriendsInfo().then((friendsInfo) => {
                 setUsersInfo([userInfo, ...friendsInfo]);
             }).catch((error) => {
-                setError({error: error, reload: fetchData});
+                setError({ error: error, reload: fetchData });
             });
 
             // Загрузка статистики пользователей для карточек
@@ -94,41 +96,41 @@ const ChooseProfilePanel = (props) => {
 
                 setStats(newStats);
             }).catch((error) => {
-                setError({error: error, reload: fetchData});
+                setError({ error: error, reload: fetchData });
             });
         };
 
         fetchData();
-    }, [userToken, userInfo, activePanel, formatStats, panelId]);
+    }, [userInfo, activePanel, formatStats, panelId]);
 
     // Преобразовываем данные в карточки
     let profileCards = [];
     if (usersInfo) {
         profileCards = usersInfo.map((user) => {
-                const post = stats ? getMeanStats(stats[user.id]) : {mood: null, stress: null, anxiety: null};
-                post.description = "Среднее за последние 7 дней";
+            const post = stats ? getMeanStats(stats[user.id]) : { mood: null, stress: null, anxiety: null };
+            post.description = "Среднее за последние 7 дней";
 
-                return (
-                    <TextPost
-                        key={`profileCard_${user.id}`}
-                        onClick={() => {
-                            props.goToUserProfile();
-                            props.setActiveUserProfile(user);
-                        }}
-                        postData={{user: user, post: post}}
-                    />
-                );
-            }
+            return (
+                <TextPost
+                    key={`profileCard_${user.id}`}
+                    onClick={() => {
+                        props.goToUserProfile();
+                        props.setActiveUserProfile(user);
+                    }}
+                    postData={{ user: user, post: post }}
+                />
+            );
+        }
         );
     }
 
-    let content = <Spinner size="large"/>;
+    let content = <Spinner size="large" />;
 
     if (error) {
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
             setError(null);
             error.reload();
-        }}> Попробовать снова </Button>}/>;
+        }}> Попробовать снова </Button>} />;
     } else if (usersInfo && stats) {
         content = <CardGrid>{profileCards}</CardGrid>
     }

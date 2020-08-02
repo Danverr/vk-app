@@ -68,7 +68,7 @@ const Feed = (props) => {
                 setSnackField(null)
             }}/>);
         }
-        if (!pState.userInfo || !pState.userToken || !entryWrapper.wantUpdate) return;
+        if (!pState.userInfo || !entryWrapper.wantUpdate) return;
         setLoading(<Spinner size='large'/>);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
@@ -82,12 +82,15 @@ const Feed = (props) => {
             toggleContext();
             return;
         }
+        entryWrapper.hasMore = 1;
         setDisplayEntries([]);
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
         setLoading(<Spinner size='large'/>);
-        entryWrapper.fetchEntries(1)
+        setTimeout(() => {
+            entryWrapper.fetchEntries(1)
+        }, 1000);
     };
 
     const toggleRefresh = () => {

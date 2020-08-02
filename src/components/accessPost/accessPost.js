@@ -38,8 +38,7 @@ const AccessPost = (props) => {
             <Button onClick={addEdge}
                 size="xl" disabled={haveEdge}
             >
-                {haveEdge && "Вы уже дали доступ"}
-                {!haveEdge && "Дать доступ в ответ"}
+                {haveEdge ? "Вы уже дали доступ" : "Дать доступ в ответ"}
             </Button>
         </Card>
     );

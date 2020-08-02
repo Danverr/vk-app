@@ -63,7 +63,6 @@ const useAppState = () => {
         }).then((res) => {
             // Обновляем токен
             if (res.scope === "friends") {
-                entryWrapper.userToken = res.access_token;
                 setUserToken(res.access_token);
                 if (callback) callback();
             } else {

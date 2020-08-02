@@ -20,6 +20,7 @@ import api from '../../../utils/api'
 
 import SearchUsers from './searchUsers/searchUsers'
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
+import entryWrapper from '../../../components/entryWrapper';
 
 import ModalFilter from './modalFilter'
 
@@ -117,6 +118,9 @@ const FriendsPanel = (props) => {
                 await api("POST", "/v1.1/statAccess/", {
                     toId: add.join(', ')
                 }).then((res) => {
+                    add.forEach((id) => {
+                        entryWrapper.pseudoFriends[id] = 1;
+                    })
                     addf = false;
                     let temp = users;
                     for (var user of temp)
@@ -133,6 +137,9 @@ const FriendsPanel = (props) => {
                 await api("DELETE", "/v1.1/statAccess/", {
                     toId: del.join(', ')
                 }).then((res) => {
+                    del.forEach((id) => {
+                        entryWrapper.pseudoFriends[id] = 0;
+                    })
                     delf = false;
                     let temp = users;
                     for (var user of temp)

@@ -7,13 +7,12 @@ import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16Done from '@vkontakte/icons/dist/16/done';
 import moment from 'moment'
 import api from '../../../utils/api'
-import bridge from '@vkontakte/vk-bridge'
 
 const DaylioPanel = (props) => {
     const fileInputRef = useRef(null);
     const [isPrivate, setIsPrivate] = useState(true);
     const [top, setTop] = useState(null);
-    const {userInfo, userToken} = props.state;
+    const {userInfo} = props.state;
     const {importCount, setImportCount, setSnackbar, setPopout} = props;
 
     const importEntries = async (files) => {
@@ -49,7 +48,7 @@ const DaylioPanel = (props) => {
                 return;
             }
             setPopout(<ScreenSpinner/>);
-            api("POST", "/v1.0/entries/", {
+            api("POST", "/v1.1/entries/", {
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = moods.indexOf(entry[4]) + 1;
                     let date = moment(`${entry[0]} ${entry[3]}:00`);
@@ -66,15 +65,15 @@ const DaylioPanel = (props) => {
                 }))
             }).then((res) => {
                 setTop(null);
-                bridge.send("VKWebAppCallAPIMethod", {
+                api("GET", "/v1.1/vkApi/", {
                     method: "storage.set",
                     params: {
-                        access_token: userToken,
-                        v: "5.120",
+                        user_id : userInfo.id,
                         key: "import",
                         value: ((importCount === 1) ? "#" : importCount - 1)
                     }
                 }).then((res) => {
+                    if (res.data.error) throw res.data.error;
                     window['yaCounter65896372'].reachGoal("importCompleted");
                     setImportCount(importCount - 1);
                     setSnackbar(<Snackbar 

@@ -1,4 +1,3 @@
-import bridge from "@vkontakte/vk-bridge";
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
@@ -55,22 +54,22 @@ export let entryWrapper = {
     },
 
     deleteEntryFromBase: (entryId) => {
-        return api("DELETE", "/v1.0/entries/", { entryId: entryId });
+        return api("DELETE", "/v1.1/entries/", { entryId: entryId });
     },
 
     postEdge: (id) => {
-        return api("POST", "/v1.0/statAccess/", { toId: id });
+        return api("POST", "/v1.1/statAccess/", { toId: id });
     },
 
     postComplaint: (entryId) => {
-        return api("POST", "/v1.0/complaints/", { entryId: entryId });
+        return api("POST", "/v1.1/complaints/", { entryId: entryId });
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/v1.0/statAccess", { type: 'fromId' })).data;
+            entryWrapper.accessEntries = (await api("GET", "/v1.1/statAccess", { type: 'fromId' })).data;
 
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
@@ -86,18 +85,19 @@ export let entryWrapper = {
                 }
             });
 
+
             if (newFriends.length) {
-                const newFriendsData = (await bridge.send("VKWebAppCallAPIMethod", {
+                const Promise = await api("GET", "/v1.1/vkApi/", {
                     method: "users.get",
                     params: {
-                        access_token: entryWrapper.userToken,
-                        v: "5.120",
                         user_ids: newFriends.join(","),
                         fields: "photo_50, photo_100, sex"
                     }
-                })).response;
+                });
 
-                newFriendsData.forEach((friend) => {
+                if (Promise.data.error) throw Promise.data.error;
+
+                Promise.data.response.forEach((friend) => {
                     entryWrapper.usersMap[friend.id] = friend;
                 });
             }
@@ -113,7 +113,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/v1.0/statAccess", { type: 'toId' })).data.forEach((friend) => {
+            (await api("GET", "/v1.1/statAccess", { type: 'toId' })).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -122,13 +122,14 @@ export let entryWrapper = {
         }
     },
 
-    fetchEntriesPack: (PACK_SZ, lastDate) => {
+    fetchEntriesPack: (PACK_SZ, beforeDate, beforeId) => {
         const queryData = {
-            lastDate: lastDate,
+            beforeDate: beforeDate,
+            beforeId : beforeId,
             count: PACK_SZ,
             users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
         };
-        return api("GET", "/v1.0/entries/", queryData);
+        return api("GET", "/v1.1/entries/", queryData);
     },
 
     fetchEntries: async (isFirstTime = null) => {
@@ -140,7 +141,7 @@ export let entryWrapper = {
                     let current = entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++];
                     entryWrapper.entries.push(current);
                     obj.push(current);
-                    cur--;
+               //     cur--;
                     continue;
                 }
                 obj.push(entryWrapper.queue[i]);
@@ -170,11 +171,13 @@ export let entryWrapper = {
             return
         }
 
-        let lastDate = (entryWrapper.entries.length) ? back(entryWrapper.entries).date :
+        let beforeDate = (entryWrapper.entries.length) ? back(entryWrapper.entries).date :
             moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
 
+        let beforeId = (entryWrapper.entries.length) ? back(entryWrapper.entries).entryId : Infinity;
+
         try {
-            let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, lastDate, isFirstTime)).data;
+            let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, beforeDate, beforeId)).data;
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;

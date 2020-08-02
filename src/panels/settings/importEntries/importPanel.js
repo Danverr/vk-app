@@ -1,52 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Header, Panel, PanelHeader, PanelHeaderBack, Button, Div, Text, Group, Cell, Radio, FixedLayout, Title, Spinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import bridge from "@vkontakte/vk-bridge";
+import api from '../../../utils/api';
 import ErrorPlaceholder from '../../../components/errorPlaceholder/errorPlaceholder';
 
 const ImportPanel = (props) => {
     const [value, setValue] = useState('daylio');
     const [error, setError] = useState(null);
-    const { userToken } = props.state;
+    const { userInfo } = props.state;
     const {importCount, setImportCount, snackbar} = props;
 
     useEffect(() => { 
         const fetchImportCount = () => {
-            bridge.send("VKWebAppCallAPIMethod", {
+            api("GET", "/v1.1/vkApi/",  {
                 method: "storage.get",
                 params: {
-                    access_token: userToken,
-                    v: "5.120",
-                    keys: "import"
+                    user_id : userInfo.id,
+                    keys: "import",
                 }
             }).then((res) => {
-                if (res.response[0].value === "")
+                if (res.data.error) throw res.data.error;
+                if (res.data.response[0].value === "")
                     setImportCount(2);
-                else if(res.response[0].value === "#")
+                else if(res.data.response[0].value === "#")
                     setImportCount(0);
                 else
-                    setImportCount(+res.response[0].value);
+                    setImportCount(+res.data.response[0].value);
             }).catch((error) => {
                 setError({ error: error, reload: fetchImportCount });
             });
         }    
         fetchImportCount();
-    }, [userToken, setImportCount]);
+    }, [userInfo, setImportCount]);
 
     const onChange = (data) => {
         setValue(data.target.value);
     }
 
     const addAttempt = () => {
-        bridge.send("VKWebAppCallAPIMethod", {
+        api("GET", "/v1.1/vkApi/", {
             method: "storage.set",
             params: {
-                access_token: userToken,
-                v: "5.120",
+                user_id : userInfo.id,
                 key: "import",
                 value: importCount + 1
             }
         }).then((res) => {
+            if (res.data.error) throw res.data.error;
             setImportCount(importCount + 1);
         }).catch(() => {
             setError({ error: error, reload: addAttempt });

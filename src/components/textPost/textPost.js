@@ -30,8 +30,8 @@ const TextPost = (props) => {
     const postData = props.postData;
 
     const user = postData.user;
-    const title = postData.post.title;
-    const note = postData.post.note;
+    const title = postData.post.title ? String(postData.post.title) : null;
+    const note = postData.post.note ? String(postData.post.note) : null;
     const currentUser = postData.currentUser;
 
     const entryId = postData.post.entryId;

@@ -6,7 +6,7 @@ import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 const ErrorPlaceholder = (props) => {
     const { error } = props;
     let header = "Упс, что-то пошло не так!";
-    let text = error.message;
+    let text = (error.message) ? error.message : error.error_msg;
     let action = props.action;
 
     return (

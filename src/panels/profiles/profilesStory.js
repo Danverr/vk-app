@@ -86,7 +86,7 @@ let localState = {
 const ProfilesStory = (props) => {
     const [activeUserProfile, setActiveUserProfile] = useState(localState.activeUserProfile);
     const {activePanel} = props.nav;
-    const {userInfo, userToken} = props.state;
+    const {userInfo} = props.state;
 
     // Обновляем локальный стейт
     useEffect(() => {
@@ -107,7 +107,6 @@ const ProfilesStory = (props) => {
                 id="chooseProfile"
                 setActiveUserProfile={setActiveUserProfile}
                 goToUserProfile={() => props.nav.goTo(props.id, "userProfile")}
-                userToken={userToken}
                 userInfo={userInfo}
                 formatStats={formatStats}
                 activePanel={props.nav.activePanel}
