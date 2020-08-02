@@ -72,9 +72,10 @@ const ImportPanel = (props) => {
             <Group>
                 {attempts}
             </Group>
+            <div style = {{height: '70.4px'}}/>
             {snackbar}
             <FixedLayout vertical="bottom">
-                <Div>
+                <Div style={{background: 'white' }}>
                     <Button disabled={importCount === 0} size="xl" onClick={() => props.nav.goTo(props.storyId, value)}> Далее </Button>
                 </Div>
             </FixedLayout>

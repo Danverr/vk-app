@@ -183,7 +183,7 @@ const FriendsPanel = (props) => {
         setTo(res.to);
     }
 
-    var content = <Spinner size="large" />;
+    var content = <Spinner size="large" style = {{paddingTop: '20px'}}/>;
 
     useEffect(() => {
         //разрешение есть, но токен еще не получен

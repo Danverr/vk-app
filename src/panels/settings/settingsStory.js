@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, View, Cell, CellButton, Group, Header} from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, Cell, CellButton, Group} from '@vkontakte/vkui';
 import bridge from "@vkontakte/vk-bridge";
 import '@vkontakte/vkui/dist/vkui.css';
 
@@ -33,7 +33,7 @@ const SettingsStory = (props) => {
               onSwipeBack={props.nav.goBack}>
             <Panel id="main">
                 <PanelHeader separator={false}>Настройки</PanelHeader>
-                <Group header={<Header mode="secondary">Основные настройки</Header>}>
+                <Group>
                     <Cell expandable before={<Icon28Notifications/>} onClick={() => {
                         props.nav.goTo(props.id, "notifications");
                     }}> Уведомления </Cell>
@@ -44,7 +44,7 @@ const SettingsStory = (props) => {
                         props.nav.goTo(props.id, "import");
                     }}> Импорт записей </Cell>
                 </Group>
-                <Group header={<Header mode="secondary">Прочее</Header>}>
+                <Group>
                     <CellButton onClick={() => {
                         bridge.send("VKWebAppShare", {}).then(() => window['yaCounter65896372'].reachGoal("appShared"));
                     }}>

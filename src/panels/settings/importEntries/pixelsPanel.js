@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Button, FixedLayout, FormLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Button, FixedLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell, FormLayout } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './import.module.css'
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -20,8 +20,8 @@ const PixelsPanel = (props) => {
             return;
 
         if(files[0].name.split('.').pop() !== 'json'){
-            setTop("Некорректный формат файла");
-            return;
+             setTop("Некорректный формат файла");
+             return;
         }
 
         let reader = new FileReader();
@@ -30,8 +30,14 @@ const PixelsPanel = (props) => {
         reader.onload = async () => {
             if (!userInfo)
                 return;
-
-            const entries = JSON.parse(reader.result);
+            let entries;
+            try{
+                entries = JSON.parse(reader.result);
+            }
+            catch(error){
+                setTop("Некорректный формат файла");
+                return;
+            }
 
             for (const entry of entries){
                 if(entry.date === undefined || entry.mood === undefined || entry.notes === undefined || !moment(`${entry.date} 9:00:00`).isValid){
@@ -107,8 +113,9 @@ const PixelsPanel = (props) => {
                     <div style = {{display: 'flex'}}> <Text weight="regular">Cделать приватными</Text> <Icon12Lock fill = 'var(--text_secondary)'style = {{marginLeft: '6px', marginTop: '4px'}}/></div> 
                 </Cell>
             </Group>
+            <div style = {{height: '80.4px'}}/>
             <FixedLayout vertical="bottom">
-                <FormLayout>
+                <FormLayout style={{background: 'white' }}>
                     <Button
                         top={<Text className={s.errorText}> {top} </Text>}
                         disabled={importCount === 0}
