@@ -35,6 +35,7 @@ const fetchFriendsInfo = async () => {
 
 const getMeanStats = (stats) => {
     let mean = [];
+    
     const lastDate = moment().startOf("day").subtract(7, "days");
 
     for (const key in stats.meanByDays) {
@@ -107,7 +108,7 @@ const ChooseProfilePanel = (props) => {
     let profileCards = [];
     if (usersInfo) {
         profileCards = usersInfo.map((user) => {
-            const post = stats ? getMeanStats(stats[user.id]) : { mood: null, stress: null, anxiety: null };
+            const post = (stats && stats[user.id]) ? getMeanStats(stats[user.id]) : { mood: null, stress: null, anxiety: null };
             post.description = "Среднее за последние 7 дней";
 
             return (
