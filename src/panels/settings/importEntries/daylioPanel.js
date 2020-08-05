@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, Button, FixedLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell, FormLayout } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, File, FixedLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell, FormLayout } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './import.module.css'
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -113,20 +113,15 @@ const DaylioPanel = (props) => {
             <div style = {{height: '80.4px'}}/>
             <FixedLayout vertical="bottom">
                 <FormLayout style={{background: 'white' }}>
-                    <Button
+                    <File
                         top={<Text className={s.errorText}> {top} </Text>}
                         disabled={importCount === 0}
-                        align="center"
-                        Component="label"
-                        size="xl">
-                        <input
-                            className="File__input"
-                            type="file"
-                            disabled={importCount === 0}
-                            ref={fileInputRef}
-                            onInput={() => { importEntries(fileInputRef.current.files); fileInputRef.current.value = null; }} />
+                        controlSize="xl"
+                        getRef = {fileInputRef}
+                        onInput={() => { importEntries(fileInputRef.current.files); fileInputRef.current.value = null; }}
+                        accept = ".csv">
                         Загрузить записи
-                    </Button>
+                    </File>
                 </FormLayout>
             </FixedLayout>
         </Panel>

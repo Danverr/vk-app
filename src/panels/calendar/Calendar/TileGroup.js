@@ -4,15 +4,25 @@ import '@vkontakte/vkui/dist/vkui.css';
 import moment from 'moment';
 
 import Tile from './Tile';
-import s from './Calendar.module.css';
 
 const TileGroup = (props) => {
-    let Tiles = [];
     let cur = moment(props.curMonth), last = moment(props.curMonth);
     cur.startOf('month'); last.endOf('month');
     
+    console.log(props);
+
+    var tiles = [], row = [];
+
+    const add = (x) => {
+        row.push(x);
+        if(row.length === 7){
+            tiles.push(<tr> {row.map((day) => <td> {day} </td>)} </tr>);
+            row = [];
+        }
+    }
+
     for(let i = 0; i < (cur.day() + 6) % 7; i++) //push empty
-        Tiles.push(<div key = {-i}/>);
+        add(<div key = {-i}/>);
 
     var curActiveDateStr = props.curDate.format("YYYY-MM-DD");
 
@@ -29,15 +39,14 @@ const TileGroup = (props) => {
        
         if(curActiveDateStr === curDateStr)
             curTileProps.active = true;
-        Tiles.push(<Tile key = {cur.format("D")} date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
+        add(<Tile key = {cur.format("D")} date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
         cur.add(1, 'days');
     }
 
-    return (
-        <div className = {s.tileGroup}>
-            {Tiles}
-        </div>
-    );
+    if(row.length !== 0)
+        tiles.push(<tr> {row.map((day) => <td> {day} </td>)} </tr>);
+
+    return (<> {tiles} </>);
 }
 
 export default TileGroup;

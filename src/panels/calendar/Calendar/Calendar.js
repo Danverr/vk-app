@@ -5,7 +5,7 @@ import Weekdays from './Weekdays';
 import TileGroup from './TileGroup';
 import moment from 'moment';
 import callPicker from '../../../utils/callPicker';
-
+import s from './Calendar.module.css'
 let localState = {
     curDate: moment(),
     curMonth: moment().startOf('month')
@@ -47,15 +47,17 @@ const Calendar = (props) => {
                 setCurMonth(moment(date));
                 localState.curMonth = moment(date);
             }} />
-            <Weekdays/>
-            <TileGroup
-                onClickTile={(date) => {
-                    setCurDate(moment(date));
-                    localState.curDate = moment(date);
-                }}
-                curMonth={moment(curMonth)}
-                curDate={moment(curDate)}
-                stats={props.stats}/>
+            <table className = {s.tileGroup}>
+                <Weekdays />
+                <TileGroup
+                    onClickTile={(date) => {
+                        setCurDate(moment(date));
+                        localState.curDate = moment(date);
+                    }}
+                    curMonth={moment(curMonth)}
+                    curDate={moment(curDate)}
+                    stats={props.stats} />
+            </table>
         </div>
     );
 }
