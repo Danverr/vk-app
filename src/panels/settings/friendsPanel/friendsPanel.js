@@ -146,7 +146,6 @@ const FriendsPanel = (props) => {
                         if (del.indexOf(user.id) !== -1)
                             user.toId = false;
                     updateUsers(temp);
-                    window['yaCounter65896372'].reachGoal("accessGiven");
                 }).finally(() => {
                     props.setPopout(null);
                 });

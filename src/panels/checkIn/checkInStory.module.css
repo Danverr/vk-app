@@ -1,41 +1,37 @@
+.checkInPanel :global(.Panel__in) {
+	height: 100vh;
+}
+
 .bulletsContainer {
-    display: flex;
-    position: absolute;
-    left: 50%;
-    padding: 0 !important;
+	display: flex;
+	justify-content: center;
+	background: var(--background_content);
+	padding: 16px 16px;
 }
 
-.bulletsContainer:global(.ios) {
-    transform: translate(-50%, -50%);
+.panelsGallery :global(.Gallery__slide) {
+	display: flex;
+	flex-direction: column;
 }
 
-.bulletsContainer:global(.android) {
-    transform: translate(-50%);
+.panelsGallery:global(.Gallery--ios) {
+	height: calc(100% - 40px - var(--panelheader_height_ios));
 }
 
-:global(#mainCheckInPanel .Panel__in) {
-    display: flex;
-    padding-bottom: 0 !important;
-}
-
-.iosGallery {
-    height: calc(100vh - var(--panelheader_height_ios));
-}
-
-.androidGallery {
-    height: calc(100vh - var(--panelheader_height_android));
+.panelsGallery:global(.Gallery--android) {
+	height: calc(100% - 40px - var(--panelheader_height_android));
 }
 
 .bullet {
-    height: 8px;
-    width: 8px;
-    padding: 0 !important;
-    margin: 0 4px;
-    opacity: 0.2;
-    background: #000;
-    border-radius: 50%;
+	height: 8px;
+	width: 8px;
+	padding: 0 !important;
+	margin: 0 4px;
+	opacity: 0.2;
+	background: #000;
+	border-radius: 50%;
 }
 
 .bulletSelected {
-    opacity: 1;
+	opacity: 1;
 }
