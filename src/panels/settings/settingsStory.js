@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Panel, PanelHeader, View, Cell, CellButton, Group } from "@vkontakte/vkui";
+import { Panel, PanelHeader, View, Cell, CellButton, Group, Footer } from "@vkontakte/vkui";
 import bridge from "@vkontakte/vk-bridge";
 import "@vkontakte/vkui/dist/vkui.css";
 
@@ -66,7 +66,7 @@ const SettingsStory = (props) => {
 				<Group>
 					{process.env.NODE_ENV === "development" ? (
 						<CellButton onClick={() => props.state.vkStorage.clear()}>
-							Очистить VK Storage
+							Очистить VK Storage [DEV]
 						</CellButton>
 					) : null}
 					<CellButton
@@ -87,6 +87,7 @@ const SettingsStory = (props) => {
 						Перейти в группу ВК
 					</CellButton>
 				</Group>
+				<Footer>Версия приложения v1.1.1</Footer>
 			</Panel>
 			<ImportPanel
 				id="import"

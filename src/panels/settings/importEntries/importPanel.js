@@ -91,8 +91,7 @@ const ImportPanel = (props) => {
 			<div>
 				<Group header={<Header mode="secondary">Откуда импортировать</Header>}>
 					<Radio name="import" value="daylio" defaultChecked onChange={onChange}>
-						{" "}
-						Daylio{" "}
+						Daylio
 					</Radio>
 					<Radio name="import" value="pixels" onChange={onChange}>
 						Pixels
@@ -101,7 +100,7 @@ const ImportPanel = (props) => {
 				<Group>
 					<Cell indicator={importCount}>Осталось попыток импорта</Cell>
 					{process.env.NODE_ENV === "development" ? (
-						<CellButton onClick={addAttempt}>Добавить попытку импорта</CellButton>
+						<CellButton onClick={addAttempt}>Добавить попытку импорта [DEV]</CellButton>
 					) : null}
 				</Group>
 				<div style={{ height: "70.4px" }} />
@@ -113,8 +112,7 @@ const ImportPanel = (props) => {
 							size="xl"
 							onClick={() => props.nav.goTo(props.storyId, value)}
 						>
-							{" "}
-							Далее{" "}
+							Далее
 						</Button>
 					</Div>
 				</FixedLayout>
