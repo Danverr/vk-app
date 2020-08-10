@@ -2,6 +2,7 @@ import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
 import { Spinner, Placeholder, Button } from '@vkontakte/vkui';
+import bridge from '@vkontakte/vk-bridge'
 
 const UPLOADED_QUANTITY = 200;
 const FIRST_BLOCK_SIZE = 25;
@@ -20,6 +21,8 @@ let deleteEntryFromFeedList = (entryId) => {
     entryWrapper.entries.splice(entryWrapper.entries.findIndex(e => e.entryId === entryId), 1);
 }
 
+let names = ["", "showEntryNotifTooltip", "showAccessNotifTooltip", "showHealthNotifTooltip"];
+
 export let entryWrapper = {
     usersMap: {},
     entries: [],
@@ -30,6 +33,68 @@ export let entryWrapper = {
     accessEntriesPointer: 0,
     wantUpdate: 1,
     editingEntry: null,
+
+    /*---------ToolTips---------*/
+    toolTips: [],
+    currentToolTip: -1,
+    t: [0, 0, 0, 0],
+    v: [0, 0, 0, 0],
+    rerenderTP: {},
+    rerenderAP: {},
+    tQueue: [],
+
+    needTool: (entry) => {
+        if (entry.systemFlag) {
+            return (!entryWrapper.t[2] && entryWrapper.v[2]) ? 2 : null;
+        }
+        if (!entryWrapper.t[1] && entryWrapper.v[1] && entry.userId === entryWrapper.userInfo.id)
+            return 1;
+        if (!entryWrapper.t[3] && entryWrapper.v[3] && entry.userId !== entryWrapper.userInfo.id && (entry.stress > 3 || entry.anxiety > 3 || entry.mood < 3))
+            return 3;
+        return null;
+    },
+
+    updateTips: (entries) => {
+        for (let entry of entries) {
+            let f = entryWrapper.needTool(entry);
+            if (f) {
+                entryWrapper.t[f] = 1;
+                entryWrapper.toolTips.push(entry);
+            }
+        }
+    },
+
+    goNextToolTip: () => {
+        if (!entryWrapper.tQueue.length || entryWrapper.currentToolTip !== -1) return;
+
+        entryWrapper.tQueue.sort();
+        let entry = entryWrapper.entries[entryWrapper.tQueue[0]];
+        entryWrapper.tQueue.splice(0, 1);
+
+        document.body.style.overflow = 'hidden';
+        let why = 1;
+        if (entry.systemFlag) why = 2;
+        else if (entry.userId !== entryWrapper.userInfo.id) why = 3;
+
+        bridge.send("VKWebAppStorageSet", { key: names[why], value: "" + false });
+        entryWrapper.v[why] = 0;
+
+        if (entry.systemFlag) {
+            entryWrapper.currentToolTip = [1, entry.id];
+            entryWrapper.rerenderAP[entry.id](1);
+        }
+        else {
+            entryWrapper.currentToolTip = [0, entry.entryId];
+            entryWrapper.rerenderTP[entry.entryId](1);
+        }
+    },
+
+    initToolTips(vkStorage) {
+        for (let i = 1; i <= 3; ++i)
+            entryWrapper.v[i] = vkStorage.getValue(names[i]);
+    },
+
+    /*-------------------------*/
 
     deleteEntryFromFeedList: deleteEntryFromFeedList,
     deleteEntryFromList: deleteEntryFromFeedList,
@@ -50,7 +115,23 @@ export let entryWrapper = {
     },
 
     addEntryToFeedList: (entryData) => {
-        entryWrapper.entries.splice(0, 0, entryWrapper.getEntry(entryData));
+        let entry = entryWrapper.getEntry(entryData);
+
+        let needPush = 0;
+        if (entryWrapper.needTool(entry)) needPush = 1;
+        for (let i in entryWrapper.toolTips) {
+            let tool = entryWrapper.toolTips[i];
+            if (!tool.systemFlag && tool.userId === entryWrapper.userInfo.id) {
+                needPush = 1;
+                entryWrapper.toolTips.splice(i, 1);
+                break;
+            }
+        }
+        if (needPush) {
+            entryWrapper.toolTips.splice(0, 0, entry);
+        }
+
+        entryWrapper.entries.splice(0, 0, entry);
     },
 
     deleteEntryFromBase: (entryId) => {
@@ -125,49 +206,98 @@ export let entryWrapper = {
     fetchEntriesPack: (PACK_SZ, beforeDate, beforeId) => {
         const queryData = {
             beforeDate: beforeDate,
-            beforeId : beforeId,
+            beforeId: beforeId,
             count: PACK_SZ,
             users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
         };
         return api("GET", "/v1.1/entries/", queryData);
     },
 
-    fetchEntries: async (isFirstTime = null) => {
-        const Pop = (POP_LIMIT = 25) => {
-            let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
-            let obj = entryWrapper.entries.slice(0);
-            for (let i = 0; i < cur;) {
-                if (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length && cmp(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer], entryWrapper.queue[i]) === -1) {
-                    let current = entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++];
-                    entryWrapper.entries.push(current);
-                    obj.push(current);
-               //     cur--;
-                    continue;
-                }
-                obj.push(entryWrapper.queue[i]);
-                entryWrapper.entries.push(entryWrapper.queue[i]);
-                i++;
+    init: async () => {
+        entryWrapper.hasMore = 1;
+        entryWrapper.accessEntriesPointer = 0;
+        entryWrapper.wantUpdate = 0;
+        entryWrapper.entries = [];
+        entryWrapper.accessEntries = [];
+        entryWrapper.queue = [];
+        entryWrapper.currentToolTip = -1;
+        entryWrapper.toolTips = [];
+        entryWrapper.tQueue = [];
+        entryWrapper.t = [0, 0, 0, 0];
+        await entryWrapper.fetchFriendsInfo();
+        await entryWrapper.fetchPseudoFriends();
+        entryWrapper.updateTips(entryWrapper.accessEntries);
+    },
+
+    Pop: (POP_LIMIT = 25, isFirstTime) => {
+        let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
+
+        const WIDTH = document.documentElement.clientWidth - 64;
+        const HEIGHT_STR = 20;
+        const HEIGHT = document.documentElement.clientHeight;
+
+        function getHeight(entry) {
+            if (entry.systemFlag) {
+                return 160;
             }
-            entryWrapper.setDisplayEntries(obj);
-            if (entryWrapper.hasMore) {
-                entryWrapper.setLoading(<Spinner size='large' />);
-            }
-            entryWrapper.queue.splice(0, cur);
+            let ret = 180;
+            ret += (Math.ceil(entry.note.length / WIDTH)) * HEIGHT_STR;
+            return ret;
         }
+        
+        let sumHeights = 0;
+
+        for (let i = 0; i < cur;) {
+            if (isFirstTime) {
+                if (sumHeights > HEIGHT) {
+                    cur = i;
+                    break;
+                }
+            }
+            else {
+                if (entryWrapper.entries.length) {
+                    const lEntry = back(entryWrapper.entries);
+                    const isEqual = (a) => {
+                        if (lEntry.systemFlag ^ a.systemFlag) return 0;
+                        if (lEntry.systemFlag) return lEntry.id === a.id;
+                        return lEntry.entryId === a.entryId;
+                    }
+                    if (entryWrapper.toolTips.findIndex(isEqual) !== -1){
+                        cur = i;
+                        break;
+                    }
+                }
+            }
+
+            if (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length
+                && cmp(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer], entryWrapper.queue[i]) === -1) {
+                let current = entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++];
+                entryWrapper.entries.push(current);
+                sumHeights += getHeight(current);
+                continue;
+            }
+            
+            sumHeights += getHeight(entryWrapper.queue[i]);
+            entryWrapper.entries.push(entryWrapper.queue[i]);
+            i++;
+        }
+        entryWrapper.loading = 0;
+        entryWrapper.setDisplayEntries(entryWrapper.entries.slice(0));
+        if (entryWrapper.hasMore) {
+            entryWrapper.setLoading(<Spinner size='large' />);
+        }
+        entryWrapper.queue.splice(0, cur);
+    },
+
+
+    fetchEntries: async (isFirstTime = null) => {
 
         if (isFirstTime) {
-            entryWrapper.hasMore = 1;
-            entryWrapper.accessEntriesPointer = 0;
-            entryWrapper.wantUpdate = 0;
-            entryWrapper.entries = [];
-            entryWrapper.accessEntries = [];
-            entryWrapper.queue = [];
-            await entryWrapper.fetchFriendsInfo();
-            await entryWrapper.fetchPseudoFriends();
+            await entryWrapper.init();
         }
 
         if (entryWrapper.queue.length) {
-            Pop();
+            entryWrapper.Pop();
             return
         }
 
@@ -178,6 +308,7 @@ export let entryWrapper = {
 
         try {
             let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, beforeDate, beforeId)).data;
+            entryWrapper.updateTips(newEntries);
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;
@@ -192,9 +323,9 @@ export let entryWrapper = {
                 entryWrapper.queue.sort(cmp);
             }
             if (!isFirstTime) {
-                Pop();
+                entryWrapper.Pop();
             } else {
-                Pop(FIRST_BLOCK_SIZE);
+                entryWrapper.Pop(FIRST_BLOCK_SIZE, 1);
                 entryWrapper.setFetching(null);
             }
         } catch (error) {

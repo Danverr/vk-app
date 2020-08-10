@@ -156,7 +156,7 @@ const SubmitPanel = (props) => {
 					asideContent={
 						<Switch checked={isChecked} onClick={switchPublic} onChange={() => null} />
 					}
-					description="Заголовок и текст будут скрыты"
+					description={<span> Заголовок и текст будут скрыты <br/> Друзья не увидят приватность записи </span>}
 				>
 					<span>Приватная запись</span>
 					<Icon12Lock className={styles.lockIcon} />

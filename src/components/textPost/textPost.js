@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     Cell,
     Avatar,
@@ -9,10 +9,11 @@ import {
     ActionSheetItem,
     Alert,
     Caption,
-    ScreenSpinner
+    ScreenSpinner,
+    Tooltip
 } from '@vkontakte/vkui';
 import s from './textPost.module.css';
-import {platform, IOS} from '@vkontakte/vkui';
+import { platform, IOS } from '@vkontakte/vkui';
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -27,6 +28,8 @@ import entryWrapper from '../entryWrapper';
 import DoneSnackbar from '../doneSnackbar/doneSnackbar';
 
 const TextPost = (props) => {
+    const [upd, setUpd] = useState(1);
+
     const postData = props.postData;
 
     const user = postData.user;
@@ -45,43 +48,60 @@ const TextPost = (props) => {
     const emojiStress = postData.post.stress ? emojiList.stress[Math.round(postData.post.stress) - 1] : emojiList.placeholder;
     const emojiAnxiety = postData.post.anxiety ? emojiList.anxiety[Math.round(postData.post.anxiety) - 1] : emojiList.placeholder;
 
+    const iHaveToolTip = () => {
+        if (!postData.wrapper || !postData.wrapper.currentToolTip)
+            return 0;
+        const g = postData.wrapper.currentToolTip;
+        if (g === -1)
+            return 0;
+        if (g[0] !== 0 || g[1] !== entryId)
+            return 0;
+        return 1;
+    }
+
+    let showTool = iHaveToolTip();
+
+    let [tool, setTool] = useState(showTool);
+
+    if (postData.wrapper && postData.wrapper.rerenderTP) {
+        postData.wrapper.rerenderTP[entryId] = setTool;
+    }
+
     const isMyPost = (currentUser && currentUser.id === user.id);
 
     const postDate = moment.utc(postData.post.date);
     const dateField = getDateDescription(postDate.local(), moment())[0];
 
-    const [upd, setUpd] = useState(null);
-
     const recursion = () => {
         const shift = getDateDescription(postDate.local(), moment())[1];
         setTimeout(() => {
-            setUpd(!upd)
+            setUpd(!upd);
         }, shift);
     };
 
     const editPost = () => {
-        postData.setUpdatingEntryData({...postData.post, date: postDate});
+        postData.setUpdatingEntryData({ ...postData.post, date: postDate });
         postData.nav.goTo("checkIn");
     };
 
     const reportPost = async () => {
-        postData.setPopout(<ScreenSpinner/>);
+        postData.setPopout(<ScreenSpinner />);
         try {
             await entryWrapper.postComplaint(entryId);
             postData.setPopout(null);
             postData.setSnackField(<DoneSnackbar onClose={() => {
                 postData.setSnackField(null)
-            }} text="Успешно"/>);
+            }} text="Успешно" />);
         } catch (error) {
             postData.setPopout(null);
             postData.setSnackField(<ErrorSnackbar onClose={() => {
                 postData.setSnackField(null)
-            }}/>)
+            }} />)
         }
     }
 
     const deletePost = async () => {
-        postData.setPopout(<ScreenSpinner/>);
+        postData.setPopout(<ScreenSpinner />);
         try {
             await entryWrapper.deleteEntryFromBase(entryId);
             postData.wrapper.deleteEntryFromList(entryId);
@@ -90,12 +110,12 @@ const TextPost = (props) => {
             }
             postData.setDisplayEntries(postData.wrapper.entries);
             postData.setPopout(null);
-            postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField}/>)
+            postData.setSnackField(<DeleteSnackbar onClose={postData.setSnackField} />)
         } catch (error) {
             postData.setPopout(null);
             postData.setSnackField(<ErrorSnackbar onClose={() => {
                 postData.setSnackField(null)
-            }}/>);
+            }} />);
         }
     };
 
@@ -108,11 +128,11 @@ const TextPost = (props) => {
                         autoclose: true,
                         mode: 'cancel'
                     },
-                        {
-                            title: 'Да',
-                            autoclose: true,
-                            action: action
-                        }]
+                    {
+                        title: 'Да',
+                        autoclose: true,
+                        action: action
+                    }]
                 }
                 onClose={() => {
                     postData.setPopout(null);
@@ -135,18 +155,18 @@ const TextPost = (props) => {
                 </ActionSheetItem>}
 
                 {!isMyPost && <ActionSheetItem autoclose
-                                               onClick={() => {
-                                                   confirm("Вы действительно хотите пожаловаться на этого пользователя?", reportPost)
-                                               }}>
+                    onClick={() => {
+                        confirm("Вы действительно хотите пожаловаться на этого пользователя?", reportPost)
+                    }}>
                     Пожаловаться
                 </ActionSheetItem>}
 
                 {isMyPost &&
-                <ActionSheetItem
-                    onClick={() => {
-                        confirm("Вы действительно хотите удалить эту запись?", deletePost)
-                    }} autoclose mode="destructive">
-                    Удалить запись
+                    <ActionSheetItem
+                        onClick={() => {
+                            confirm("Вы действительно хотите удалить эту запись?", deletePost)
+                        }} autoclose mode="destructive">
+                        Удалить запись
                 </ActionSheetItem>}
 
                 {platform() === IOS && <ActionSheetItem autoclose mode="cancel"> Отменить </ActionSheetItem>}
@@ -163,15 +183,15 @@ const TextPost = (props) => {
                 </div>
 
                 <div className={s.progressBarsCol}>
-                    <div><ProgressBar param="mood" value={mood * 20}/></div>
-                    <div><ProgressBar param="anxiety" value={anxiety * 20}/></div>
-                    <div><ProgressBar param="stress" value={stress * 20}/></div>
+                    <div><ProgressBar param="mood" value={mood * 20} /></div>
+                    <div><ProgressBar param="anxiety" value={anxiety * 20} /></div>
+                    <div><ProgressBar param="stress" value={stress * 20} /></div>
                 </div>
 
                 <div>
-                    <img src={emojiMood} alt=""/>
-                    <img src={emojiAnxiety} alt=""/>
-                    <img src={emojiStress} alt=""/>
+                    <img src={emojiMood} alt="" />
+                    <img src={emojiAnxiety} alt="" />
+                    <img src={emojiStress} alt="" />
                 </div>
             </div>
         );
@@ -185,7 +205,7 @@ const TextPost = (props) => {
         if (postData.post.date) {
             return <>
                 {dateField}
-                <div className={s.lockIcon}> {(isMyPost && !postData.post.isPublic) && <Icon12Lock/>}</div>
+                <div className={s.lockIcon}> {(isMyPost && !postData.post.isPublic) && <Icon12Lock />}</div>
             </>;
         }
 
@@ -194,7 +214,7 @@ const TextPost = (props) => {
 
     const renderText = (s, i) => {
         if (s === '\n')
-            return <br key={i}/>
+            return <br key={i} />
         return <React.Fragment key={i}>
             {s}
         </React.Fragment>
@@ -212,12 +232,27 @@ const TextPost = (props) => {
 
     return (
         <Card size="l" mode="shadow" className="TextPost" onClick={props.onClick}>
-            <Cell
-                description={description()}
-                before={<Avatar size={48} src={avatar}/>}
-                asideContent={currentUser && <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon}/>}>
-                {`${user.first_name} ${user.last_name}`}
-            </Cell>
+            <Tooltip
+            offsetX={-6}
+                offsetY={6}
+                isShown={tool}
+                onClose={() => {
+                    if (!iHaveToolTip()) return;
+                    setTool(0);
+                    document.body.style.overflow = 'visible';
+                    postData.wrapper.currentToolTip = -1;
+                    postData.wrapper.goNextToolTip()
+                }}
+                header={isMyPost ? "А вот и ваша запись!" : "У друга плохое самочувствие!"}
+                text={isMyPost ? "Включите уведомление об опросе в настройках" : "Включите уведомление о низких показателях друга в настройках"}
+            >
+                <Cell
+                    description={description()}
+                    before={<Avatar size={48} src={avatar} />}
+                    asideContent={currentUser && <Icon24MoreVertical onClick={onSettingClick} className={s.settingIcon} />}>
+                    {`${user.first_name} ${user.last_name}`}
+                </Cell>
+            </Tooltip>
 
             {postText()}
             {parametrField()}

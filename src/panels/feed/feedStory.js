@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
-import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
-import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
-import {Button, Placeholder} from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
+import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
+import { Button, Placeholder } from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -13,7 +13,6 @@ import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 import s from './feedStory.module.css';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
 import TextPost from '../../components/textPost/textPost';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import entryWrapper from '../../components/entryWrapper';
 import AccessPost from '../../components/accessPost/accessPost';
 import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
@@ -30,15 +29,15 @@ const Feed = (props) => {
         return <Placeholder
             header="Упс, что-то пошло не так!"
             action={<Button size="xl" onClick={() => {
-                setLoading(<Spinner size='large'/>);
+                setLoading(<Spinner size='large' />);
                 setTimeout(entryWrapper.fetchEntries, 1000);
             }}> Попробовать снова </Button>}
         >
         </Placeholder>
     };
 
-    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
-        <Spinner size='large'/> : null);
+    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder /> : entryWrapper.hasMore ?
+        <Spinner size='large' /> : null);
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
     const [error, setError] = useState(null);
 
@@ -49,8 +48,29 @@ const Feed = (props) => {
     const setErrorSnackbar = (error) => {
         setSnackField(<ErrorSnackbar onClose={() => {
             setSnackField(null);
-        }}/>);
+        }} />);
     };
+
+    const isVisibleBot = (id) => {
+        let elem = document.querySelector(`.TextPost:nth-child(${id + 1})`);
+        if (!elem) return 0;
+        const posBot = elem.getBoundingClientRect().bottom;
+        return posBot <= window.innerHeight;
+    }
+
+    const handleScroll = () => {
+        Detect();
+        if (!entryWrapper.loading && entryWrapper.entries.length && entryWrapper.hasMore && isVisibleBot(entryWrapper.entries.length - 1)) {
+            entryWrapper.loading = 1;
+            setTimeout(entryWrapper.fetchEntries, 1000);
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => { window.removeEventListener('scroll', handleScroll) };
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         entryWrapper.setErrorSnackbar = setErrorSnackbar;
@@ -58,6 +78,13 @@ const Feed = (props) => {
         entryWrapper.setDisplayEntries = setDisplayEntries;
         entryWrapper.setLoading = setLoading;
         entryWrapper.setFetching = setFetching;
+
+        if (entryWrapper.currentToolTip !== -1) {
+            document.body.style.overflow = 'hidden';
+        }
+        return () => {
+            document.body.style.overflow = 'visible';
+        }
     }, []);
 
     useEffect(() => {
@@ -66,12 +93,19 @@ const Feed = (props) => {
             pState.setEntryAdded(null);
             setSnackField(<DoneSnackbar onClose={() => {
                 setSnackField(null)
-            }}/>);
+            }} />);
         }
         if (!pState.userInfo || !entryWrapper.wantUpdate) return;
-        setLoading(<Spinner size='large'/>);
+        entryWrapper.initToolTips(pState.vkStorage);
+        setLoading(<Spinner size='large' />);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
+
+    useEffect(() => {
+        if (!displayEntries) return;
+        Detect();
+        // eslint-disable-next-line
+    }, [displayEntries]);
 
     const toggleContext = () => {
         setContextOpened(!contextOpened);
@@ -87,7 +121,7 @@ const Feed = (props) => {
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size='large'/>);
+        setLoading(<Spinner size='large' />);
         setTimeout(() => {
             entryWrapper.fetchEntries(1)
         }, 1000);
@@ -100,8 +134,37 @@ const Feed = (props) => {
         }, 1000);
     };
 
+    const isVisible = (id) => {
+        let elem = document.querySelector(`.TextPost:nth-child(${id + 1})`);
+        if (!elem) return 0;
+        const posTop = elem.getBoundingClientRect().top;
+        return posTop + 200 <= window.innerHeight;
+    };
+
+    const Detect = () => {
+        if (!entryWrapper.toolTips.length) return;
+        let ers = [];
+        for (let key of entryWrapper.toolTips) {
+            let id = -1;
+            if (key.systemFlag) {
+                id = entryWrapper.entries.findIndex((e) => (e.systemFlag && e.id === key.id));
+            }
+            else {
+                id = entryWrapper.entries.findIndex((e) => (e.entryId === key.entryId));
+            }
+            if (id === -1) continue;
+            if (!isVisible(id)) continue;
+            entryWrapper.tQueue.push(id);
+            ers.push(key);
+        }
+        for (let key of ers) {
+            entryWrapper.toolTips.splice(entryWrapper.toolTips.findIndex((e) => (e === key)), 1);
+        }
+        entryWrapper.goNextToolTip();
+    };
+
     const buttonRefresh = () => {
-        setLoading(<Spinner size='large'/>);
+        setLoading(<Spinner size='large' />);
         entryWrapper.fetchEntries(1)
     };
 
@@ -112,7 +175,8 @@ const Feed = (props) => {
                 haveEdge: entryWrapper.pseudoFriends[entry.id],
                 postEdge: entryWrapper.postEdge,
                 setSnackField: setSnackField,
-                setPopout : setPopout,
+                setPopout: setPopout,
+                wrapper: entryWrapper,
             }} key={id} />
         }
         return <TextPost postData={{
@@ -125,12 +189,12 @@ const Feed = (props) => {
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: entryWrapper,
             nav: props.nav,
-        }} key={id}/>
+        }} key={id} />
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
             header="Нет записей"
             stretched={true}
             action={<Button
@@ -140,11 +204,6 @@ const Feed = (props) => {
                 "Попросите друга дать вам доступ, импортируйте записи или создайте их самостоятельно" :
                 "Импортируйте записи или создайте их самостоятельно"}
         </Placeholder>
-    }
-
-    const Next = () => {
-        if (!displayEntries.length) return;
-        entryWrapper.fetchEntries();
     }
 
     return error ? <ErrorPlaceholder error={error}
@@ -160,27 +219,27 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
+                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed/>}
-                              onClick={() => {
-                                  select('feed')
-                              }}
-                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
-                              description="Все записи"
+                        <Cell before={<Icon28Newsfeed />}
+                            onClick={() => {
+                                select('feed')
+                            }}
+                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
+                            description="Все записи"
                         >
                             Лента
                         </Cell>
-                        <Cell before={<Icon28ArticleOutline/>}
-                              onClick={() => {
-                                  select('diary')
-                              }}
-                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
-                              description="Только мои записи"
+                        <Cell before={<Icon28ArticleOutline />}
+                            onClick={() => {
+                                select('diary')
+                            }}
+                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
+                            description="Только мои записи"
                         >
                             Мой дневник
                         </Cell>
@@ -188,17 +247,18 @@ const Feed = (props) => {
                 </PanelHeaderContext>
 
                 {(entryWrapper.hasMore || displayEntries.length) ?
-                    <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
-                        <InfiniteScroll
+                    <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching} onScroll={Detect}>
+                        {/* <InfiniteScroll
                             hasMore={true}
                             dataLength={displayEntries.length}
                             next={Next}
                             scrollThreshold={1}
-                        >
-                            <CardGrid className="entriesGrid">
-                                {displayEntries.map(renderData)}
-                            </CardGrid>
-                        </InfiniteScroll>
+                            onScroll={Detect}
+                        > */}
+                        <CardGrid className="entriesGrid">
+                            {displayEntries.map(renderData)}
+                        </CardGrid>
+                        {/* </InfiniteScroll> */}
                         {(!entryWrapper.hasMore && !displayEntries.length) && Empty()}
                     </PullToRefresh> : null
                 }

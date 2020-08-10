@@ -25,7 +25,7 @@
     margin-bottom: 8px;
 }
 
-:global(.Panel .Panel__in) {
+:global(#userProfile .Panel__in) {
     position: relative;
     max-width: 100%; 
     overflow-x: hidden ;
