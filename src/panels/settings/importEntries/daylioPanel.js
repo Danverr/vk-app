@@ -1,6 +1,21 @@
-
-import React, { useState, useRef } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Cell, Switch, Text, Group, File, FixedLayout, Avatar, Snackbar, ScreenSpinner, InfoRow, SimpleCell, FormLayout } from '@vkontakte/vkui';
+import React, {useState, useRef} from 'react';
+import {
+    Panel,
+    PanelHeader,
+    PanelHeaderBack,
+    Cell,
+    Switch,
+    Text,
+    Group,
+    File,
+    FixedLayout,
+    Avatar,
+    Snackbar,
+    ScreenSpinner,
+    InfoRow,
+    SimpleCell,
+    FormLayout
+} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import s from './import.module.css'
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -19,7 +34,7 @@ const DaylioPanel = (props) => {
         if (!files || files.length === 0)
             return;
 
-        if(files[0].name.split('.').pop() !== 'csv'){
+        if (files[0].name.split('.').pop() !== 'csv') {
             setTop("Некорректный формат файла");
             return;
         }
@@ -32,18 +47,18 @@ const DaylioPanel = (props) => {
                 return;
 
             const moods = ["ужасно", "плохо", "так себе", "хорошо", "супер"];
-            
+
             const csvparse = require('js-csvparser');
             const entries = csvparse(reader.result).data;
 
-            for (const entry of entries){
-                if(entry.length !== 7 || moods.indexOf(entry[4]) === -1 || !moment(`${entry[0]} ${entry[3]}:00`).isValid){
+            for (const entry of entries) {
+                if (entry.length !== 7 || moods.indexOf(entry[4]) === -1 || !moment(`${entry[0]} ${entry[3]}:00`).isValid) {
                     setTop("Некорректный формат файла");
                     return;
                 }
             }
 
-            if(entries.length > 500){
+            if (entries.length > 500) {
                 setTop("Нельзя импортировать более 500 записей за раз");
                 return;
             }
@@ -52,7 +67,7 @@ const DaylioPanel = (props) => {
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = moods.indexOf(entry[4]) + 1;
                     let date = moment(`${entry[0]} ${entry[3]}:00`);
-   
+
                     return ({
                         mood: mood,
                         stress: 6 - mood,
@@ -68,7 +83,7 @@ const DaylioPanel = (props) => {
                 api("GET", "/v1.1/vkApi/", {
                     method: "storage.set",
                     params: {
-                        user_id : userInfo.id,
+                        user_id: userInfo.id,
                         key: "import",
                         value: ((importCount === 1) ? "#" : importCount - 1)
                     }
@@ -76,12 +91,12 @@ const DaylioPanel = (props) => {
                     if (res.data.error) throw res.data.error;
                     window['yaCounter65896372'].reachGoal("importCompleted");
                     setImportCount(importCount - 1);
-                    setSnackbar(<Snackbar 
-                        className = {s.snackbar}
+                    setSnackbar(<Snackbar
+                        className={s.snackbar}
                         layout="vertical"
                         onClose={() => setSnackbar(null)}
-                        before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
-                            fill="#fff" width={14} height={14} /></Avatar>}>
+                        before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
+                            fill="#fff" width={14} height={14}/></Avatar>}>
                         Изменения сохранены
                     </Snackbar>);
                     props.nav.goBack();
@@ -96,30 +111,40 @@ const DaylioPanel = (props) => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { props.nav.goBack(); }} />} >
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => {
+                props.nav.goBack();
+            }}/>}>
                 Импорт
-            </PanelHeader>        
+            </PanelHeader>
             <Group>
-                <SimpleCell disabled> <InfoRow header = "Шаг 1"> Зайдите в раздел Daylio “Больше” </InfoRow> </SimpleCell> 
-                <SimpleCell disabled> <InfoRow header = "Шаг 2"> Нажмите на “Экспорт записей” </InfoRow> </SimpleCell> 
-                <SimpleCell disabled> <InfoRow header = "Шаг 3">  Выберите формат CSV и сохраните файл </InfoRow> </SimpleCell> 
-                <SimpleCell disabled> <InfoRow header = "Шаг 4"> Загрузите файл в mood </InfoRow> </SimpleCell> 
+                <SimpleCell disabled> <InfoRow header="Шаг 1"> Зайдите в раздел Daylio “Больше” </InfoRow> </SimpleCell>
+                <SimpleCell disabled> <InfoRow header="Шаг 2"> Нажмите на “Экспорт записей” </InfoRow> </SimpleCell>
+                <SimpleCell disabled> <InfoRow header="Шаг 3"> Выберите формат CSV и сохраните файл </InfoRow>
+                </SimpleCell>
+                <SimpleCell disabled> <InfoRow header="Шаг 4"> Загрузите файл в mood </InfoRow> </SimpleCell>
             </Group>
             <Group>
-                <Cell asideContent={<Switch checked = {isPrivate} onChange = {(e) => setIsPrivate(e.target.checked)}/>} description="Весь текст будет скрыт">
-                    <div style = {{display: 'flex'}}> <Text weight="regular">Cделать приватными</Text> <Icon12Lock fill = 'var(--text_secondary)'style = {{marginLeft: '6px', marginTop: '4px'}}/></div> 
+                <Cell
+                    asideContent={<Switch checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)}/>}
+                    description={<span> Весь текст будет скрыт <br/> Друзья не увидят приватность записей </span>}
+                >
+                    <div style={{display: 'flex'}}><Text weight="regular">Cделать приватными</Text> <Icon12Lock
+                        fill='var(--text_secondary)' style={{marginLeft: '6px', marginTop: '4px'}}/></div>
                 </Cell>
             </Group>
-            <div style = {{height: '80.4px'}}/>
+            <div style={{height: '80.4px'}}/>
             <FixedLayout vertical="bottom">
-                <FormLayout style={{background: 'white' }}>
+                <FormLayout style={{background: 'white'}}>
                     <File
                         top={<Text className={s.errorText}> {top} </Text>}
                         disabled={importCount === 0}
                         controlSize="xl"
-                        getRef = {fileInputRef}
-                        onInput={() => { importEntries(fileInputRef.current.files); fileInputRef.current.value = null; }}
-                        accept = ".csv">
+                        getRef={fileInputRef}
+                        onInput={() => {
+                            importEntries(fileInputRef.current.files);
+                            fileInputRef.current.value = null;
+                        }}
+                        accept=".csv">
                         Загрузить записи
                     </File>
                 </FormLayout>

@@ -1,7 +1,12 @@
-
-:global(.entriesGrid ) {
+:global(.entriesGrid) {
     margin-bottom: 24px;
     margin-top: 12px;
+}
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
 }
 
 .date {

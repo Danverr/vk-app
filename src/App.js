@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Epic, Root, ConfigProvider } from "@vkontakte/vkui";
+import React, {useEffect} from "react";
+import {Epic, Root, ConfigProvider} from "@vkontakte/vkui";
 import "@vkontakte/vkui/dist/vkui.css";
 import moment from "moment";
 
@@ -19,32 +19,37 @@ import SettingsStory from "./panels/settings/settingsStory";
 
 const startTime = moment();
 
-const getTimeElapsed = (start) => {
-	let ms = moment().diff(start);
+const logAppState = (state, nav) => {
+    const getTimeElapsed = (start) => {
+        let ms = moment().diff(start);
 
-	let s = Math.floor(ms / 1000);
-	ms %= 1000;
+        let s = Math.floor(ms / 1000);
+        ms %= 1000;
 
-	let m = Math.floor(s / 60);
-	s %= 60;
+        let m = Math.floor(s / 60);
+        s %= 60;
 
-	if (ms < 10) ms = "00" + m;
-	else if (ms < 100) ms = "0" + ms;
-	if (s < 10) s = "0" + s;
-	if (m < 10) m = "0" + m;
+        if (ms < 10) ms = "00" + m;
+        else if (ms < 100) ms = "0" + ms;
+        if (s < 10) s = "0" + s;
+        if (m < 10) m = "0" + m;
 
-	return `${m}:${s}:${ms}`;
+        return `${m}:${s}:${ms}`;
+    };
+
+    console.group(getTimeElapsed(startTime));
+    console.log("VK Storage: ", state.vkStorage._values);
+    console.log("View history: ", nav.viewHistory);
+    console.log("Current panel history: ", nav.panelHistory[nav.activeStory]);
+    console.log("Scroll history: ", nav.scrollHistory);
+    console.groupEnd();
 };
 
 const App = () => {
-	console.group(getTimeElapsed(startTime));
-
-	// Состояние и навигация приложения
-	const state = useAppState();
-	const nav = useNav();
-	const { goBack } = nav;
-
-	console.groupEnd();
+    // Состояние и навигация приложения
+    const state = useAppState();
+    const nav = useNav();
+    const {goBack} = nav;
 
     // Добавляем обработчик события изменения истории для работы аппаратных кнопок
     useEffect(() => {
@@ -52,29 +57,26 @@ const App = () => {
     }, [goBack]);
 
     if (!state.loading) {
-		if(state.banStatus.isBanned) nav.goTo("banned"); 
-        else if (state.globalError) nav.goTo("globalError");
-		else if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
+        logAppState(state, nav);
+
+        if (state.globalError) nav.goTo("globalError");
+        else if (state.banStatus.isBanned) nav.goTo("banned");
+        else if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
     }
 
     return (
         <ConfigProvider isWebView>
             <Root activeView="Epic">
-				<Epic
-					id="Epic"
-					className={nav.navbar ? "" : "hideNavbar"}
-					activeStory={state.loading ? "loadingScreen" : nav.activeStory}
-					tabbar={nav.navbar}
-				>
-					<BannedView id = "banned" state = {state} nav = {nav}/>
-                    <GlobalErrorView
-						id="globalError"
-						error={state.globalError}
-						state={state}
-						nav={nav}
-					/>
-					<LoadingScreen id="loadingScreen" state={state} nav={nav} />
-					<IntroView id="intro" state={state} nav={nav} />
+                <Epic
+                    id="Epic"
+                    className={nav.navbar ? "" : "hideNavbar"}
+                    activeStory={state.loading ? "loadingScreen" : nav.activeStory}
+                    tabbar={nav.navbar}
+                >
+                    <BannedView id="banned" state={state} nav={nav}/>
+                    <GlobalErrorView id="globalError" error={state.globalError} nav={nav}/>
+                    <LoadingScreen id="loadingScreen" state={state} nav={nav}/>
+                    <IntroView id="intro" state={state} nav={nav}/>
 
                     <FeedStory id="feed" state={state} nav={nav}/>
                     <ProfilesStory id="profiles" state={state} nav={nav}/>

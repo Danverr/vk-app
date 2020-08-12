@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
-import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
-import { Button, Placeholder } from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
+import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
+import {Button, Placeholder} from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -25,20 +25,18 @@ const Feed = (props) => {
     const [mode, setMode] = useState(entryWrapper.mode);
     const [snackField, setSnackField] = useState(null);
 
-    const ButtonHolder = () => {
-        return <Placeholder
-            header="Упс, что-то пошло не так!"
-            action={<Button size="xl" onClick={() => {
-                setLoading(<Spinner size='large' />);
-                setTimeout(entryWrapper.fetchEntries, 1000);
-            }}> Попробовать снова </Button>}
-        >
-        </Placeholder>
-    };
+    const ButtonHolder = () => (
+        <Button size="m" mode="tertiary" onClick={() => {
+            setLoading(<Spinner size='small'/>);
+            entryWrapper.fetchEntries();
+        }}>
+            Загрузить записи
+        </Button>
+    );
 
-    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder /> : entryWrapper.hasMore ?
-        <Spinner size='large' /> : null);
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
+    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
+        <Spinner size={displayEntries.lentgh === 0 ? "large" : 'small'}/> : null);
     const [error, setError] = useState(null);
 
     const setErrorPlaceholder = (error) => {
@@ -48,7 +46,7 @@ const Feed = (props) => {
     const setErrorSnackbar = (error) => {
         setSnackField(<ErrorSnackbar onClose={() => {
             setSnackField(null);
-        }} />);
+        }}/>);
     };
 
     const isVisibleBot = (id) => {
@@ -56,7 +54,7 @@ const Feed = (props) => {
         if (!elem) return 0;
         const posBot = elem.getBoundingClientRect().bottom;
         return posBot <= window.innerHeight;
-    }
+    };
 
     const handleScroll = () => {
         Detect();
@@ -64,11 +62,13 @@ const Feed = (props) => {
             entryWrapper.loading = 1;
             setTimeout(entryWrapper.fetchEntries, 1000);
         }
-    }
+    };
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
-        return () => { window.removeEventListener('scroll', handleScroll) };
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -93,11 +93,11 @@ const Feed = (props) => {
             pState.setEntryAdded(null);
             setSnackField(<DoneSnackbar onClose={() => {
                 setSnackField(null)
-            }} />);
+            }}/>);
         }
         if (!pState.userInfo || !entryWrapper.wantUpdate) return;
         entryWrapper.initToolTips(pState.vkStorage);
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='small'/>);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
 
@@ -121,7 +121,7 @@ const Feed = (props) => {
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='small'/>);
         setTimeout(() => {
             entryWrapper.fetchEntries(1)
         }, 1000);
@@ -148,8 +148,7 @@ const Feed = (props) => {
             let id = -1;
             if (key.systemFlag) {
                 id = entryWrapper.entries.findIndex((e) => (e.systemFlag && e.id === key.id));
-            }
-            else {
+            } else {
                 id = entryWrapper.entries.findIndex((e) => (e.entryId === key.entryId));
             }
             if (id === -1) continue;
@@ -164,7 +163,7 @@ const Feed = (props) => {
     };
 
     const buttonRefresh = () => {
-        setLoading(<Spinner size='large' />);
+        setLoading(<Spinner size='small'/>);
         entryWrapper.fetchEntries(1)
     };
 
@@ -177,7 +176,7 @@ const Feed = (props) => {
                 setSnackField: setSnackField,
                 setPopout: setPopout,
                 wrapper: entryWrapper,
-            }} key={id} />
+            }} key={id}/>
         }
         return <TextPost postData={{
             post: entry,
@@ -189,12 +188,12 @@ const Feed = (props) => {
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: entryWrapper,
             nav: props.nav,
-        }} key={id} />
+        }} key={id}/>
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
             header="Нет записей"
             stretched={true}
             action={<Button
@@ -206,8 +205,14 @@ const Feed = (props) => {
         </Placeholder>
     }
 
-    return error ? <ErrorPlaceholder error={error}
-        action={<Button onClick={() => { setError(null); entryWrapper.fetchEntries(1) }}> Попробовать снова  </Button>} /> :
+    return error ?
+        <ErrorPlaceholder
+            error={error}
+            action={<Button onClick={() => {
+                setError(null);
+                entryWrapper.fetchEntries(1)
+            }}> Попробовать снова </Button>}/>
+        :
         <View
             id={props.id}
             popout={popout}
@@ -219,27 +224,27 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
+                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed />}
-                            onClick={() => {
-                                select('feed')
-                            }}
-                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Все записи"
+                        <Cell before={<Icon28Newsfeed/>}
+                              onClick={() => {
+                                  select('feed')
+                              }}
+                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Все записи"
                         >
                             Лента
                         </Cell>
-                        <Cell before={<Icon28ArticleOutline />}
-                            onClick={() => {
-                                select('diary')
-                            }}
-                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Только мои записи"
+                        <Cell before={<Icon28ArticleOutline/>}
+                              onClick={() => {
+                                  select('diary')
+                              }}
+                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Только мои записи"
                         >
                             Мой дневник
                         </Cell>
@@ -265,11 +270,10 @@ const Feed = (props) => {
                 {(!entryWrapper.hasMore && !displayEntries.length) ?
                     Empty() : null
                 }
-                {loading}
+                {loading ? <div className={s.loadingContainer}>{loading}</div> : null}
                 {snackField}
             </Panel>
         </View>
-
-}
+};
 
 export default Feed;

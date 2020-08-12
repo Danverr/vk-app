@@ -1,7 +1,7 @@
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
-import { Spinner, Placeholder, Button } from '@vkontakte/vkui';
+import {Spinner, Button} from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge'
 
 const UPLOADED_QUANTITY = 200;
@@ -76,14 +76,13 @@ export let entryWrapper = {
         if (entry.systemFlag) why = 2;
         else if (entry.userId !== entryWrapper.userInfo.id) why = 3;
 
-        bridge.send("VKWebAppStorageSet", { key: names[why], value: "" + false });
+        bridge.send("VKWebAppStorageSet", {key: names[why], value: "" + false});
         entryWrapper.v[why] = 0;
 
         if (entry.systemFlag) {
             entryWrapper.currentToolTip = [1, entry.id];
             entryWrapper.rerenderAP[entry.id](1);
-        }
-        else {
+        } else {
             entryWrapper.currentToolTip = [0, entry.entryId];
             entryWrapper.rerenderTP[entry.entryId](1);
         }
@@ -135,22 +134,22 @@ export let entryWrapper = {
     },
 
     deleteEntryFromBase: (entryId) => {
-        return api("DELETE", "/v1.1/entries/", { entryId: entryId });
+        return api("DELETE", "/v1.1/entries/", {entryId: entryId});
     },
 
     postEdge: (id) => {
-        return api("POST", "/v1.1/statAccess/", { toId: id });
+        return api("POST", "/v1.1/statAccess/", {toId: id});
     },
 
     postComplaint: (entryId) => {
-        return api("POST", "/v1.1/complaints/", { entryId: entryId });
+        return api("POST", "/v1.1/complaints/", {entryId: entryId});
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/v1.1/statAccess", { type: 'fromId' })).data;
+            entryWrapper.accessEntries = (await api("GET", "/v1.1/statAccess", {type: 'fromId'})).data;
 
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
@@ -194,7 +193,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/v1.1/statAccess", { type: 'toId' })).data.forEach((friend) => {
+            (await api("GET", "/v1.1/statAccess", {type: 'toId'})).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -244,7 +243,7 @@ export let entryWrapper = {
             ret += (Math.ceil(entry.note.length / WIDTH)) * HEIGHT_STR;
             return ret;
         }
-        
+
         let sumHeights = 0;
 
         for (let i = 0; i < cur;) {
@@ -253,8 +252,7 @@ export let entryWrapper = {
                     cur = i;
                     break;
                 }
-            }
-            else {
+            } else {
                 if (entryWrapper.entries.length) {
                     const lEntry = back(entryWrapper.entries);
                     const isEqual = (a) => {
@@ -262,7 +260,7 @@ export let entryWrapper = {
                         if (lEntry.systemFlag) return lEntry.id === a.id;
                         return lEntry.entryId === a.entryId;
                     }
-                    if (entryWrapper.toolTips.findIndex(isEqual) !== -1){
+                    if (entryWrapper.toolTips.findIndex(isEqual) !== -1) {
                         cur = i;
                         break;
                     }
@@ -276,7 +274,7 @@ export let entryWrapper = {
                 sumHeights += getHeight(current);
                 continue;
             }
-            
+
             sumHeights += getHeight(entryWrapper.queue[i]);
             entryWrapper.entries.push(entryWrapper.queue[i]);
             i++;
@@ -284,7 +282,7 @@ export let entryWrapper = {
         entryWrapper.loading = 0;
         entryWrapper.setDisplayEntries(entryWrapper.entries.slice(0));
         if (entryWrapper.hasMore) {
-            entryWrapper.setLoading(<Spinner size='large' />);
+            entryWrapper.setLoading(<Spinner size='small'/>);
         }
         entryWrapper.queue.splice(0, cur);
     },
@@ -298,7 +296,7 @@ export let entryWrapper = {
 
         if (entryWrapper.queue.length) {
             entryWrapper.Pop();
-            return
+            return;
         }
 
         let beforeDate = (entryWrapper.entries.length) ? back(entryWrapper.entries).date :
@@ -335,18 +333,17 @@ export let entryWrapper = {
                 entryWrapper.wantUpdate = 1;
             } else {
                 entryWrapper.wasError = 1;
-                entryWrapper.setLoading(<Placeholder
-                    header="Упс, что-то пошло не так!"
-                    action={<Button size="xl" onClick={() => {
-                        entryWrapper.setLoading(<Spinner size='large' />);
-                        setTimeout(entryWrapper.fetchEntries, 1000);
-                    }}> Попробовать снова </Button>}
-                >
-                </Placeholder>);
+                entryWrapper.setLoading(
+                    <Button size="m" mode="tertiary" onClick={() => {
+                        entryWrapper.setLoading(<Spinner size='small'/>);
+                        entryWrapper.fetchEntries();
+                    }}>
+                        Попробовать снова
+                    </Button>
+                );
             }
         }
     },
-
-}
+};
 
 export default entryWrapper;
