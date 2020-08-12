@@ -12,14 +12,15 @@ const defaultStory = "feed";
 
 // Панели по умолчанию для каждого view
 const defaultPanels = {
-	globalError: "main",
-	intro: 0,
+    banned: "main",
+    globalError: "main",
+    intro: 0,
 
-	feed: "main",
-	profiles: "chooseProfile",
-	checkIn: "main",
-	calendar: "main",
-	settings: "main",
+    feed: "main",
+    profiles: "chooseProfile",
+    checkIn: 0,
+    calendar: "main",
+    settings: "main",
 };
 
 const getDefaultPanelHistory = () => {

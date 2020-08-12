@@ -87,7 +87,7 @@ const SettingsStory = (props) => {
 						Перейти в группу ВК
 					</CellButton>
 				</Group>
-				<Footer>Версия приложения v1.1.1</Footer>
+				<Footer>Версия приложения v1.2.0</Footer>
 			</Panel>
 			<ImportPanel
 				id="import"

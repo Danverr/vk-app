@@ -13,7 +13,7 @@ const GlobalErrorView = (props) => {
     }, [setNavbarVis]);
 
     return (
-        <View id={props.id} activePanel="main">
+        <View id={props.id} activePanel={props.nav.activePanel}>
             <Panel id="main">
                 <ErrorPlaceholder action = {<Button onClick = {() => window.location.reload()}> Перезагрузить приложение </Button>} error={props.error}/>
             </Panel>

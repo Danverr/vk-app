@@ -8,8 +8,6 @@ import Tile from './Tile';
 const TileGroup = (props) => {
     let cur = moment(props.curMonth), last = moment(props.curMonth);
     cur.startOf('month'); last.endOf('month');
-    
-    console.log(props);
 
     var tiles = [], row = [];
 

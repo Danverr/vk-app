@@ -13,7 +13,7 @@ const ErrorPlaceholder = (props) => {
         <Placeholder
             header={header}
             stretched={true}
-            icon={<Icon56ErrorOutline />}
+            icon={<Icon56ErrorOutline fill = "var(--destructive)"/>}
             action={action}
         >
             {text}

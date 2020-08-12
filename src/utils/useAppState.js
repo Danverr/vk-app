@@ -3,6 +3,7 @@ import bridge from "@vkontakte/vk-bridge";
 import moment from "moment";
 import entryWrapper from "../components/entryWrapper";
 import useVkStorage from "./useVkStorage";
+import api from './api';
 
 const APP_ID = 7424071;
 
@@ -26,6 +27,7 @@ const useAppState = () => {
 	const [notifications, setNotifications] = useState(
 		launchParams.vk_are_notifications_enabled === "1"
 	);
+	const [banStatus, setBanStatus] = useState(null);
 	const [userToken, setUserToken] = useState(null);
 	const [userInfo, setUserInfo] = useState(null);
 	const [entryAdded, setEntryAdded] = useState(false);
@@ -36,15 +38,6 @@ const useAppState = () => {
 		showHealthNotifTooltip: true,
 		showAccessNotifTooltip: true,
 	});
-
-	useEffect(() => {
-		bridge.subscribe((e) => {
-			if (e.detail.type === "VKWebAppAllowNotificationsResult" && e.detail.data.result)
-				setNotifications(true);
-			else if (e.detail.type === "VKWebAppDenyNotificationsResult" && e.detail.data.result)
-				setNotifications(false);
-		});
-	}, []);
 
 	useEffect(() => {
 		const showNativeAds = () => {
@@ -107,12 +100,28 @@ const useAppState = () => {
 			});
 	};
 
+	const fetchBanStatus = () => {
+        return api("GET", "/v1.1/banlist/", {}).then((res) => {
+            setBanStatus(res.data);
+        }).catch((error) => {
+            setGlobalError(error);
+        });
+    }
+
 	useEffect(() => {
 		const initApp = async () => {
 			const start = moment();
 
 			await fetchUserInfo();
 			await vkStorage.fetchValues();
+			await fetchBanStatus();
+
+			bridge.subscribe((e) => {
+                if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
+                    setNotifications(true);
+                else if (e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
+                    setNotifications(false);
+            });
 
 			const waitYmInit = () => {
 				if (window["yaCounter65896372"] !== undefined) {
@@ -132,6 +141,7 @@ const useAppState = () => {
 
 	return {
 		loading: loading,
+		banStatus: banStatus,
 		globalError: globalError,
 		vkStorage: vkStorage,
 		notifications: notifications,

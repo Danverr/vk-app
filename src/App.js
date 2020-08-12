@@ -6,6 +6,7 @@ import moment from "moment";
 import useAppState from "./utils/useAppState";
 import useNav from "./utils/useNav";
 
+import BannedView from './panels/bannedView/bannedView';
 import GlobalErrorView from "./panels/globalError/globalErrorView";
 import LoadingScreen from "./panels/loadingScreen/loadingScreen";
 import IntroView from "./panels/intro/introView";
@@ -45,26 +46,28 @@ const App = () => {
 
 	console.groupEnd();
 
-	// Добавляем обработчик события изменения истории для работы аппаратных кнопок
-	useEffect(() => {
-		window.addEventListener("popstate", goBack);
-	}, [goBack]);
+    // Добавляем обработчик события изменения истории для работы аппаратных кнопок
+    useEffect(() => {
+        window.addEventListener('popstate', goBack);
+    }, [goBack]);
 
-	if (!state.loading) {
-		if (state.globalError) nav.goTo("globalError");
-		if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
-	}
+    if (!state.loading) {
+		if(state.banStatus.isBanned) nav.goTo("banned"); 
+        else if (state.globalError) nav.goTo("globalError");
+		else if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
+    }
 
-	return (
-		<ConfigProvider isWebView>
-			<Root activeView="Epic">
+    return (
+        <ConfigProvider isWebView>
+            <Root activeView="Epic">
 				<Epic
 					id="Epic"
 					className={nav.navbar ? "" : "hideNavbar"}
 					activeStory={state.loading ? "loadingScreen" : nav.activeStory}
 					tabbar={nav.navbar}
 				>
-					<GlobalErrorView
+					<BannedView id = "banned" state = {state} nav = {nav}/>
+                    <GlobalErrorView
 						id="globalError"
 						error={state.globalError}
 						state={state}
@@ -73,15 +76,16 @@ const App = () => {
 					<LoadingScreen id="loadingScreen" state={state} nav={nav} />
 					<IntroView id="intro" state={state} nav={nav} />
 
-					<FeedStory id="feed" state={state} nav={nav} />
-					<ProfilesStory id="profiles" state={state} nav={nav} />
-					<CheckInStory id="checkIn" state={state} nav={nav} />
-					<CalendarStory id="calendar" state={state} nav={nav} />
-					<SettingsStory id="settings" state={state} nav={nav} />
-				</Epic>
-			</Root>
-		</ConfigProvider>
-	);
+                    <FeedStory id="feed" state={state} nav={nav}/>
+                    <ProfilesStory id="profiles" state={state} nav={nav}/>
+                    <CheckInStory id="checkIn" state={state} nav={nav}/>
+                    <CalendarStory id="calendar" state={state} nav={nav}/>
+                    <SettingsStory id="settings" state={state} nav={nav}/>
+                </Epic>
+            </Root>
+
+        </ConfigProvider>
+    );
 };
 
 export default App;
