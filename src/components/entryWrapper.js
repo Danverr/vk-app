@@ -5,7 +5,7 @@ import {Spinner, Button} from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge'
 
 const UPLOADED_QUANTITY = 200;
-const FIRST_BLOCK_SIZE = 25;
+const FIRST_BLOCK_SIZE = 10;
 
 function back(ar) {
     return ar[ar.length - 1];
@@ -223,6 +223,7 @@ export let entryWrapper = {
         entryWrapper.toolTips = [];
         entryWrapper.tQueue = [];
         entryWrapper.t = [0, 0, 0, 0];
+        entryWrapper.loading = 0;
         await entryWrapper.fetchFriendsInfo();
         await entryWrapper.fetchPseudoFriends();
         entryWrapper.updateTips(entryWrapper.accessEntries);
@@ -231,28 +232,9 @@ export let entryWrapper = {
     Pop: (POP_LIMIT = 25, isFirstTime) => {
         let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
 
-        const WIDTH = document.documentElement.clientWidth - 64;
-        const HEIGHT_STR = 20;
-        const HEIGHT = document.documentElement.clientHeight;
-
-        function getHeight(entry) {
-            if (entry.systemFlag) {
-                return 160;
-            }
-            let ret = 180;
-            ret += (Math.ceil(entry.note.length / WIDTH)) * HEIGHT_STR;
-            return ret;
-        }
-
-        let sumHeights = 0;
-
         for (let i = 0; i < cur;) {
-            if (isFirstTime) {
-                if (sumHeights > HEIGHT) {
-                    cur = i;
-                    break;
-                }
-            } else {
+
+            if (!isFirstTime) {
                 if (entryWrapper.entries.length) {
                     const lEntry = back(entryWrapper.entries);
                     const isEqual = (a) => {
@@ -265,17 +247,15 @@ export let entryWrapper = {
                         break;
                     }
                 }
-            }
+            } 
 
             if (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length
                 && cmp(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer], entryWrapper.queue[i]) === -1) {
                 let current = entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++];
                 entryWrapper.entries.push(current);
-                sumHeights += getHeight(current);
                 continue;
             }
 
-            sumHeights += getHeight(entryWrapper.queue[i]);
             entryWrapper.entries.push(entryWrapper.queue[i]);
             i++;
         }
@@ -299,10 +279,15 @@ export let entryWrapper = {
             return;
         }
 
-        let beforeDate = (entryWrapper.entries.length) ? back(entryWrapper.entries).date :
-            moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
+        let beforeDate = moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
+        let beforeId = Infinity;
 
-        let beforeId = (entryWrapper.entries.length) ? back(entryWrapper.entries).entryId : Infinity;
+        for (let i = entryWrapper.entries.length - 1; i >= 0; --i){
+            if (entryWrapper.entries[i].systemFlag) continue;
+            beforeDate = entryWrapper.entries[i].date;
+            beforeId = entryWrapper.entries[i].entryId;
+            break;
+        }
 
         try {
             let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, beforeDate, beforeId)).data;

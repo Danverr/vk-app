@@ -36,7 +36,8 @@ const Feed = (props) => {
 
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
     const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
-        <Spinner size={displayEntries.lentgh === 0 ? "large" : 'small'}/> : null);
+        (!displayEntries.length) ? <Spinner size="large"/> : <Spinner size="small"/> : null);
+
     const [error, setError] = useState(null);
 
     const setErrorPlaceholder = (error) => {
@@ -97,13 +98,12 @@ const Feed = (props) => {
         }
         if (!pState.userInfo || !entryWrapper.wantUpdate) return;
         entryWrapper.initToolTips(pState.vkStorage);
-        setLoading(<Spinner size='small'/>);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
 
     useEffect(() => {
         if (!displayEntries) return;
-        Detect();
+        handleScroll();
         // eslint-disable-next-line
     }, [displayEntries]);
 
@@ -121,7 +121,7 @@ const Feed = (props) => {
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size='small'/>);
+        setLoading(<Spinner size="large" />);
         setTimeout(() => {
             entryWrapper.fetchEntries(1)
         }, 1000);
@@ -250,20 +250,11 @@ const Feed = (props) => {
                         </Cell>
                     </List>
                 </PanelHeaderContext>
-
                 {(entryWrapper.hasMore || displayEntries.length) ?
                     <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching} onScroll={Detect}>
-                        {/* <InfiniteScroll
-                            hasMore={true}
-                            dataLength={displayEntries.length}
-                            next={Next}
-                            scrollThreshold={1}
-                            onScroll={Detect}
-                        > */}
                         <CardGrid className="entriesGrid">
                             {displayEntries.map(renderData)}
                         </CardGrid>
-                        {/* </InfiniteScroll> */}
                         {(!entryWrapper.hasMore && !displayEntries.length) && Empty()}
                     </PullToRefresh> : null
                 }
