@@ -12,7 +12,7 @@ const Tile = (props) => {
         anxiety
     } = props;
 
-    let borderStyle = {}, circleStyle = {}, circleClass = s.circle, borderClass = s.border;
+    let borderStyle = {}, circleStyle = {}, textStyle = {}, circleClass = s.circle, borderClass = s.border;
     if (mood != null && stress != null && anxiety != null) {
         let colors = ["var(--very_good)", "var(--good)", "var(--norm)", "var(--bad)", "var(--very_bad)"];
         let gradient = [];
@@ -30,11 +30,12 @@ const Tile = (props) => {
     }
     if(props.active)
         borderClass += " " + s.borderActive;
-
+    if(props.date.format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"))
+        textStyle = {color: 'var(--accent)'};
     return (
         <div className={s.tile} onClick={() => {props.onClickTile(moment(props.date));}}>
             <div className={borderClass} style={borderStyle}>
-                <div className={circleClass} style = {circleStyle}> <Subhead className = {s.tileText} weight = "regular"> {props.date.format("D")} </Subhead> </div>
+                <div className={circleClass} style = {circleStyle}> <Subhead style = {textStyle} className = {s.tileText} weight = "regular"> {props.date.format("D")} </Subhead> </div>
             </div>
         </div>
     );
