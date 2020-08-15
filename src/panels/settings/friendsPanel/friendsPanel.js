@@ -168,9 +168,9 @@ const FriendsPanel = (props) => {
     const onClickSave = () => {
         const add = [], del = [];
         for (var user of users) {
-            //if (!user.toId && statAccess.indexOf(user.id) !== -1)
+            if (!user.toId && statAccess.indexOf(user.id) !== -1)
                 add.push(user.id);
-            //if (user.toId && statAccess.indexOf(user.id) === -1)
+            if (user.toId && statAccess.indexOf(user.id) === -1)
                 del.push(user.id);
         }
         if(add.length === 0 && del.length === 0)
