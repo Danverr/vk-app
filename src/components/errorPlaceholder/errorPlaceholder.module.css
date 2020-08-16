@@ -1,0 +1,3 @@
+.errorPlaceholder :global(.Placeholder__in) {
+    width: 100%;
+}

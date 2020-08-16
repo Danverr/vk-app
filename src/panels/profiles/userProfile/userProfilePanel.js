@@ -52,7 +52,7 @@ const UserProfilePanel = (props) => {
         if (userInfo === null) return;
 
         const fetchData = () => {
-            api("GET", "/v1.1/entries/", {
+            api("GET", "/v1.2.0/entries/", {
                 users: userInfo.id,
             }).then((res) => {
                 setStats(formatStats(res.data));
