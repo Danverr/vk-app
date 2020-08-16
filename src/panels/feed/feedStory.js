@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
 import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
-import {Button, Placeholder} from '@vkontakte/vkui';
+import {Button, Placeholder, ModalRoot, ModalCard} from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -24,6 +24,7 @@ const Feed = (props) => {
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState(entryWrapper.mode);
     const [snackField, setSnackField] = useState(null);
+    const [activeModal, setActiveModal] = useState(null);
 
     const ButtonHolder = () => (
         <Button size="m" mode="tertiary" onClick={() => {
@@ -37,8 +38,31 @@ const Feed = (props) => {
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
     const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
         (!displayEntries.length) ? <Spinner size="large"/> : <Spinner size="small"/> : null);
-
     const [error, setError] = useState(null);
+
+    const modal = (
+        <ModalRoot
+        activeModal={activeModal}
+        onClose={()=>{setActiveModal(null)}}
+        >
+            <ModalCard 
+            header="Нужно разрешение"
+            caption="Для редактирования доступа к статистике нам нужен список ваших друзей"
+            actions={[
+                {
+                    title:"Дать разрешение",
+                    mode:'primary',
+                    action: () => {
+                        props.state.fetchUserToken(entryWrapper.addEdge); 
+                        setActiveModal(null)
+                    }
+                }
+            ]}
+            id="tokenQuery" onClose={()=>{setActiveModal(null)}}>
+
+            </ModalCard>
+        </ModalRoot>
+    );
 
     const setErrorPlaceholder = (error) => {
         setError(error);
@@ -176,6 +200,9 @@ const Feed = (props) => {
                 setSnackField: setSnackField,
                 setPopout: setPopout,
                 wrapper: entryWrapper,
+                setActiveModal : setActiveModal,
+                state : props.state,
+                nav : props.nav,
             }} key={id}/>
         }
         return <TextPost postData={{
@@ -219,6 +246,7 @@ const Feed = (props) => {
             activePanel={props.nav.activePanel}
             history={props.nav.panelHistory[props.id]}
             onSwipeBack={props.nav.goBack}
+            modal={modal}
         >
             <Panel id='main'>
                 <PanelHeader separator={false} className={s.header}>

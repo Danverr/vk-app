@@ -150,6 +150,7 @@ const useNav = () => {
     };
 
     const getNav = () => ({
+        saveScroll : saveScroll,
         setScroll: setScroll,
         activeStory: getActiveStory(),
         activePanel: getActivePanel(),

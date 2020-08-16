@@ -7,7 +7,7 @@ import entryWrapper from "../entryWrapper";
 
 const AccessPost = (props) => {
 	const postData = props.postData;
-
+	const { accessTokenScope, userToken, fetchUserToken } = postData.state;
 	const user = postData.user;
 	const phr = ["Дала", "Дал"];
 	const [haveEdge, setHaveEdge] = useState(postData.haveEdge);
@@ -32,6 +32,21 @@ const AccessPost = (props) => {
 	if (postData.wrapper && postData.wrapper.rerenderTP) {
 		postData.wrapper.rerenderAP[user.id] = setTool;
 	}
+
+	const action = async () => {
+		postData.nav.saveScroll();
+		if (userToken) { // токен уже получен
+			addEdge();
+		}
+		else if (!userToken && accessTokenScope.split(",").indexOf("friends") !== -1) { // токен не получен, но разрешение есть
+			postData.setPopout(<ScreenSpinner />);
+			fetchUserToken(addEdge);
+		}
+		else { // нет разрешения
+			postData.wrapper.addEdge = addEdge;
+			postData.setActiveModal("tokenQuery");
+		}
+	};
 
 	const addEdge = async () => {
 		postData.setPopout(<ScreenSpinner />);
@@ -62,8 +77,8 @@ const AccessPost = (props) => {
 	return (
 		<Card size="l" mode="shadow" className="TextPost">
 			<Tooltip
-			offsetX={6}
-			 offsetY={12}
+				offsetX={6}
+				offsetY={12}
 				isShown={tool}
 				onClose={() => {
 					if (!iHaveToolTip()) return;
@@ -83,7 +98,7 @@ const AccessPost = (props) => {
 					{`${user.first_name} ${user.last_name}`}
 				</RichCell>
 			</Tooltip>
-			<Button onClick={addEdge} size="xl" disabled={haveEdge}>
+			<Button onClick={action} size="xl" disabled={haveEdge}>
 				{haveEdge ? "Вы уже дали доступ" : "Дать доступ в ответ"}
 			</Button>
 		</Card>

@@ -1,7 +1,7 @@
 import api from '../utils/api';
 import moment from 'moment';
 import React from 'react';
-import {Spinner, Button} from '@vkontakte/vkui';
+import { Spinner, Button } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge'
 
 const UPLOADED_QUANTITY = 200;
@@ -76,7 +76,7 @@ export let entryWrapper = {
         if (entry.systemFlag) why = 2;
         else if (entry.userId !== entryWrapper.userInfo.id) why = 3;
 
-        bridge.send("VKWebAppStorageSet", {key: names[why], value: "" + false});
+        bridge.send("VKWebAppStorageSet", { key: names[why], value: "" + false });
         entryWrapper.v[why] = 0;
 
         if (entry.systemFlag) {
@@ -134,22 +134,32 @@ export let entryWrapper = {
     },
 
     deleteEntryFromBase: (entryId) => {
-        return api("DELETE", "/v1.1/entries/", {entryId: entryId});
+        return api("DELETE", "/v1.2.0/entries/", { entryId: entryId });
     },
 
-    postEdge: (id) => {
-        return api("POST", "/v1.1/statAccess/", {toId: id});
+    postEdge: async (id) => {
+        const signatures = await bridge.sendPromise("VKWebAppCallAPIMethod", {
+            method : "friends.areFriends",
+            params : {
+                need_sign : 1,
+                user_ids : id,
+                access_token: entryWrapper.userToken,
+                v : "5.120"
+            }
+        });
+        signatures.response.forEach(friend => friend.id = friend.user_id);
+        return api("POST", "/v1.2.0/statAccess/", {users : JSON.stringify(signatures.response)});
     },
 
     postComplaint: (entryId) => {
-        return api("POST", "/v1.1/complaints/", {entryId: entryId});
+        return api("POST", "/v1.2.0/complaints/", { entryId: entryId });
     },
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
 
         try {
-            entryWrapper.accessEntries = (await api("GET", "/v1.1/statAccess", {type: 'fromId'})).data;
+            entryWrapper.accessEntries = (await api("GET", "/v1.2.0/statAccess", { type: 'fromId' })).data;
 
             entryWrapper.friends = [];
             entryWrapper.accessEntries.forEach((accessEntry) => {
@@ -165,19 +175,12 @@ export let entryWrapper = {
                 }
             });
 
-
             if (newFriends.length) {
-                const Promise = await api("GET", "/v1.1/vkApi/", {
-                    method: "users.get",
-                    params: {
-                        user_ids: newFriends.join(","),
-                        fields: "photo_50, photo_100, sex"
-                    }
+                const Promise = await api("GET", "/v1.2.0/vkApi/users.get", {
+                    users: newFriends.join(","),
                 });
 
-                if (Promise.data.error) throw Promise.data.error;
-
-                Promise.data.response.forEach((friend) => {
+                Promise.data.forEach((friend) => {
                     entryWrapper.usersMap[friend.id] = friend;
                 });
             }
@@ -193,7 +196,7 @@ export let entryWrapper = {
 
         try {
             entryWrapper.pseudoFriends = {};
-            (await api("GET", "/v1.1/statAccess", {type: 'toId'})).data.forEach((friend) => {
+            (await api("GET", "/v1.2.0/statAccess", { type: 'toId' })).data.forEach((friend) => {
                 entryWrapper.pseudoFriends[friend.id] = 1;
             });
         } catch (error) {
@@ -209,7 +212,7 @@ export let entryWrapper = {
             count: PACK_SZ,
             users: (entryWrapper.mode === 'diary') ? entryWrapper.userInfo.id : entryWrapper.friends.join(',')
         };
-        return api("GET", "/v1.1/entries/", queryData);
+        return api("GET", "/v1.2.0/entries/", queryData);
     },
 
     init: async () => {
@@ -247,7 +250,7 @@ export let entryWrapper = {
                         break;
                     }
                 }
-            } 
+            }
 
             if (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length
                 && cmp(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer], entryWrapper.queue[i]) === -1) {
@@ -262,7 +265,7 @@ export let entryWrapper = {
         entryWrapper.loading = 0;
         entryWrapper.setDisplayEntries(entryWrapper.entries.slice(0));
         if (entryWrapper.hasMore) {
-            entryWrapper.setLoading(<Spinner size='small'/>);
+            entryWrapper.setLoading(<Spinner size='small' />);
         }
         entryWrapper.queue.splice(0, cur);
     },
@@ -282,7 +285,7 @@ export let entryWrapper = {
         let beforeDate = moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
         let beforeId = Infinity;
 
-        for (let i = entryWrapper.entries.length - 1; i >= 0; --i){
+        for (let i = entryWrapper.entries.length - 1; i >= 0; --i) {
             if (entryWrapper.entries[i].systemFlag) continue;
             beforeDate = entryWrapper.entries[i].date;
             beforeId = entryWrapper.entries[i].entryId;
@@ -320,7 +323,7 @@ export let entryWrapper = {
                 entryWrapper.wasError = 1;
                 entryWrapper.setLoading(
                     <Button size="m" mode="tertiary" onClick={() => {
-                        entryWrapper.setLoading(<Spinner size='small'/>);
+                        entryWrapper.setLoading(<Spinner size='small' />);
                         entryWrapper.fetchEntries();
                     }}>
                         Попробовать снова

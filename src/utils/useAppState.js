@@ -54,7 +54,7 @@ const useAppState = () => {
         };
 
         if (!loading && !vkStorage.getValue("showIntro")) {
-            showNativeAds();
+            showNativeAds();    
         }
 
         // eslint-disable-next-line
@@ -69,6 +69,7 @@ const useAppState = () => {
             .then((res) => {
                 // Обновляем токен
                 if (res.scope === "friends") {
+                    entryWrapper.userToken = res.access_token;
                     setUserToken(res.access_token);
                     if (callback) callback();
                 } else {
