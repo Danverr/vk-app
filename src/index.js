@@ -9,7 +9,7 @@ ReactDOM.render(<App/>, document.getElementById("root"));
 
 if (process.env.NODE_ENV === "development") {
     window.onerror = function (msg, url, line, columnNo, error) {
-        api("POST", "/v1.1/logs/", {
+        api("POST", "/v1.2.0/logs/", {
             userAgent: window.navigator.userAgent,
             error: (`Message: ${error.message} \n Stack: ${error.stack}`)
         });

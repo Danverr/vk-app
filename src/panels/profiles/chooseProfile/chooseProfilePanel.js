@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, Group, CardGrid, Spinner, Button } from "@vkontakte/vkui";
+import React, {useState, useEffect} from 'react';
+import {Panel, PanelHeader, Group, CardGrid, Spinner, Button} from "@vkontakte/vkui";
 import styles from "./chooseProfilePanel.module.css";
 import api from "../../../utils/api";
 import moment from "moment";
@@ -9,33 +9,29 @@ import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlacehol
 
 const fetchFriendsInfo = async () => {
     // ID друзей к которым есть доступ
-    const friendsIdsPromise = await api("GET", "/v1.1/statAccess/", {
+    const friendsIdsPromise = await api("GET", "/v1.2.0/statAccess/", {
         type: "fromId",
     }).catch((error) => {
         throw error;
     });
 
     // Информация о друзьях
-    const friendsInfoPromise = await api("GET", "/v1.1/vkApi/", {
-        method: "users.get",
-        params: {
-            user_ids: friendsIdsPromise.data.map(item => item.id).join(","),
-            fields: "photo_50, photo_100, sex"
-        }
+    const friendsInfoPromise = await api("GET", "/v1.2.0/vkApi/users.get", {
+        users: friendsIdsPromise.data.map(item => item.id).join(","),
     }).catch((error) => {
         throw error;
     });
 
     if (friendsIdsPromise.data.error) throw friendsIdsPromise.data.error;
 
-    return friendsInfoPromise.data.response.map((info) => {
+    return friendsInfoPromise.data.map((info) => {
         return {...info, "isCurrentUser": false};
     });
 };
 
 const getMeanStats = (stats) => {
     let mean = [];
-    
+
     const lastDate = moment().startOf("day").subtract(7, "days");
 
     for (const key in stats.meanByDays) {
@@ -56,7 +52,7 @@ const ChooseProfilePanel = (props) => {
     const [error, setError] = useState(null);
     const [usersInfo, setUsersInfo] = useState(localState.usersInfo);
     const [stats, setStats] = useState(localState.stats);
-    const { activePanel, userInfo, formatStats, id: panelId } = props;
+    const {activePanel, userInfo, formatStats, id: panelId} = props;
 
     // Обновляем локальный стейт
     useEffect(() => {
@@ -74,11 +70,11 @@ const ChooseProfilePanel = (props) => {
             fetchFriendsInfo().then((friendsInfo) => {
                 setUsersInfo([userInfo, ...friendsInfo]);
             }).catch((error) => {
-                setError({ error: error, reload: fetchData });
+                setError({error: error, reload: fetchData});
             });
 
             // Загрузка статистики пользователей для карточек
-            api("GET", "/v1.1/entries/", {
+            api("GET", "/v1.2.0/entries/", {
                 afterDate: moment().utc().subtract(7, "days").startOf("day").format("YYYY-MM-DD"),
             }).then((res) => {
                 let newStats = {};
@@ -97,7 +93,7 @@ const ChooseProfilePanel = (props) => {
 
                 setStats(newStats);
             }).catch((error) => {
-                setError({ error: error, reload: fetchData });
+                setError({error: error, reload: fetchData});
             });
         };
 
@@ -108,30 +104,34 @@ const ChooseProfilePanel = (props) => {
     let profileCards = [];
     if (usersInfo) {
         profileCards = usersInfo.map((user) => {
-            const post = (stats && stats[user.id]) ? getMeanStats(stats[user.id]) : { mood: null, stress: null, anxiety: null };
-            post.description = "Среднее за последние 7 дней";
+                const post = (stats && stats[user.id]) ? getMeanStats(stats[user.id]) : {
+                    mood: null,
+                    stress: null,
+                    anxiety: null
+                };
+                post.description = "Среднее за последние 7 дней";
 
-            return (
-                <TextPost
-                    key={`profileCard_${user.id}`}
-                    onClick={() => {
-                        props.goToUserProfile();
-                        props.setActiveUserProfile(user);
-                    }}
-                    postData={{ user: user, post: post }}
-                />
-            );
-        }
+                return (
+                    <TextPost
+                        key={`profileCard_${user.id}`}
+                        onClick={() => {
+                            props.goToUserProfile();
+                            props.setActiveUserProfile(user);
+                        }}
+                        postData={{user: user, post: post}}
+                    />
+                );
+            }
         );
     }
 
-    let content = <Spinner size="large" />;
+    let content = <Spinner size="large"/>;
 
     if (error) {
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
             setError(null);
             error.reload();
-        }}> Попробовать снова </Button>} />;
+        }}> Попробовать снова </Button>}/>;
     } else if (usersInfo && stats) {
         content = <CardGrid>{profileCards}</CardGrid>
     }
