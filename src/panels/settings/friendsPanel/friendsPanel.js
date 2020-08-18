@@ -69,7 +69,7 @@ const FriendsPanel = (props) => {
                 setError({ error: error, reload: fetchData });
             });
             //кому юзер дал доступ
-            await api("GET", "/v1.1/statAccess/", {
+            await api("GET", "/v1.2.0/statAccess/", {
                 type: "toId"
             }).then((edges) => {
                 toId = edges.data.map(user => user.id);
@@ -78,7 +78,7 @@ const FriendsPanel = (props) => {
                 setError({ error: error, reload: fetchData });
             });
             //кто дал доступ юзеру
-            await api("GET", "/v1.1/statAccess/", {
+            await api("GET", "/v1.2.0/statAccess/", {
                 type: "fromId"
             }).then((edges) => {
                 fromId = edges.data.map(user => user.id);
@@ -115,8 +115,22 @@ const FriendsPanel = (props) => {
         try {
             if (addf) {
                 props.setPopout(<ScreenSpinner />);
-                await api("POST", "/v1.1/statAccess/", {
-                    toId: add.join(', ')
+
+                var addWithSign;
+                await bridge.send("VKWebAppCallAPIMethod", {
+                    method: "friends.areFriends",
+                    params: {
+                        access_token: userToken,
+                        v: "5.120",
+                        user_ids: add.join(","),
+                        need_sign: 1
+                    }
+                }).then((res) => {
+                    addWithSign = res.response;
+                });
+
+                await api("POST", "/v1.2.0/statAccess/", {
+                     users: JSON.stringify(addWithSign.map((user) => ({id: user.user_id, sign: user.sign})))
                 }).then((res) => {
                     add.forEach((id) => {
                         entryWrapper.pseudoFriends[id] = 1;
@@ -134,7 +148,7 @@ const FriendsPanel = (props) => {
             }
             if (delf) {
                 props.setPopout(<ScreenSpinner />);
-                await api("DELETE", "/v1.1/statAccess/", {
+                await api("DELETE", "/v1.2.0/statAccess/", {
                     toId: del.join(', ')
                 }).then((res) => {
                     del.forEach((id) => {

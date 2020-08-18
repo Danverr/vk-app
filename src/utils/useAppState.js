@@ -27,7 +27,7 @@ const useAppState = () => {
     const [notifications, setNotifications] = useState(
         launchParams.vk_are_notifications_enabled === "1"
     );
-    const [banStatus, setBanStatus] = useState(null);
+    const [isBanned, setIsBanned] = useState(null);
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
@@ -101,9 +101,9 @@ const useAppState = () => {
             });
     };
 
-    const fetchBanStatus = () => {
-        return api("GET", "/v1.1/banlist/", {}).then((res) => {
-            setBanStatus(res.data);
+    const fetchIsBanned = () => {
+        return api("GET", "/v1.2.0/users/", {}).then((res) => {
+            setIsBanned(res.data.isBanned);
         }).catch((error) => {
             setGlobalError(error);
             throw error;
@@ -151,7 +151,7 @@ const useAppState = () => {
                 .catch(() => logEvent("VK Storage Data", "Error"));
 
             // Загрузка статуса бана
-            await fetchBanStatus()
+            await fetchIsBanned()
                 .then(() => logEvent("Ban Status", "Loaded"))
                 .catch(() => logEvent("Ban Status", "Error"));
 
@@ -180,7 +180,7 @@ const useAppState = () => {
 
     return {
         loading: loading,
-        banStatus: banStatus,
+        isBanned: isBanned,
         globalError: globalError,
         vkStorage: vkStorage,
         notifications: notifications,

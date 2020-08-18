@@ -5,15 +5,13 @@ import s from './Calendar.module.css';
 
 const Weekdays = (props) => {
     return (
-        <tr className = {s.weekdays}>
-            <th> <Text weight = 'regular' className = {s.weekday}> пн </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> вт </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> ср </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> чт </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> пт </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> сб </Text> </th>
-            <th> <Text weight = 'regular' className = {s.weekday}> вс </Text> </th>
-        </tr>
+        <tr className = {s.weekdays}><th><Text weight = 'regular' className = {s.weekday}>пн</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>вт</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>ср</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>чт</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>пт</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>сб</Text></th>
+            <th><Text weight = 'regular' className = {s.weekday}>вс</Text></th></tr>
     );
 }
 

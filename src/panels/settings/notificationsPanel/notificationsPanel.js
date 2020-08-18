@@ -49,8 +49,11 @@ const NotificationsPanel = (props) => {
 		setCheckinNotif(s);
 		api(
 			"PUT",
-			"/v1.1/notifications/",
-			s ? { createEntry: moment(curTime).utc().format("HH:mm") } : { createEntry: "null" }
+			"/v1.2.0/users/", { 
+				createEntryNotif: s ? moment(curTime).utc().format("HH:mm") : "null",
+				accessGivenNotif: +accessNotif,
+				lowStatsNotif: +healthNotif
+			}
 		)
 			.then((res) => {
 				changesSaved();
@@ -63,7 +66,11 @@ const NotificationsPanel = (props) => {
 
 	const changeAccess = (s) => {
 		setAccessNotif(s);
-		api("PUT", "/v1.1/notifications/", { accessGiven: +s })
+		api("PUT", "/v1.2.0/users/", { 
+				createEntryNotif: checkinNotif ? moment(curTime).utc().format("HH:mm") : "null",
+				accessGivenNotif: +s,
+				lowStatsNotif: +healthNotif
+		})
 			.then((res) => {
 				changesSaved();
 			})
@@ -75,7 +82,11 @@ const NotificationsPanel = (props) => {
 
 	const changeHealth = (s) => {
 		setHealthNotif(s);
-		api("PUT", "/v1.1/notifications/", { lowStats: +s })
+		api("PUT", "/v1.2.0/users/", { 
+			createEntryNotif: checkinNotif ? moment(curTime).utc().format("HH:mm") : "null",
+			accessGivenNotif: +accessNotif,
+			lowStatsNotif: +s
+		})
 			.then((res) => {
 				changesSaved();
 			})
@@ -87,7 +98,11 @@ const NotificationsPanel = (props) => {
 
 	const changeTime = () => {
 		const updateTime = (res) => {
-			api("PUT", "/v1.1/notifications/", { createEntry: moment(res).utc().format("HH:mm") })
+			api("PUT", "/v1.2.0/users/", { 
+					createEntryNotif: checkinNotif ? moment(res).utc().format("HH:mm") : "null",
+					accessGivenNotif: +accessNotif,
+					lowStatsNotif: +healthNotif
+			})
 				.then(() => {
 					setCurTime(res);
 					changesSaved();
@@ -109,19 +124,20 @@ const NotificationsPanel = (props) => {
 
 	useEffect(() => {
 		const fetchData = () => {
-			api("GET", "/v1.1/notifications/", {})
+			api("GET", "/v1.2.0/users/", {})
 				.then((res) => {
+					console.log(res);
 					let time;
-					if (res.data.createEntry == null) {
+					if (res.data.createEntryNotif == null) {
 						setCheckinNotif(false);
 						time = moment(`2000-01-01 22:00`).utc();
 					} else {
 						setCheckinNotif(true);
-						time = moment.utc(`2000-01-01 ${res.data.createEntry}`);
+						time = moment.utc(`2000-01-01 ${res.data.createEntryNotif}`);
 					}
 					setCurTime(moment(time).local());
-					setAccessNotif(res.data.accessGiven);
-					setHealthNotif(res.data.lowStats);
+					setAccessNotif(res.data.accessGivenNotif);
+					setHealthNotif(res.data.lowStatsNotif);
 				})
 				.catch((error) => {
 					setError({ error: error, reload: fetchData });

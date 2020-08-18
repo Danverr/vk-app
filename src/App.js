@@ -60,7 +60,7 @@ const App = () => {
         logAppState(state, nav);
 
         if (state.globalError) nav.goTo("globalError");
-        else if (state.banStatus.isBanned) nav.goTo("banned");
+        else if (state.isBanned) nav.goTo("banned");
         else if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
     }
 

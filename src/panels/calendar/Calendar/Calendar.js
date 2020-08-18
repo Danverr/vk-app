@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import Navigation from './Navigation'
 import Weekdays from './Weekdays';
@@ -22,41 +22,43 @@ const Calendar = (props) => {
 
     return (
         <div>
-            <Navigation 
-            NavLabel = {moment(curMonth).format("MMMM YYYY")}
-            onClickPrev = {() => {
-                let date = moment(curMonth);
-                date.add(-1, 'months');
-                date.startOf('month');
-                setCurMonth(moment(date));
-                localState.curMonth = moment(date);
-            }} 
-            onClickPicker = {() => {
-                callPicker({type: "date", startDate: curDate.toDate(), maxDate: new Date(2050, 0, 1)}, props.setPopout, (res) => {
-                    setCurDate(moment(res));
-                    localState.curDate = moment(res);
-                    res.startOf('month');
-                    setCurMonth(moment(res));
-                    localState.curMonth = moment(res);
-                });
-            }}
-            onClickNext = {() => {
-                let date = moment(curMonth);
-                date.add(1, 'months');
-                date.startOf('month');
-                setCurMonth(moment(date));
-                localState.curMonth = moment(date);
-            }} />
-            <table className = {s.tileGroup}>
-                <Weekdays />
-                <TileGroup
-                    onClickTile={(date) => {
-                        setCurDate(moment(date));
-                        localState.curDate = moment(date);
-                    }}
-                    curMonth={moment(curMonth)}
-                    curDate={moment(curDate)}
-                    stats={props.stats} />
+            <Navigation
+                NavLabel={moment(curMonth).format("MMMM YYYY")}
+                onClickPrev={() => {
+                    let date = moment(curMonth);
+                    date.add(-1, 'months');
+                    date.startOf('month');
+                    setCurMonth(moment(date));
+                    localState.curMonth = moment(date);
+                }}
+                onClickPicker={() => {
+                    callPicker({ type: "date", startDate: curDate.toDate(), maxDate: new Date(2050, 0, 1) }, props.setPopout, (res) => {
+                        setCurDate(moment(res));
+                        localState.curDate = moment(res);
+                        res.startOf('month');
+                        setCurMonth(moment(res));
+                        localState.curMonth = moment(res);
+                    });
+                }}
+                onClickNext={() => {
+                    let date = moment(curMonth);
+                    date.add(1, 'months');
+                    date.startOf('month');
+                    setCurMonth(moment(date));
+                    localState.curMonth = moment(date);
+                }} />
+            <table className={s.tileGroup}>
+                <tbody>
+                    <Weekdays />
+                    <TileGroup
+                        onClickTile={(date) => {
+                            setCurDate(moment(date));
+                            localState.curDate = moment(date);
+                        }}
+                        curMonth={moment(curMonth)}
+                        curDate={moment(curDate)}
+                        stats={props.stats} />
+                </tbody>
             </table>
         </div>
     );

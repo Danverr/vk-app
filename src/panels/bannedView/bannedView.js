@@ -18,7 +18,7 @@ const BannedView = (props) => {
                     stretched
                     header="Аккаунт заблокирован"
                     icon={<Icon56ErrorOutline fill = "var(--destructive)"/>}>
-                    {`Причина: ${props.state.banStatus.reason}`}
+                    {`Причина: ${props.state.isBanned}`}
                 </Placeholder>
             </Panel>
         </View>

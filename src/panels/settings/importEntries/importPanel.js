@@ -7,7 +7,6 @@ import {
 	Button,
 	Div,
 	Group,
-	CellButton,
 	Cell,
 	Radio,
 	FixedLayout,
@@ -25,18 +24,10 @@ const ImportPanel = (props) => {
 
 	useEffect(() => {
 		const fetchImportCount = () => {
-			api("GET", "/v1.1/vkApi/", {
-				method: "storage.get",
-				params: {
-					user_id: userInfo.id,
-					keys: "import",
-				},
-			})
+			api("GET", "/v1.2.0/users/", {})
 				.then((res) => {
 					if (res.data.error) throw res.data.error;
-					if (res.data.response[0].value === "") setImportCount(2);
-					else if (res.data.response[0].value === "#") setImportCount(0);
-					else setImportCount(+res.data.response[0].value);
+					setImportCount(res.data.importAttempts);
 				})
 				.catch((error) => {
 					setError({ error: error, reload: fetchImportCount });
@@ -47,24 +38,6 @@ const ImportPanel = (props) => {
 
 	const onChange = (data) => {
 		setValue(data.target.value);
-	};
-
-	const addAttempt = () => {
-		api("GET", "/v1.1/vkApi/", {
-			method: "storage.set",
-			params: {
-				user_id: userInfo.id,
-				key: "import",
-				value: importCount + 1,
-			},
-		})
-			.then((res) => {
-				if (res.data.error) throw res.data.error;
-				setImportCount(importCount + 1);
-			})
-			.catch(() => {
-				setError({ error: error, reload: addAttempt });
-			});
 	};
 
 	var content = <Spinner size="large" />;
@@ -99,9 +72,6 @@ const ImportPanel = (props) => {
 				</Group>
 				<Group>
 					<Cell indicator={importCount}>Осталось попыток импорта</Cell>
-					{process.env.NODE_ENV === "development" ? (
-						<CellButton onClick={addAttempt}>Добавить попытку импорта [DEV]</CellButton>
-					) : null}
 				</Group>
 				<div style={{ height: "70.4px" }} />
 				{snackbar}

@@ -14,13 +14,13 @@ const TileGroup = (props) => {
     const add = (x) => {
         row.push(x);
         if(row.length === 7){
-            tiles.push(<tr> {row.map((day) => <td> {day} </td>)} </tr>);
+            tiles.push(<tr key = {tiles.length}>{row}</tr>);
             row = [];
         }
     }
 
     for(let i = 0; i < (cur.day() + 6) % 7; i++) //push empty
-        add(<div key = {-i}/>);
+        add(<td key = {-i}/>);
 
     var curActiveDateStr = props.curDate.format("YYYY-MM-DD");
 
@@ -37,14 +37,14 @@ const TileGroup = (props) => {
        
         if(curActiveDateStr === curDateStr)
             curTileProps.active = true;
-        add(<Tile key = {cur.format("D")} date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/>);
+        add(<td key = {cur.format("D")}><Tile date = {moment(cur)} onClickTile = {props.onClickTile} {...curTileProps}/></td>);
         cur.add(1, 'days');
     }
 
     if(row.length !== 0)
-        tiles.push(<tr> {row.map((day) => <td> {day} </td>)} </tr>);
+        tiles.push(<tr key = {tiles.length}>{row}</tr>);
 
-    return (<> {tiles} </>);
+    return (<>{tiles}</>);
 }
 
 export default TileGroup;

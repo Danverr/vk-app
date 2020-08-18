@@ -63,7 +63,8 @@ const DaylioPanel = (props) => {
                 return;
             }
             setPopout(<ScreenSpinner/>);
-            api("POST", "/v1.1/entries/", {
+            api("POST", "/v1.2.0/entries/", {
+                isImport: 'true',
                 entries: JSON.stringify(entries.map((entry) => {
                     let mood = moods.indexOf(entry[4]) + 1;
                     let date = moment(`${entry[0]} ${entry[3]}:00`);
@@ -80,27 +81,17 @@ const DaylioPanel = (props) => {
                 }))
             }).then((res) => {
                 setTop(null);
-                api("GET", "/v1.1/vkApi/", {
-                    method: "storage.set",
-                    params: {
-                        user_id: userInfo.id,
-                        key: "import",
-                        value: ((importCount === 1) ? "#" : importCount - 1)
-                    }
-                }).then((res) => {
-                    if (res.data.error) throw res.data.error;
-                    window['yaCounter65896372'].reachGoal("importCompleted");
-                    setImportCount(importCount - 1);
-                    setSnackbar(<Snackbar
-                        className={s.snackbar}
-                        layout="vertical"
-                        onClose={() => setSnackbar(null)}
-                        before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
-                            fill="#fff" width={14} height={14}/></Avatar>}>
-                        Изменения сохранены
-                    </Snackbar>);
-                    props.nav.goBack();
-                });
+                window['yaCounter65896372'].reachGoal("importCompleted");
+                setImportCount(importCount - 1);
+                setSnackbar(<Snackbar
+                    className={s.snackbar}
+                    layout="vertical"
+                    onClose={() => setSnackbar(null)}
+                    before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
+                        fill="#fff" width={14} height={14} /></Avatar>}>
+                    Изменения сохранены
+                </Snackbar>);
+                props.nav.goBack();
             }).catch((error) => {
                 setTop("Произошла ошибка. Попробуйте еще");
             }).finally(() => {
