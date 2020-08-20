@@ -40,7 +40,8 @@ const logAppState = (state, nav) => {
     console.group(getTimeElapsed(startTime));
     console.log("VK Storage: ", state.vkStorage._values);
     console.log("View history: ", nav.viewHistory);
-    console.log("Current panel history: ", nav.panelHistory[nav.activeStory]);
+    console.log(`Current panel history: `, nav.panelHistory[nav.activeStory]);
+    console.log(`Current popout: `, nav.popout);
     console.log("Scroll history: ", nav.scrollHistory);
     console.groupEnd();
 };

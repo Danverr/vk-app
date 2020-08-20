@@ -1,21 +1,16 @@
 .questionSection {
-	height: 128px;
-}
-
-.questionSection + * {
-	overflow: auto;
-	flex: auto;
+    height: 128px;
 }
 
 .questionText {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	padding: 0 32px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 32px;
 }
 
 .questionText :global(.Subhead) {
-	margin-top: 4px;
-	color: var(--text_secondary);
+    margin-top: 4px;
+    color: var(--text_secondary);
 }

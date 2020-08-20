@@ -15,18 +15,22 @@ const fetchFriendsInfo = async () => {
         throw error;
     });
 
-    // Информация о друзьях
-    const friendsInfoPromise = await api("GET", "/v1.2.0/vkApi/users.get", {
-        users: friendsIdsPromise.data.map(item => item.id).join(","),
-    }).catch((error) => {
-        throw error;
-    });
+    if (friendsIdsPromise.data.length) {
+        // Информация о друзьях
+        const friendsInfoPromise = await api("GET", "/v1.2.0/vkApi/users.get", {
+            users: friendsIdsPromise.data.map(item => item.id).join(","),
+        }).catch((error) => {
+            throw error;
+        });
 
-    if (friendsIdsPromise.data.error) throw friendsIdsPromise.data.error;
+        if (friendsIdsPromise.data.error) throw friendsIdsPromise.data.error;
 
-    return friendsInfoPromise.data.map((info) => {
-        return {...info, "isCurrentUser": false};
-    });
+        return friendsInfoPromise.data.map((info) => {
+            return {...info, "isCurrentUser": false};
+        });
+    } else {
+        return [];
+    }
 };
 
 const getMeanStats = (stats) => {
@@ -68,7 +72,7 @@ const ChooseProfilePanel = (props) => {
 
         const fetchData = () => {
             fetchFriendsInfo().then((friendsInfo) => {
-                setUsersInfo([userInfo, ...friendsInfo]);
+                setUsersInfo(friendsInfo.length ? [userInfo, ...friendsInfo] : [userInfo]);
             }).catch((error) => {
                 setError({error: error, reload: fetchData});
             });

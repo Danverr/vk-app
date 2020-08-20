@@ -14,10 +14,10 @@ import DaylioPanel from "./importEntries/daylioPanel";
 import PixelsPanel from "./importEntries/pixelsPanel";
 
 const SettingsStory = (props) => {
-    const [popout, setPopout] = useState(null);
     const [modal, setModal] = useState(null);
     const [importCount, setImportCount] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
+    const {popout, setPopout} = props.nav;
 
     useEffect(() => {
         if (props.nav.activePanel !== "friends") setModal(null);
@@ -87,7 +87,7 @@ const SettingsStory = (props) => {
                         Перейти в группу ВК
                     </CellButton>
                 </Group>
-                <Footer>Версия приложения v1.2.1</Footer>
+                <Footer>Версия приложения v1.2.2</Footer>
             </Panel>
             <ImportPanel
                 id="import"

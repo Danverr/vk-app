@@ -1,5 +1,6 @@
 .slideContainer {
     width: auto;
+    overflow: auto;
 }
 
 .formLayout {

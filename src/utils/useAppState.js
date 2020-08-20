@@ -54,14 +54,14 @@ const useAppState = () => {
         };
 
         if (!loading && !vkStorage.getValue("showIntro")) {
-            showNativeAds();    
+            showNativeAds();
         }
 
         // eslint-disable-next-line
     }, [loading]);
 
-    const fetchUserToken = (callback = null) => {
-        bridge
+    const fetchUserToken = async (callback = null) => {
+        await bridge
             .send("VKWebAppGetAuthToken", {
                 app_id: APP_ID,
                 scope: "friends",
@@ -77,17 +77,14 @@ const useAppState = () => {
                 }
             })
             .catch((error) => {
-                if (error.error_data && error.error_data.error_code !== 4) {
-                    // 4: User denied
+                if (error.error_data && error.error_data.error_code !== 4) { // 4: User denied
                     setGlobalError(error);
-                } else {
-                    fetchUserToken();
                 }
             });
     };
 
-    const fetchUserInfo = () => {
-        return bridge
+    const fetchUserInfo = async () => {
+        await bridge
             .send("VKWebAppGetUserInfo")
             .then((userInfo) => {
                 entryWrapper.userInfo = userInfo;
@@ -110,75 +107,94 @@ const useAppState = () => {
         });
     };
 
-    useEffect(() => {
-        const initApp = async () => {
-            const logEvent = (title, status) => {
-                let color = "#4bb34b";
-                if (status === "Started") color = "#d3b51d";
-                else if (status === "Error") color = "#e64646";
+    const ymInit = async () => {
+        if (window["yaCounter65896372"] === undefined) {
+            setTimeout(await ymInit, 100);
+        }
+    };
 
-                console.log("%s%c%s", `[${moment().diff(start)} ms] ${title}: `, `color: ${color};`, status);
-            };
-
-            bridge.subscribe((e) => {
-                if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result)
-                    setNotifications(true);
-                else if (e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result)
-                    setNotifications(false);
-            });
-
-            const start = moment();
-            if (process.env.NODE_ENV === "development") {
-                await import("./../eruda");
+    const vkSubscribe = async () => {
+        await bridge.subscribe((e) => {
+            if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result) {
+                setNotifications(true);
+            } else if (e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result) {
+                setNotifications(false);
+            } else if (e.detail.type === "VKWebAppViewRestore") {
+                initApp();
             }
+        });
+    };
 
-            console.group("APP INIT");
-            logEvent("App Init", "Started");
+    const [initActions] = useState([
+        {name: "VK Subscribe", func: vkSubscribe},
+        {name: "VK Bridge Init", func: bridge.send, params: ["VKWebAppInit", {}], await: true},
+        {name: "VK Storage Loading", func: vkStorage.fetchValues},
+        {name: "Yandex.Metrika Init", func: ymInit},
+        {name: "User Info Loading", func: fetchUserInfo, await: true},
+        {name: "Ban Status Loading", func: fetchIsBanned},
+    ]);
+    let [initActionsCompleted] = useState(0);
 
-            // Инициализация VK Mini App
-            await bridge.send("VKWebAppInit", {})
-                .then(() => logEvent("VK Bridge Init", "Completed"))
-                .catch(() => logEvent("VK Bridge Init", "Error"));
+    const initApp = async () => {
+        if (initActionsCompleted === initActions.length) {
+            return;
+        }
 
-            // Загрузка инфы о текущем юзере
-            await fetchUserInfo()
-                .then(() => logEvent("User Info", "Loaded"))
-                .catch(() => logEvent("User Info", "Error"));
+        const logEvent = (title, status) => {
+            let color = "#e64646";
+            if (status === "Started") color = "#d3b51d";
+            else if (status === "OK" || status === "Completed") color = "#4bb34b";
 
-            // Загрузка ключей из VK Storage
-            await vkStorage.fetchValues()
-                .then(() => logEvent("VK Storage Data", "Loaded"))
-                .catch(() => logEvent("VK Storage Data", "Error"));
-
-            // Загрузка статуса бана
-            await fetchIsBanned()
-                .then(() => logEvent("Ban Status", "Loaded"))
-                .catch(() => logEvent("Ban Status", "Error"));
-
-            // Инициализация Яндекс.Метрики
-            const waitYmInit = () => {
-                if (window["yaCounter65896372"] !== undefined) {
-                    logEvent("Yandex.Metrika Init", "Completed");
-                    const timeout = Math.max(1000 - moment().diff(start), 0);
-
-                    setTimeout(() => {
-                        logEvent("App Init", "Completed");
-                        console.groupEnd();
-                        setLoading(false);
-                    }, timeout);
-                } else {
-                    setTimeout(waitYmInit, 100);
-                }
-            };
-
-            waitYmInit();
+            console.log("%s%c%s", `[${moment().diff(start)} ms] ${title}: `, `color: ${color};`, status);
         };
 
+        const runAction = async (action) => {
+            const params = action.params ? action.params : [];
+
+            await action.func(...params)
+                .then(() => logEvent(action.name, "OK"))
+                .catch(error => logEvent(action.name, error.message))
+                .finally(() => {
+                    if (++initActionsCompleted === initActions.length) {
+                        endAppInit();
+                    }
+                });
+        };
+
+        const endAppInit = () => {
+            const timeout = Math.max(1000 - moment().diff(start), 0);
+
+            setTimeout(() => {
+                logEvent("App Init", "Completed");
+                console.groupEnd();
+                setLoading(false);
+            }, timeout);
+        };
+
+        const start = moment();
+
+        //if (process.env.NODE_ENV === "development") {
+        await import("./../eruda");
+        //}
+
+        console.group("APP INIT");
+        logEvent("App Init", "Started");
+
+        for (const action of initActions) {
+            logEvent(action.name, "Started");
+
+            if (action.await) await runAction(action);
+            else runAction(action);
+        }
+    };
+
+    useEffect(() => {
         initApp();
         // eslint-disable-next-line
     }, []);
 
     return {
+        initApp: initApp,
         loading: loading,
         isBanned: isBanned,
         globalError: globalError,

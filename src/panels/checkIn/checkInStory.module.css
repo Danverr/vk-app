@@ -1,37 +1,39 @@
 .checkInPanel :global(.Panel__in) {
-	height: 100vh;
+    position: relative;
+    height: 100%;
+    overflow-y: hidden;
 }
 
 .bulletsContainer {
-	display: flex;
-	justify-content: center;
-	background: var(--background_content);
-	padding: 16px 16px;
+    display: flex;
+    justify-content: center;
+    background: var(--background_content);
+    padding: 16px 16px;
 }
 
 .panelsGallery :global(.Gallery__slide) {
-	display: flex;
-	flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .panelsGallery:global(.Gallery--ios) {
-	height: calc(100% - 40px - var(--panelheader_height_ios));
+    height: calc(100% - 40px - var(--panelheader_height_ios));
 }
 
 .panelsGallery:global(.Gallery--android) {
-	height: calc(100% - 40px - var(--panelheader_height_android));
+    height: calc(100% - 40px - var(--panelheader_height_android));
 }
 
 .bullet {
-	height: 8px;
-	width: 8px;
-	padding: 0 !important;
-	margin: 0 4px;
-	opacity: 0.2;
-	background: #000;
-	border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    padding: 0 !important;
+    margin: 0 4px;
+    opacity: 0.2;
+    background: #000;
+    border-radius: 50%;
 }
 
 .bulletSelected {
-	opacity: 1;
+    opacity: 1;
 }

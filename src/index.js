@@ -5,9 +5,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import api from './utils/api';
 
-ReactDOM.render(<App/>, document.getElementById("root"));
-
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "development") {
     window.onerror = function (msg, url, line, columnNo, error) {
         api("POST", "/v1.2.0/logs/", {
             userAgent: window.navigator.userAgent,
@@ -15,3 +13,5 @@ if (process.env.NODE_ENV === "development") {
         });
     }
 }
+
+ReactDOM.render(<App/>, document.getElementById("root"));

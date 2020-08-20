@@ -19,12 +19,12 @@ import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
 
 const Feed = (props) => {
-    const [popout, setPopout] = useState(null);
     const [fetching, setFetching] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState(entryWrapper.mode);
     const [snackField, setSnackField] = useState(null);
     const [activeModal, setActiveModal] = useState(null);
+    const {popout, setPopout} = props.nav;
 
     const ButtonHolder = () => (
         <Button size="m" mode="tertiary" onClick={() => {
@@ -42,23 +42,27 @@ const Feed = (props) => {
 
     const modal = (
         <ModalRoot
-        activeModal={activeModal}
-        onClose={()=>{setActiveModal(null)}}
+            activeModal={activeModal}
+            onClose={() => {
+                setActiveModal(null)
+            }}
         >
-            <ModalCard 
-            header="Нужно разрешение"
-            caption="Для редактирования доступа к статистике нам нужен список ваших друзей"
-            actions={[
-                {
-                    title:"Дать разрешение",
-                    mode:'primary',
-                    action: () => {
-                        props.state.fetchUserToken(entryWrapper.addEdge); 
-                        setActiveModal(null)
+            <ModalCard
+                header="Нужно разрешение"
+                caption="Для редактирования доступа к статистике нам нужен список ваших друзей"
+                actions={[
+                    {
+                        title: "Дать разрешение",
+                        mode: 'primary',
+                        action: () => {
+                            props.state.fetchUserToken(entryWrapper.addEdge);
+                            setActiveModal(null)
+                        }
                     }
-                }
-            ]}
-            id="tokenQuery" onClose={()=>{setActiveModal(null)}}>
+                ]}
+                id="tokenQuery" onClose={() => {
+                setActiveModal(null)
+            }}>
 
             </ModalCard>
         </ModalRoot>
@@ -145,7 +149,7 @@ const Feed = (props) => {
         entryWrapper.mode = e;
         setMode(e);
         toggleContext();
-        setLoading(<Spinner size="large" />);
+        setLoading(<Spinner size="large"/>);
         setTimeout(() => {
             entryWrapper.fetchEntries(1)
         }, 1000);
@@ -200,9 +204,9 @@ const Feed = (props) => {
                 setSnackField: setSnackField,
                 setPopout: setPopout,
                 wrapper: entryWrapper,
-                setActiveModal : setActiveModal,
-                state : props.state,
-                nav : props.nav,
+                setActiveModal: setActiveModal,
+                state: props.state,
+                nav: props.nav,
             }} key={id}/>
         }
         return <TextPost postData={{

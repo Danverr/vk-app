@@ -1,6 +1,17 @@
 import React from 'react';
 import styles from './slidePanel.module.css';
-import {Button, Div, Panel, PanelHeader, PanelHeaderBack, Progress, Text, Title} from "@vkontakte/vkui";
+import {
+    Button,
+    FixedLayout,
+    Panel,
+    PanelHeader,
+    PanelHeaderBack,
+    Placeholder,
+    Progress,
+    Text,
+    Title,
+    Div
+} from "@vkontakte/vkui";
 
 const SlidePanel = (props) => {
     const {slideData, progress, nav, index} = props;
@@ -17,21 +28,25 @@ const SlidePanel = (props) => {
                 left={index ? <PanelHeaderBack onClick={() => window.history.back()}/> : null}
             />
 
-            <Div className={styles.textContainer} style={slideData.textStyles}>
-                <Title level="1" weight="bold">{slideData.title}</Title>
-                <Text weight="regular">{slideData.text}</Text>
-            </Div>
+            <Placeholder stretched className={styles.textContainer} style={slideData.textStyles}>
+                <Div>
+                    <Title level="1" weight="bold">{slideData.title}</Title>
+                    <Text weight="regular">{slideData.text}</Text>
+                </Div>
+            </Placeholder>
 
-            <Div>
-                <Button
-                    size="xl"
-                    mode="overlay_primary"
-                    onClick={slideData.action ? slideData.action : () => nav.goTo(props.id, index + 1)}
-                >
-                    {slideData.buttonText ? slideData.buttonText : "Далее"}
-                </Button>
-                <Progress className={styles.slideProgress} value={progress}/>
-            </Div>
+            <FixedLayout vertical="bottom">
+                <Div>
+                    <Button
+                        size="xl"
+                        mode="overlay_primary"
+                        onClick={slideData.action ? slideData.action : () => nav.goTo(props.id, index + 1)}
+                    >
+                        {slideData.buttonText ? slideData.buttonText : "Далее"}
+                    </Button>
+                    <Progress className={styles.slideProgress} value={progress}/>
+                </Div>
+            </FixedLayout>
         </Panel>
     );
 };

@@ -1,15 +1,19 @@
+.formLayout {
+    overflow: auto;
+}
+
 .formLayout :global(.FormLayout__row):not(:last-child) {
-	padding-bottom: 0;
+    padding-bottom: 0;
 }
 
 .privacySwitch :global(.Cell__children) {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .lockIcon {
-	display: inline;
-	margin-left: 6px;
-	margin-top: 2px;
-	color: #99a2ad;
+    display: inline;
+    margin-left: 6px;
+    margin-top: 2px;
+    color: #99a2ad;
 }

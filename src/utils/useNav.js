@@ -36,12 +36,12 @@ const getDefaultPanelHistory = () => {
 const useNav = () => {
     let [scrollHistory] = useState({});
     let [isNavbarVis] = useState(true);
+    let [popout] = useState(null);
     const [viewHistory] = useState([defaultStory]);
     const [panelHistory] = useState(getDefaultPanelHistory());
 
     const getActiveStory = () => viewHistory[viewHistory.length - 1];
-    const getActivePanel = () =>
-        panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
+    const getActivePanel = () => panelHistory[getActiveStory()][panelHistory[getActiveStory()].length - 1];
 
     const sendHit = () =>
         window["yaCounter65896372"].hit(
@@ -68,17 +68,25 @@ const useNav = () => {
         setSavedScroll();
     });
 
+    const setPopout = (newPopout) => {
+        // Создаём новую запись в истории браузера
+        window.history.pushState([getActiveStory(), getActivePanel()], popout);
+        saveScroll();
+        popout = newPopout;
+        setNav(getNav());
+    };
+
     // Функция возврата с экрана
     const goBack = () => {
         // Сохраняем позицию скролла перед уходом
         saveScroll();
 
-        if (panelHistory[getActiveStory()].length > 1) {
-            // Переход между панелями
+        if (popout) { // Убираем popout
+            popout = null;
+        } else if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
             saveScroll();
             panelHistory[getActiveStory()].pop();
-        } else {
-            // Переход между историями
+        } else { // Переход между историями
             if (viewHistory.length === 1) {
                 // Отправляем bridge на закрытие сервиса.
                 bridge.send("VKWebAppClose", {status: "success"});
@@ -105,6 +113,11 @@ const useNav = () => {
 
         // Сохраняем позицию скролла перед уходом
         saveScroll();
+
+        // При уходе убираем popout
+        if (popout) {
+            popout = null;
+        }
 
         if (panel === null) {
             // Возвращаем iOS Swipe Back
@@ -150,13 +163,15 @@ const useNav = () => {
     };
 
     const getNav = () => ({
-        saveScroll : saveScroll,
+        saveScroll: saveScroll,
         setScroll: setScroll,
         activeStory: getActiveStory(),
         activePanel: getActivePanel(),
         viewHistory: viewHistory,
         panelHistory: panelHistory,
         clearStory: clearStory,
+        popout: popout,
+        setPopout: setPopout,
         goBack: goBack,
         goTo: goTo,
         setNavbarVis: setNavbarVis,
