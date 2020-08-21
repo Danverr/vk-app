@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
 import getAnswer from "../../../utils/getAnswer";
+import getErrorMessage from "../../../utils/getErrorMessage";
 
 import Icon12Lock from "@vkontakte/icons/dist/12/lock";
 
@@ -123,7 +124,7 @@ const SubmitPanel = (props) => {
                 .catch((error) => {
                     setFormStatus({
                         title: "Упс, что-то пошло не так!",
-                        text: error.message,
+                        text: getErrorMessage(error),
                         mode: "error",
                     });
                 })

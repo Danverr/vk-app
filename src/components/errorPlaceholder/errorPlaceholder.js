@@ -1,6 +1,7 @@
 import React from "react";
 import {Placeholder} from "@vkontakte/vkui";
 import styles from "./errorPlaceholder.module.css";
+import getErrorMessage from "../../utils/getErrorMessage";
 
 import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
@@ -8,7 +9,7 @@ const ErrorPlaceholder = (props) => {
     const {error} = props;
     let header = "Упс, что-то пошло не так!";
     let action = props.action;
-    let text = <>{error.message ? error.message : error.error_msg}<br/>{error.stack}</>;
+    let text = getErrorMessage(error);
 
     return (
         <Placeholder

@@ -113,6 +113,16 @@ const useAppState = () => {
         }
     };
 
+    const initScheme = async () => {
+        return bridge.send('VKWebAppSetViewSettings', {
+            'status_bar_style': 'dark',
+            'action_bar_color': '#fff'
+        }).catch((error) => {
+            error.message = error.error_data.error_reason;
+            throw error;
+        });
+    };
+
     const vkSubscribe = async () => {
         await bridge.subscribe((e) => {
             if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result) {
@@ -129,6 +139,7 @@ const useAppState = () => {
         {name: "VK Subscribe", func: vkSubscribe},
         {name: "VK Bridge Init", func: bridge.send, params: ["VKWebAppInit", {}], await: true},
         {name: "VK Storage Loading", func: vkStorage.fetchValues},
+        {name: "Init Color Scheme", func: initScheme},
         {name: "Yandex.Metrika Init", func: ymInit},
         {name: "User Info Loading", func: fetchUserInfo, await: true},
         {name: "Ban Status Loading", func: fetchIsBanned},
@@ -136,10 +147,6 @@ const useAppState = () => {
     let [initActionsCompleted] = useState(0);
 
     const initApp = async () => {
-        if (initActionsCompleted === initActions.length) {
-            return;
-        }
-
         const logEvent = (title, status) => {
             let color = "#e64646";
             if (status === "Started") color = "#d3b51d";
@@ -156,22 +163,21 @@ const useAppState = () => {
                 .catch(error => logEvent(action.name, error.message))
                 .finally(() => {
                     if (++initActionsCompleted === initActions.length) {
-                        endAppInit();
+                        logEvent("App Init", "Completed");
+                        console.groupEnd();
+                        setLoading(false);
                     }
                 });
         };
 
-        const endAppInit = () => {
-            const timeout = Math.max(1000 - moment().diff(start), 0);
-
-            setTimeout(() => {
-                logEvent("App Init", "Completed");
-                console.groupEnd();
-                setLoading(false);
-            }, timeout);
-        };
-
         const start = moment();
+
+        if (initActionsCompleted === initActions.length) {
+            console.group("APP INIT");
+            logEvent("App Init", "Completed");
+            console.groupEnd();
+            return;
+        }
 
         //if (process.env.NODE_ENV === "development") {
         await import("./../eruda");

@@ -87,8 +87,8 @@ const DaylioPanel = (props) => {
                     className={s.snackbar}
                     layout="vertical"
                     onClose={() => setSnackbar(null)}
-                    before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
-                        fill="#fff" width={14} height={14} /></Avatar>}>
+                    before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
+                        fill="#fff" width={14} height={14}/></Avatar>}>
                     Изменения сохранены
                 </Snackbar>);
                 props.nav.goBack();
@@ -135,7 +135,8 @@ const DaylioPanel = (props) => {
                             importEntries(fileInputRef.current.files);
                             fileInputRef.current.value = null;
                         }}
-                        accept=".csv">
+                        accept=".csv,text/plain"
+                    >
                         Загрузить записи
                     </File>
                 </FormLayout>
