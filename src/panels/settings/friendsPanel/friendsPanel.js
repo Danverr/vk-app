@@ -211,7 +211,7 @@ const FriendsPanel = (props) => {
             header="Нужно разрешение"
             stretched
             action={<Button onClick = {() => fetchUserToken()}> Дать разрешение </Button>}> 
-            Для редактирования доступа к статистике нам нужен список ваших друзей 
+            Для редактирования доступа к статистике нам нужен список ваших друзей.
         </Placeholder>;
     else if (error)
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {

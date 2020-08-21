@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
-import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext} from '@vkontakte/vkui';
-import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
-import {Button, Placeholder, ModalRoot, ModalCard} from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
+import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
+import { Button, Placeholder, ModalRoot, ModalCard } from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -18,6 +18,8 @@ import AccessPost from '../../components/accessPost/accessPost';
 import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
 
+const PIXELS = 200;
+
 const Feed = (props) => {
     const [fetching, setFetching] = useState(null);
     const [contextOpened, setContextOpened] = useState(null);
@@ -28,7 +30,7 @@ const Feed = (props) => {
 
     const ButtonHolder = () => (
         <Button size="m" mode="tertiary" onClick={() => {
-            setLoading(<Spinner size='small'/>);
+            setLoading(<Spinner size='small' />);
             entryWrapper.fetchEntries();
         }}>
             Загрузить записи
@@ -36,16 +38,14 @@ const Feed = (props) => {
     );
 
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
-    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
-        (!displayEntries.length) ? <Spinner size="large"/> : <Spinner size="small"/> : null);
+    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder /> : entryWrapper.hasMore ?
+        (!displayEntries.length) ? <Spinner size="large" /> : <Spinner size="small" /> : null);
     const [error, setError] = useState(null);
 
     const modal = (
         <ModalRoot
             activeModal={activeModal}
-            onClose={() => {
-                setActiveModal(null)
-            }}
+            onClose={() => { setActiveModal(null) }}
         >
             <ModalCard
                 header="Нужно разрешение"
@@ -60,9 +60,7 @@ const Feed = (props) => {
                         }
                     }
                 ]}
-                id="tokenQuery" onClose={() => {
-                setActiveModal(null)
-            }}>
+                id="tokenQuery" onClose={() => { setActiveModal(null) }}>
 
             </ModalCard>
         </ModalRoot>
@@ -75,7 +73,7 @@ const Feed = (props) => {
     const setErrorSnackbar = (error) => {
         setSnackField(<ErrorSnackbar onClose={() => {
             setSnackField(null);
-        }}/>);
+        }} />);
     };
 
     const isVisibleBot = (id) => {
@@ -85,8 +83,30 @@ const Feed = (props) => {
         return posBot <= window.innerHeight;
     };
 
+    const isVisible = (id) => {
+        let elem = document.querySelector(`.TextPost:nth-child(${id + 1})`);
+        if (!elem) return 0;
+        const posTop = elem.getBoundingClientRect().top;
+        return posTop + PIXELS <= window.innerHeight;
+    };
+
+    const DetectTips = () => {
+        if (!entryWrapper.toolTips.length) return;
+
+        while (entryWrapper.toolTips.length && isVisible(entryWrapper.entryIndex(entryWrapper.toolTips[0]))) {
+            document.body.style.overflow = 'hidden';            
+            entryWrapper.tQueue.push(entryWrapper.toolTips[0]);
+            entryWrapper.toolTips.splice(0, 1);
+        }
+
+        entryWrapper.goNextToolTip();
+    };
+
     const handleScroll = () => {
-        Detect();
+        if (document.scrollingElement.scrollTop > entryWrapper.currentScroll){
+            document.scrollingElement.scrollTop = entryWrapper.currentScroll;
+        }
+        DetectTips();
         if (!entryWrapper.loading && entryWrapper.entries.length && entryWrapper.hasMore && isVisibleBot(entryWrapper.entries.length - 1)) {
             entryWrapper.loading = 1;
             setTimeout(entryWrapper.fetchEntries, 1000);
@@ -122,20 +142,23 @@ const Feed = (props) => {
             pState.setEntryAdded(null);
             setSnackField(<DoneSnackbar onClose={() => {
                 setSnackField(null)
-            }}/>);
+            }} />);
         }
         if (!pState.userInfo || !entryWrapper.wantUpdate) return;
+        entryWrapper.wantUpdate = 0;
         entryWrapper.initToolTips(pState.vkStorage);
         entryWrapper.fetchEntries(1);
     }, [props.state]);
 
     useEffect(() => {
-        if (!displayEntries) return;
+        if (!displayEntries.length) return;
+        entryWrapper.setCurrentScroll();
         handleScroll();
         // eslint-disable-next-line
     }, [displayEntries]);
 
     const toggleContext = () => {
+        if (entryWrapper.currentToolTip !== -1) return;
         setContextOpened(!contextOpened);
     };
 
@@ -162,36 +185,8 @@ const Feed = (props) => {
         }, 1000);
     };
 
-    const isVisible = (id) => {
-        let elem = document.querySelector(`.TextPost:nth-child(${id + 1})`);
-        if (!elem) return 0;
-        const posTop = elem.getBoundingClientRect().top;
-        return posTop + 200 <= window.innerHeight;
-    };
-
-    const Detect = () => {
-        if (!entryWrapper.toolTips.length) return;
-        let ers = [];
-        for (let key of entryWrapper.toolTips) {
-            let id = -1;
-            if (key.systemFlag) {
-                id = entryWrapper.entries.findIndex((e) => (e.systemFlag && e.id === key.id));
-            } else {
-                id = entryWrapper.entries.findIndex((e) => (e.entryId === key.entryId));
-            }
-            if (id === -1) continue;
-            if (!isVisible(id)) continue;
-            entryWrapper.tQueue.push(id);
-            ers.push(key);
-        }
-        for (let key of ers) {
-            entryWrapper.toolTips.splice(entryWrapper.toolTips.findIndex((e) => (e === key)), 1);
-        }
-        entryWrapper.goNextToolTip();
-    };
-
     const buttonRefresh = () => {
-        setLoading(<Spinner size='small'/>);
+        setLoading(<Spinner size="large"/>);
         entryWrapper.fetchEntries(1)
     };
 
@@ -207,7 +202,7 @@ const Feed = (props) => {
                 setActiveModal: setActiveModal,
                 state: props.state,
                 nav: props.nav,
-            }} key={id}/>
+            }} key={id} />
         }
         return <TextPost postData={{
             post: entry,
@@ -219,20 +214,20 @@ const Feed = (props) => {
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: entryWrapper,
             nav: props.nav,
-        }} key={id}/>
+        }} key={id} />
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
             header="Нет записей"
             stretched={true}
             action={<Button
                 onClick={buttonRefresh}> {(entryWrapper.mode === 'feed') ? "Обновить ленту" : "Обновить дневник"} </Button>}
         >
             {entryWrapper.mode === 'feed' ?
-                "Попросите друга дать вам доступ, импортируйте записи или создайте их самостоятельно" :
-                "Импортируйте записи или создайте их самостоятельно"}
+                "Попросите друга дать Вам доступ, импортируйте записи или создайте их самостоятельно." :
+                "Импортируйте записи или создайте их самостоятельно."}
         </Placeholder>
     }
 
@@ -242,7 +237,7 @@ const Feed = (props) => {
             action={<Button onClick={() => {
                 setError(null);
                 entryWrapper.fetchEntries(1)
-            }}> Попробовать снова </Button>}/>
+            }}> Попробовать снова </Button>} />
         :
         <View
             id={props.id}
@@ -256,34 +251,34 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
+                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed/>}
-                              onClick={() => {
-                                  select('feed')
-                              }}
-                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
-                              description="Все записи"
+                        <Cell before={<Icon28Newsfeed />}
+                            onClick={() => {
+                                select('feed')
+                            }}
+                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
+                            description="Все записи"
                         >
                             Лента
                         </Cell>
-                        <Cell before={<Icon28ArticleOutline/>}
-                              onClick={() => {
-                                  select('diary')
-                              }}
-                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
-                              description="Только мои записи"
+                        <Cell before={<Icon28ArticleOutline />}
+                            onClick={() => {
+                                select('diary')
+                            }}
+                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
+                            description="Только мои записи"
                         >
                             Мой дневник
                         </Cell>
                     </List>
                 </PanelHeaderContext>
                 {(entryWrapper.hasMore || displayEntries.length) ?
-                    <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching} onScroll={Detect}>
+                    <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
                         <CardGrid className="entriesGrid">
                             {displayEntries.map(renderData)}
                         </CardGrid>

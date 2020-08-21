@@ -5,11 +5,8 @@ import { Spinner, Button } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge'
 
 const UPLOADED_QUANTITY = 200;
-const FIRST_BLOCK_SIZE = 10;
-
-function back(ar) {
-    return ar[ar.length - 1];
-};
+const MAXPOP = 30;
+const PIXELS = 200;
 
 function cmp(l, r) {
     if (moment.utc(l.date).isBefore(moment.utc(r.date))) return 1;
@@ -18,7 +15,34 @@ function cmp(l, r) {
 }
 
 let deleteEntryFromFeedList = (entryId) => {
-    entryWrapper.entries.splice(entryWrapper.entries.findIndex(e => e.entryId === entryId), 1);
+    const id = entryWrapper.entryIndex({ entryId: entryId });
+    entryWrapper.entries.splice(id, 1);
+
+    let inTool = entryWrapper.toolTips.findIndex((e) => { return (!e.systemFlag && e.entryId === entryId)});
+
+    if (inTool !== -1) {
+        entryWrapper.toolTips.splice(inTool, 1);
+        entryWrapper.t[1] = 0;
+        entryWrapper.entries.forEach((entry) => {
+            if (!entryWrapper.t[1] && entry.userId === entryWrapper.userInfo.id) {
+                entryWrapper.t[1] = 1;
+                entryWrapper.toolTips.push(entry);
+                entryWrapper.toolTips.sort((left, right) => {
+                    let l = entryWrapper.entryIndex(left);
+                    let r = entryWrapper.entryIndex(right);
+                    return (l < r) ? -1 : 1; 
+                })
+            }
+        })
+    }
+
+}
+
+function getYcoord(id) {
+    let elem = document.querySelector(`.TextPost:nth-child(${id + 1})`);
+    if (!elem) return 0;
+    const top = elem.getBoundingClientRect().top + window.pageYOffset;
+    return top - PIXELS;
 }
 
 let names = ["", "showEntryNotifTooltip", "showAccessNotifTooltip", "showHealthNotifTooltip"];
@@ -34,7 +58,17 @@ export let entryWrapper = {
     wantUpdate: 1,
     editingEntry: null,
 
+    entryIndex: (entry) => {
+        if (entry.systemFlag){
+            return entryWrapper.entries.findIndex(e => {
+                return (e.systemFlag && e.id === entry.id);
+            })
+        }
+        return entryWrapper.entries.findIndex(e => e.entryId === entry.entryId);
+    },
+
     /*---------ToolTips---------*/
+    currentScroll: Infinity,
     toolTips: [],
     currentToolTip: -1,
     t: [0, 0, 0, 0],
@@ -42,6 +76,14 @@ export let entryWrapper = {
     rerenderTP: {},
     rerenderAP: {},
     tQueue: [],
+
+    setCurrentScroll: () => {
+        if (entryWrapper.toolTips.length) {
+            entryWrapper.currentScroll = getYcoord(entryWrapper.entryIndex(entryWrapper.toolTips[0]));
+        } else {
+            entryWrapper.currentScroll = Infinity;
+        }
+    },
 
     needTool: (entry) => {
         if (entry.systemFlag) {
@@ -54,28 +96,24 @@ export let entryWrapper = {
         return null;
     },
 
-    updateTips: (entries) => {
-        for (let entry of entries) {
-            let f = entryWrapper.needTool(entry);
-            if (f) {
-                entryWrapper.t[f] = 1;
-                entryWrapper.toolTips.push(entry);
-            }
-        }
+    updateTips: (entry) => {
+        let f = entryWrapper.needTool(entry);
+        if (!f) return;
+        entryWrapper.t[f] = 1;
+        entryWrapper.toolTips.push(entry);
     },
 
     goNextToolTip: () => {
         if (!entryWrapper.tQueue.length || entryWrapper.currentToolTip !== -1) return;
 
-        entryWrapper.tQueue.sort();
-        let entry = entryWrapper.entries[entryWrapper.tQueue[0]];
+        let entry = entryWrapper.tQueue[0];
         entryWrapper.tQueue.splice(0, 1);
 
-        document.body.style.overflow = 'hidden';
         let why = 1;
         if (entry.systemFlag) why = 2;
         else if (entry.userId !== entryWrapper.userInfo.id) why = 3;
 
+        document.body.style.overflow = 'hidden'; 
         bridge.send("VKWebAppStorageSet", { key: names[why], value: "" + false });
         entryWrapper.v[why] = 0;
 
@@ -126,6 +164,7 @@ export let entryWrapper = {
                 break;
             }
         }
+
         if (needPush) {
             entryWrapper.toolTips.splice(0, 0, entry);
         }
@@ -139,16 +178,16 @@ export let entryWrapper = {
 
     postEdge: async (id) => {
         const signatures = await bridge.sendPromise("VKWebAppCallAPIMethod", {
-            method : "friends.areFriends",
-            params : {
-                need_sign : 1,
-                user_ids : id,
+            method: "friends.areFriends",
+            params: {
+                need_sign: 1,
+                user_ids: id,
                 access_token: entryWrapper.userToken,
-                v : "5.120"
+                v: "5.120"
             }
         });
         signatures.response.forEach(friend => friend.id = friend.user_id);
-        return api("POST", "/v1.2.0/statAccess/", {users : JSON.stringify(signatures.response)});
+        return api("POST", "/v1.2.0/statAccess/", { users: JSON.stringify(signatures.response) });
     },
 
     postComplaint: (entryId) => {
@@ -218,7 +257,6 @@ export let entryWrapper = {
     init: async () => {
         entryWrapper.hasMore = 1;
         entryWrapper.accessEntriesPointer = 0;
-        entryWrapper.wantUpdate = 0;
         entryWrapper.entries = [];
         entryWrapper.accessEntries = [];
         entryWrapper.queue = [];
@@ -227,38 +265,24 @@ export let entryWrapper = {
         entryWrapper.tQueue = [];
         entryWrapper.t = [0, 0, 0, 0];
         entryWrapper.loading = 0;
+        entryWrapper.currentScroll = Infinity;
         await entryWrapper.fetchFriendsInfo();
         await entryWrapper.fetchPseudoFriends();
-        entryWrapper.updateTips(entryWrapper.accessEntries);
     },
 
-    Pop: (POP_LIMIT = 25, isFirstTime) => {
+    Pop: (POP_LIMIT = MAXPOP) => {
         let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
 
         for (let i = 0; i < cur;) {
-
-            if (!isFirstTime) {
-                if (entryWrapper.entries.length) {
-                    const lEntry = back(entryWrapper.entries);
-                    const isEqual = (a) => {
-                        if (lEntry.systemFlag ^ a.systemFlag) return 0;
-                        if (lEntry.systemFlag) return lEntry.id === a.id;
-                        return lEntry.entryId === a.entryId;
-                    }
-                    if (entryWrapper.toolTips.findIndex(isEqual) !== -1) {
-                        cur = i;
-                        break;
-                    }
-                }
-            }
-
             if (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length
                 && cmp(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer], entryWrapper.queue[i]) === -1) {
                 let current = entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++];
+                entryWrapper.updateTips(current);
                 entryWrapper.entries.push(current);
                 continue;
             }
 
+            entryWrapper.updateTips(entryWrapper.queue[i]);
             entryWrapper.entries.push(entryWrapper.queue[i]);
             i++;
         }
@@ -294,36 +318,31 @@ export let entryWrapper = {
 
         try {
             let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, beforeDate, beforeId)).data;
-            entryWrapper.updateTips(newEntries);
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
             const coming = entryWrapper.accessEntries.length - entryWrapper.accessEntriesPointer + newEntries.length;
-            if (coming === 0 || (isFirstTime && coming < FIRST_BLOCK_SIZE)) {
+            if (coming === 0 || (isFirstTime && coming < MAXPOP)) {
                 entryWrapper.setLoading(null);
                 entryWrapper.hasMore = false;
             }
-            if (!newEntries.length || (isFirstTime && coming < FIRST_BLOCK_SIZE)) {
+            if (!newEntries.length || (isFirstTime && coming < MAXPOP)) {
                 while (entryWrapper.accessEntriesPointer < entryWrapper.accessEntries.length) {
                     entryWrapper.queue.push(entryWrapper.accessEntries[entryWrapper.accessEntriesPointer++]);
                 }
                 entryWrapper.queue.sort(cmp);
             }
-            if (!isFirstTime) {
-                entryWrapper.Pop();
-            } else {
-                entryWrapper.Pop(FIRST_BLOCK_SIZE, 1);
-                entryWrapper.setFetching(null);
-            }
+            entryWrapper.Pop();
+            entryWrapper.setFetching(null);
         } catch (error) {
             if (isFirstTime) {
                 entryWrapper.setDisplayEntries([]);
-                entryWrapper.setErrorPlaceholder(error);
+                entryWrapper.setErrorё(error);
                 entryWrapper.wantUpdate = 1;
             } else {
                 entryWrapper.wasError = 1;
                 entryWrapper.setLoading(
                     <Button size="m" mode="tertiary" onClick={() => {
-                        entryWrapper.setLoading(<Spinner size='small' />);
+                        entryWrapper.setLoading(<Spinner size='large' />);
                         entryWrapper.fetchEntries();
                     }}>
                         Попробовать снова

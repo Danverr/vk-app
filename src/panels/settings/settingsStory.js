@@ -23,6 +23,13 @@ const SettingsStory = (props) => {
         if (props.nav.activePanel !== "friends") setModal(null);
     }, [props.nav.activePanel]);
 
+    const versionFutterStyle = {
+        '-moz-user-select': 'none',
+        '-khtml-user-select': 'none',
+        '-webkit-user-select': 'none',
+        'user-select': 'none',
+    };
+
     return (
         <View
             id={props.id}
@@ -87,7 +94,7 @@ const SettingsStory = (props) => {
                         Перейти в группу ВК
                     </CellButton>
                 </Group>
-                <Footer>Версия приложения v1.2.2</Footer>
+                <Footer style={versionFutterStyle}>Версия приложения v1.2.2</Footer>
             </Panel>
             <ImportPanel
                 id="import"

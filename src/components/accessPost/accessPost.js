@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { RichCell, Avatar, Card, Button, ScreenSpinner, Tooltip } from "@vkontakte/vkui";
 import "./accessPost.module.css";
 import ErrorSnackbar from "../errorSnackbar/errorSnackbar";
@@ -85,15 +85,16 @@ const AccessPost = (props) => {
 					setTool(0);
 					document.body.style.overflow = 'visible';
 					postData.wrapper.currentToolTip = -1;
+					postData.wrapper.setCurrentScroll()
 					postData.wrapper.goNextToolTip()
 				}}
-				header="Кто-то выдал вам доступ!"
+				header="Кто-то выдал Вам доступ!"
 				text="Включите уведомление о выдаче доступа в настройках"
 			>
 				<RichCell
 					disabled
 					before={<Avatar size={72} src={avatar} />}
-					caption={`${phr[user.sex === 2 ? 1 : 0]} вам доступ к записям`}
+					caption={`${phr[user.sex === 2 ? 1 : 0]} Вам доступ к записям`}
 				>
 					{`${user.first_name} ${user.last_name}`}
 				</RichCell>

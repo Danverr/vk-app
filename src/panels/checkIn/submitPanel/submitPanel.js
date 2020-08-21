@@ -8,7 +8,7 @@ import {
     ScreenSpinner,
     Cell,
 } from "@vkontakte/vkui";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
 import getAnswer from "../../../utils/getAnswer";
@@ -18,8 +18,11 @@ import Icon12Lock from "@vkontakte/icons/dist/12/lock";
 import QuestionSection from "../questionSection/questionSection";
 import entryWrapper from "../../../components/entryWrapper";
 
+const MAX_NOTE_LEN = 2048;
+const MAX_TITLE_LEN = 64;
+
 const SubmitPanel = (props) => {
-    const {answer, setAnswer, setActiveSlideIndex} = props;
+    const { answer, setAnswer, setActiveSlideIndex } = props;
     const [isChecked, setCheck] = useState(!answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
@@ -65,7 +68,7 @@ const SubmitPanel = (props) => {
                 mode: "error",
             });
         } else {
-            props.setPopout(<ScreenSpinner/>);
+            props.setPopout(<ScreenSpinner />);
             setFormStatus({
                 title: "",
                 text: "",
@@ -104,6 +107,7 @@ const SubmitPanel = (props) => {
                         entryWrapper.editEntryFromFeedList(entryData);
                     }
 
+                    props.setPopout(null);
                     setAnswer(getAnswer());
                     setActiveSlideIndex(0);
                     props.setEntryAdded(true);
@@ -130,9 +134,15 @@ const SubmitPanel = (props) => {
         }
     };
 
+    const change = (e, maxLen) => {
+        if (e.target.value === "") return;
+        e.target.value = e.target.value.substr(0, Math.min(maxLen, e.target.value.length));
+    }
+
+
     return (
         <>
-            <QuestionSection question={"Что вам запомнилось?"} date={answer.date.val}/>
+            <QuestionSection question={"Что Вам запомнилось?"} date={answer.date.val} />
             <FormLayout className={styles.formLayout}>
                 {formStatus.text.length === 0 ? null : (
                     <FormStatus header={formStatus.title} mode={formStatus.mode}>
@@ -141,6 +151,7 @@ const SubmitPanel = (props) => {
                 )}
 
                 <Input
+                    onChangeCapture={(e) => { change(e, MAX_TITLE_LEN) }}
                     top="Заголовок"
                     placeholder="Можно оставить пустым"
                     maxLength="64"
@@ -148,6 +159,7 @@ const SubmitPanel = (props) => {
                     onChange={handleTitle}
                 />
                 <Textarea
+                    onChangeCapture={(e) => { change(e, MAX_NOTE_LEN) }}
                     top="Текст заметки"
                     placeholder="Можно оставить пустым"
                     maxLength="2048"
@@ -157,13 +169,13 @@ const SubmitPanel = (props) => {
                 <Cell
                     className={styles.privacySwitch}
                     asideContent={
-                        <Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>
+                        <Switch checked={isChecked} onClick={switchPublic} onChange={() => null} />
                     }
                     description={
-                        <span> Заголовок и текст будут скрыты <br/> Друзья не увидят приватность записи </span>}
+                        <span> Заголовок и текст будут скрыты. <br /> Друзья не увидят приватность записи. </span>}
                 >
                     <span>Приватная запись</span>
-                    <Icon12Lock className={styles.lockIcon}/>
+                    <Icon12Lock className={styles.lockIcon} />
                 </Cell>
 
                 <Button size="xl" mode="primary" onClick={saveAnswer}>

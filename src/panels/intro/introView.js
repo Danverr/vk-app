@@ -20,7 +20,7 @@ const IntroView = (props) => {
 		{
 			title: "Наша цель",
 			text:
-				"У всех бывают трудные дни, но не всегда с ними легко справится в одиночку. mood без лишних слов даст вам знать, когда близкому человеку потребуется поддержка.",
+				"У всех бывают трудные дни, но не всегда с ними легко справиться в одиночку. mood без лишних слов даст Вам знать, когда близкому человеку потребуется поддержка.",
 			img: intro1,
 		},
 		{
@@ -67,7 +67,7 @@ const IntroView = (props) => {
 			onSwipeBack={props.nav.goBack}
 		>
 			{slidesData.map((slideData, index) => (
-				<SlidePanel
+				<SlidePanel style={{'user-select' : 'none'}}
 					id={index}
 					key={"introSlide_" + index}
 					index={index}

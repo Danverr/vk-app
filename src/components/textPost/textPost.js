@@ -145,6 +145,7 @@ const TextPost = (props) => {
     }
 
     const onSettingClick = () => {
+        if (postData.wrapper.currentToolTip && postData.wrapper.currentToolTip !== -1) return;
         postData.setSnackField(null);
         postData.setPopout(
             <ActionSheet onClose={() => {
@@ -233,7 +234,7 @@ const TextPost = (props) => {
     return (
         <Card size="l" mode="shadow" className="TextPost" onClick={props.onClick}>
             <Tooltip
-            offsetX={-6}
+                offsetX={-6}
                 offsetY={6}
                 isShown={tool}
                 onClose={() => {
@@ -241,6 +242,7 @@ const TextPost = (props) => {
                     setTool(0);
                     document.body.style.overflow = 'visible';
                     postData.wrapper.currentToolTip = -1;
+                    postData.wrapper.setCurrentScroll()
                     postData.wrapper.goNextToolTip()
                 }}
                 header={isMyPost ? "А вот и ваша запись!" : "У друга плохое самочувствие!"}

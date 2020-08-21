@@ -101,7 +101,7 @@ const StatsChart = (props) => {
     if (stats.length === 0) {
         return (
             <Placeholder header="Недостаточно записей">
-                Для статистики нужна хотя бы одна запись
+                Для статистики нужна хотя бы одна запись.
             </Placeholder>
         );
     }

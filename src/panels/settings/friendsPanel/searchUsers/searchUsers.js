@@ -25,17 +25,17 @@ const SearchUsers = (props) => {
     }
 
     const searchedFriends = searchFriends();
-    const placeholderText = (!users || users.length === 0) ? "Список друзей пуст" : "Пользователи не найдены";
+    const placeholderText = (!users || users.length === 0) ? "Список друзей пуст." : "Пользователи не найдены.";
     const searchedIds = searchedFriends.map(user => user.id);
 
     const getDescription = (sex) => {
         switch(sex){
             case 0:
-                return "Дал(а) вам доступ";
+                return "Дал(а) Вам доступ";
             case 1:
-                return "Далa вам доступ";
+                return "Далa Вам доступ";
             case 2:
-                return "Дал вам доступ";
+                return "Дал Вам доступ";
             default:
                 break;
         }

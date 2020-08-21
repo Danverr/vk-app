@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid, Button, Placeholder} from '@vkontakte/vkui';
+import React, { useState, useEffect } from 'react';
+import { Panel, PanelHeader, View, Div, Header, Group, Spinner, CardGrid, Button, Placeholder } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import moment from 'moment';
@@ -39,7 +39,7 @@ function calendarStateUpdate() {
         mood = Math.floor(mood + 0.5);
         stress = Math.floor(stress + 0.5);
         anxiety = Math.floor(anxiety + 0.5);
-        stats[day] = {mood: mood, stress: stress, anxiety: anxiety};
+        stats[day] = { mood: mood, stress: stress, anxiety: anxiety };
     }
     localState.userStats = stats;
     localState.setUserStats(stats);
@@ -48,7 +48,7 @@ function calendarStateUpdate() {
 
 function fetchCalendar() {
     localState.usersMap[localState.userInfo.id] = localState.userInfo;
-    api("GET", "/v1.2.0/entries/", {users: localState.userInfo.id}).catch((error) => {
+    api("GET", "/v1.2.0/entries/", { users: localState.userInfo.id }).catch((error) => {
         localState.setError(error)
     }).then((result) => {
         localState.allEntries = result.data;
@@ -73,7 +73,7 @@ let localState = {
     calendarStateUpdate: calendarStateUpdate,
     deleteEntryFromList: deleteEntryFromList,
     fetchCalendar: fetchCalendar,
-    calendarField: <Spinner size="large" style={{marginTop: 20}}/>,
+    calendarField: <Spinner size="large" style={{ marginTop: 20 }} />,
     curDate: null
 };
 
@@ -85,16 +85,16 @@ const CalendarStory = (props) => {
     const [fetching, setFetching] = useState(1);
     const [snackField, setSnackField] = useState(null);
     const [error, setError] = useState(null);
-    const {popout, setPopout} = props.nav;
+    const { popout, setPopout } = props.nav;
 
-    const {userInfo} = props.state;
+    const { userInfo } = props.state;
 
     useEffect(() => {
         if (props.state.entryAdded) {
             props.state.setEntryAdded(null);
             setSnackField(<DoneSnackbar onClose={() => {
                 setSnackField(null)
-            }}/>)
+            }} />)
         }
     }, [props.state])
 
@@ -118,7 +118,7 @@ const CalendarStory = (props) => {
     useEffect(() => {
         if (!userInfo || !curDate || fetching)
             return;
-        setEntriesField(<Spinner size="large"/>);
+        setEntriesField(<Spinner size="large" />);
 
         localState.entries = []
 
@@ -137,7 +137,7 @@ const CalendarStory = (props) => {
                 setCurDate(moment(date));
                 localState.curDate = moment(date);
             }}
-            stats={userStats}/>;
+            stats={userStats} />;
         setCalendarField(temp);
         localState.calendarField = temp;
         // eslint-disable-next-line
@@ -155,43 +155,52 @@ const CalendarStory = (props) => {
             nav: props.nav,
             deleteEntryFromFeedList: entryWrapper.deleteEntryFromFeedList,
         };
-        return <TextPost postData={dat} key={entry.entryId}/>
+        return <TextPost postData={dat} key={entry.entryId} />
     };
 
     const Empty = () => {
         return <Placeholder>
-            У Вас нет записей за этот день
+            У Вас нет записей за этот день.
         </Placeholder>
     }
 
+    const calendarDivStyle = {
+        'paddingTop': '0',
+        'paddingBottom': '0',
+        '-moz-user-select': 'none',
+        '-khtml-user-select': 'none',
+        '-webkit-user-select': 'none',
+        'user-select': 'none',
+    }
+
     return error ? <ErrorPlaceholder error={error}
-                                     action={<Button onClick={() => {
-                                         setError(null);
-                                         fetchCalendar()
-                                     }}> Попробовать снова </Button>}/> : (
-        <View id={props.id}
-              popout={popout}
-              activePanel={props.nav.activePanel}
-              history={props.nav.viewHistory}
-              onSwipeBack={props.nav.goBack}
-        >
-            <Panel id="main">
-                <PanelHeader separator={false}>Календарь</PanelHeader>
-                <Group separator="show">
-                    <Div style={{paddingTop: "0", paddingBottom: "0"}}>
-                        {calendarField}
-                    </Div>
-                </Group>
-                <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
-                    <CardGrid className="entriesGrid">
-                        {entriesField.map(renderData)}
-                    </CardGrid>
-                    {(!fetching && !localState.entries.length) && Empty()}
-                </Group>
-                {snackField}
-            </Panel>
-        </View>
-    );
+        action={<Button onClick={() => {
+            setError(null);
+            fetchCalendar()
+        }}> Попробовать снова </Button>} /> : (
+            <View id={props.id}
+                popout={popout}
+                activePanel={props.nav.activePanel}
+                history={props.nav.viewHistory}
+                onSwipeBack={props.nav.goBack}
+            >
+                <Panel id="main">
+                    <PanelHeader separator={false}>Календарь</PanelHeader>
+                    <Group separator="show">
+                        <Div style={calendarDivStyle}>
+                            {calendarField}
+                        </Div>
+                    </Group>
+                    <Group header={<Header mode="secondary" style={{'user-select' : 'none'}}> Записи за этот день: </Header>}>
+                        <CardGrid className="entriesGrid">
+                            {entriesField.map(renderData)}
+                        </CardGrid>
+                        {(!fetching && !localState.entries.length) && Empty()}
+                    </Group>
+                    {snackField}
+                </Panel>
+            </View>
+        );
 };
 
 export default CalendarStory;
