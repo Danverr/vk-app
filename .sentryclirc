@@ -1,0 +1,7 @@
+[defaults]
+url = https://sentry.io/
+org = daniel-zm
+project = daniel-zm
+
+[auth]
+token=fa02f8faee0843afa2151efa26ee5c078308f44ace86474799069b455270e6c5

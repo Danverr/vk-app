@@ -137,7 +137,7 @@ const useAppState = () => {
 
     const [initActions] = useState([
         {name: "VK Subscribe", func: vkSubscribe},
-        {name: "VK Bridge Init", func: bridge.send, params: ["VKWebAppInit", {}], await: true},
+        {name: "VK Bridge Init", func: bridge.send, params: ["VKWebAppInit"], await: true},
         {name: "VK Storage Loading", func: vkStorage.fetchValues},
         {name: "Init Color Scheme", func: initScheme},
         {name: "Yandex.Metrika Init", func: ymInit},
@@ -172,19 +172,19 @@ const useAppState = () => {
 
         const start = moment();
 
-        if (initActionsCompleted === initActions.length) {
-            console.group("APP INIT");
-            logEvent("App Init", "Completed");
-            console.groupEnd();
-            return;
-        }
-
         //if (process.env.NODE_ENV === "development") {
         await import("./../eruda");
         //}
 
-        console.group("APP INIT");
-        logEvent("App Init", "Started");
+        console.group(`APP INIT (${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
+
+        if (initActionsCompleted === initActions.length) {
+            logEvent("App Init", "Completed");
+            console.groupEnd();
+            return;
+        } else {
+            logEvent("App Init", "Started");
+        }
 
         for (const action of initActions) {
             logEvent(action.name, "Started");
