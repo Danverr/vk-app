@@ -18,7 +18,7 @@ let deleteEntryFromFeedList = (entryId) => {
     const id = entryWrapper.entryIndex({ entryId: entryId });
     entryWrapper.entries.splice(id, 1);
 
-    let inTool = entryWrapper.toolTips.findIndex((e) => { return (!e.systemFlag && e.entryId === entryId)});
+    let inTool = entryWrapper.toolTips.findIndex((e) => { return (!e.systemFlag && e.entryId === entryId) });
 
     if (inTool !== -1) {
         entryWrapper.toolTips.splice(inTool, 1);
@@ -30,7 +30,7 @@ let deleteEntryFromFeedList = (entryId) => {
                 entryWrapper.toolTips.sort((left, right) => {
                     let l = entryWrapper.entryIndex(left);
                     let r = entryWrapper.entryIndex(right);
-                    return (l < r) ? -1 : 1; 
+                    return (l < r) ? -1 : 1;
                 })
             }
         })
@@ -59,7 +59,7 @@ export let entryWrapper = {
     editingEntry: null,
 
     entryIndex: (entry) => {
-        if (entry.systemFlag){
+        if (entry.systemFlag) {
             return entryWrapper.entries.findIndex(e => {
                 return (e.systemFlag && e.id === entry.id);
             })
@@ -113,7 +113,7 @@ export let entryWrapper = {
         if (entry.systemFlag) why = 2;
         else if (entry.userId !== entryWrapper.userInfo.id) why = 3;
 
-        document.body.style.overflow = 'hidden'; 
+        document.body.style.overflow = 'hidden';
         bridge.send("VKWebAppStorageSet", { key: names[why], value: "" + false });
         entryWrapper.v[why] = 0;
 
@@ -196,52 +196,31 @@ export let entryWrapper = {
 
     fetchFriendsInfo: async () => {
         if (entryWrapper.mode === 'diary') return;
+        entryWrapper.accessEntries = (await api("GET", "/v1.2.0/statAccess", { type: 'fromId' })).data;
 
-        try {
-            entryWrapper.accessEntries = (await api("GET", "/v1.2.0/statAccess", { type: 'fromId' })).data;
+        entryWrapper.friends = [];
+        entryWrapper.friends.push(entryWrapper.userInfo.id);
+        entryWrapper.accessEntries.forEach((accessEntry) => {
+            accessEntry.systemFlag = 1;
+            entryWrapper.friends.push(accessEntry.id)
+        });
 
-            entryWrapper.friends = [];
-            entryWrapper.accessEntries.forEach((accessEntry) => {
-                accessEntry.systemFlag = 1;
-                entryWrapper.friends.push(accessEntry.id)
-            });
+        const Promise = await api("GET", "/v1.2.0/vkApi/users.get", {
+            users: entryWrapper.friends.join(","),
+        });
 
-            entryWrapper.friends.push(entryWrapper.userInfo.id);
-            const newFriends = [];
-            entryWrapper.friends.forEach((friend) => {
-                if (typeof entryWrapper.usersMap[friend] === 'undefined') {
-                    newFriends.push(friend);
-                }
-            });
-
-            if (newFriends.length) {
-                const Promise = await api("GET", "/v1.2.0/vkApi/users.get", {
-                    users: newFriends.join(","),
-                });
-
-                Promise.data.forEach((friend) => {
-                    entryWrapper.usersMap[friend.id] = friend;
-                });
-            }
-
-        } catch (error) {
-            entryWrapper.wantUpdate = 1;
-            entryWrapper.setErrorPlaceholder(error);
-        }
+        Promise.data.forEach((friend) => {
+            entryWrapper.usersMap[friend.id] = friend;
+        })
     },
 
     fetchPseudoFriends: async () => {
         if (entryWrapper.mode === 'diary') return;
 
-        try {
-            entryWrapper.pseudoFriends = {};
-            (await api("GET", "/v1.2.0/statAccess", { type: 'toId' })).data.forEach((friend) => {
-                entryWrapper.pseudoFriends[friend.id] = 1;
-            });
-        } catch (error) {
-            entryWrapper.setErrorPlaceholder(error);
-            entryWrapper.wantUpdate = 1;
-        }
+        entryWrapper.pseudoFriends = {};
+        (await api("GET", "/v1.2.0/statAccess", { type: 'toId' })).data.forEach((friend) => {
+            entryWrapper.pseudoFriends[friend.id] = 1;
+        });
     },
 
     fetchEntriesPack: (PACK_SZ, beforeDate, beforeId) => {
@@ -255,19 +234,28 @@ export let entryWrapper = {
     },
 
     init: async () => {
-        entryWrapper.hasMore = 1;
-        entryWrapper.accessEntriesPointer = 0;
-        entryWrapper.entries = [];
-        entryWrapper.accessEntries = [];
-        entryWrapper.queue = [];
-        entryWrapper.currentToolTip = -1;
-        entryWrapper.toolTips = [];
-        entryWrapper.tQueue = [];
-        entryWrapper.t = [0, 0, 0, 0];
-        entryWrapper.loading = 0;
-        entryWrapper.currentScroll = Infinity;
-        await entryWrapper.fetchFriendsInfo();
-        await entryWrapper.fetchPseudoFriends();
+        try {
+            entryWrapper.hasMore = 1;
+            entryWrapper.accessEntriesPointer = 0;
+            entryWrapper.entries = [];
+            entryWrapper.accessEntries = [];
+            entryWrapper.queue = [];
+            entryWrapper.currentToolTip = -1;
+            entryWrapper.toolTips = [];
+            entryWrapper.tQueue = [];
+            entryWrapper.t = [0, 0, 0, 0];
+            entryWrapper.loading = 0;
+            entryWrapper.currentScroll = Infinity;
+            await entryWrapper.fetchFriendsInfo();
+            await entryWrapper.fetchPseudoFriends();
+            return 1;
+        } catch (error) {
+            entryWrapper.setDisplayEntries([]);
+            entryWrapper.setLoading(<Spinner size='large' />);
+            entryWrapper.setErrorPlaceholder(error);
+            entryWrapper.wantUpdate = 1;
+            return 0;
+        }
     },
 
     Pop: (POP_LIMIT = MAXPOP) => {
@@ -298,10 +286,12 @@ export let entryWrapper = {
     fetchEntries: async (isFirstTime = null) => {
 
         if (isFirstTime) {
-            await entryWrapper.init();
+            if (!await entryWrapper.init()){ // если init зашел в catch
+                return;
+            }
         }
 
-        if (entryWrapper.queue.length) {
+        if (entryWrapper.queue.length) { // есть что показать пользователю
             entryWrapper.Pop();
             return;
         }
@@ -336,7 +326,8 @@ export let entryWrapper = {
         } catch (error) {
             if (isFirstTime) {
                 entryWrapper.setDisplayEntries([]);
-                entryWrapper.setErrorё(error);
+                entryWrapper.setLoading(<Spinner size='large' />);
+                entryWrapper.setErrorPlaceholder(error);
                 entryWrapper.wantUpdate = 1;
             } else {
                 entryWrapper.wasError = 1;
@@ -345,7 +336,7 @@ export let entryWrapper = {
                         entryWrapper.setLoading(<Spinner size='large' />);
                         entryWrapper.fetchEntries();
                     }}>
-                        Попробовать снова
+                        Загрузить записи
                     </Button>
                 );
             }

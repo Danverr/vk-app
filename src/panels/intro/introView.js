@@ -67,7 +67,7 @@ const IntroView = (props) => {
             onSwipeBack={props.nav.goBack}
         >
             {slidesData.map((slideData, index) => (
-                <SlidePanel style={{'user-select': 'none'}}
+                <SlidePanel
                             id={index}
                             key={"introSlide_" + index}
                             index={index}

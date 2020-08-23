@@ -87,7 +87,7 @@ const AccessPost = (props) => {
                     postData.wrapper.goNextToolTip()
                 }}
                 header="Кто-то выдал Вам доступ!"
-                text="Включите уведомления о выдаче доступа в настройках"
+                text="Включите уведомления о выдаче доступа в настройках."
             >
                 <RichCell
                     disabled

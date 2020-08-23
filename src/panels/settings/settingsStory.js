@@ -23,13 +23,6 @@ const SettingsStory = (props) => {
         if (props.nav.activePanel !== "friends") setModal(null);
     }, [props.nav.activePanel]);
 
-    const versionFooterStyle = {
-        '-moz-user-select': 'none',
-        '-khtml-user-select': 'none',
-        '-webkit-user-select': 'none',
-        'user-select': 'none',
-    };
-
     return (
         <View
             id={props.id}
@@ -94,7 +87,7 @@ const SettingsStory = (props) => {
                         Перейти в группу ВК
                     </CellButton>
                 </Group>
-                <Footer style={versionFooterStyle}>
+                <Footer>
                     Версия приложения {process.env.REACT_APP_VERSION}
                 </Footer>
             </Panel>

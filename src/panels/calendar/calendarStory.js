@@ -164,15 +164,6 @@ const CalendarStory = (props) => {
         </Placeholder>
     }
 
-    const calendarDivStyle = {
-        'paddingTop': '0',
-        'paddingBottom': '0',
-        '-moz-user-select': 'none',
-        '-khtml-user-select': 'none',
-        '-webkit-user-select': 'none',
-        'user-select': 'none',
-    }
-
     return error ? <ErrorPlaceholder error={error}
         action={<Button onClick={() => {
             setError(null);
@@ -187,11 +178,11 @@ const CalendarStory = (props) => {
                 <Panel id="main">
                     <PanelHeader separator={false}>Календарь</PanelHeader>
                     <Group separator="show">
-                        <Div style={calendarDivStyle}>
+                        <Div>
                             {calendarField}
                         </Div>
                     </Group>
-                    <Group header={<Header mode="secondary" style={{'user-select' : 'none'}}> Записи за этот день: </Header>}>
+                    <Group header={<Header mode="secondary"> Записи за этот день: </Header>}>
                         <CardGrid className="entriesGrid">
                             {entriesField.map(renderData)}
                         </CardGrid>

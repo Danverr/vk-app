@@ -35,16 +35,18 @@ const SubmitPanel = (props) => {
 
     // Обрабатываем изменения в поле заголовка
     const handleTitle = (event, name) => {
-        props.answer.title.val = event.target.value;
+        let title = event.target.value.substr(0, Math.min(event.target.value.length, MAX_TITLE_LEN));
+        props.answer.title.val = title;
         setAnswer(answer);
-        setTitleText(event.target.value);
+        setTitleText(title);
     };
 
     // Обрабатываем изменения в поле текста записки
     const handleNote = (event) => {
-        answer.note.val = event.target.value;
+        let note = event.target.value.substr(0, Math.min(event.target.value.length, MAX_NOTE_LEN));
+        answer.note.val = note;
         setAnswer(answer);
-        setNoteText(event.target.value);
+        setNoteText(note);
     };
 
     // Переключаем доступ друзей к записи
@@ -135,12 +137,6 @@ const SubmitPanel = (props) => {
         }
     };
 
-    const change = (e, maxLen) => {
-        if (e.target.value === "") return;
-        e.target.value = e.target.value.substr(0, Math.min(maxLen, e.target.value.length));
-    }
-
-
     return (
         <>
             <QuestionSection question={"Что Вам запомнилось?"} date={answer.date.val} />
@@ -152,7 +148,6 @@ const SubmitPanel = (props) => {
                 )}
 
                 <Input
-                    onChangeCapture={(e) => { change(e, MAX_TITLE_LEN) }}
                     top="Заголовок"
                     placeholder="Можно оставить пустым"
                     maxLength="64"
@@ -160,7 +155,6 @@ const SubmitPanel = (props) => {
                     onChange={handleTitle}
                 />
                 <Textarea
-                    onChangeCapture={(e) => { change(e, MAX_NOTE_LEN) }}
                     top="Текст заметки"
                     placeholder="Можно оставить пустым"
                     maxLength="2048"

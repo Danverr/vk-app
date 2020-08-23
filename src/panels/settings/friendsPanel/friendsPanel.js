@@ -27,6 +27,8 @@ import ModalFilter from './modalFilter'
 import Icon16Done from '@vkontakte/icons/dist/16/done'
 import s from './friendsPanel.module.css'
 
+let pressedOnAllowButton = false;
+
 const FriendsPanel = (props) => {
     const [snackbar, setSnackbar] = useState(null);
     const [error, setError] = useState(null);
@@ -130,7 +132,7 @@ const FriendsPanel = (props) => {
                 });
 
                 await api("POST", "/v1.2.0/statAccess/", {
-                     users: JSON.stringify(addWithSign.map((user) => ({id: user.user_id, sign: user.sign})))
+                    users: JSON.stringify(addWithSign.map((user) => ({ id: user.user_id, sign: user.sign })))
                 }).then((res) => {
                     add.forEach((id) => {
                         entryWrapper.pseudoFriends[id] = 1;
@@ -165,8 +167,8 @@ const FriendsPanel = (props) => {
                 });
             }
             if (!addf && !delf)
-                setSnackbar(<Snackbar 
-                    className = {s.snackbar}
+                setSnackbar(<Snackbar
+                    className={s.snackbar}
                     layout="vertical"
                     onClose={() => setSnackbar(null)}
                     before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
@@ -187,7 +189,7 @@ const FriendsPanel = (props) => {
             if (user.toId && statAccess.indexOf(user.id) === -1)
                 del.push(user.id);
         }
-        if(add.length === 0 && del.length === 0)
+        if (add.length === 0 && del.length === 0)
             return;
         changeStatAccess(add, del, add.length > 0, del.length > 0);
     }
@@ -197,20 +199,25 @@ const FriendsPanel = (props) => {
         setTo(res.to);
     }
 
-    var content = <Spinner size="large" style = {{paddingTop: '20px'}}/>;
+    var content = <Spinner size="large" style={{ paddingTop: '20px' }} />;
 
     useEffect(() => {
         //разрешение есть, но токен еще не получен
-        if(!userToken && accessTokenScope.split(",").indexOf("friends") !== -1)
+        if (!userToken && accessTokenScope.split(",").indexOf("friends") !== -1)
             fetchUserToken(); //получаем, не показывая плейсхолдер
     }, [userToken, accessTokenScope, fetchUserToken])
 
     //токен не получен и разрешения нет
-    if(!userToken && accessTokenScope.split(",").indexOf("friends") === -1) //показываем плейсхолдер
-        content = <Placeholder 
+    if (!userToken && accessTokenScope.split(",").indexOf("friends") === -1) //показываем плейсхолдер
+        content = <Placeholder
             header="Нужно разрешение"
             stretched
-            action={<Button onClick = {() => fetchUserToken()}> Дать разрешение </Button>}> 
+            action={<Button onClick={() => {
+                if (pressedOnAllowButton) return;
+                pressedOnAllowButton = true;
+                setTimeout(() => { pressedOnAllowButton = false }, 1000);
+                fetchUserToken();
+            }}> Дать разрешение </Button>}>
             Для редактирования доступа к статистике нам нужен список ваших друзей.
         </Placeholder>;
     else if (error)
@@ -221,15 +228,15 @@ const FriendsPanel = (props) => {
     else if (users && statAccess)
         content = (<div>
             <SearchUsers
-                search = {search}
-                from = {from}
-                to = {to}
+                search={search}
+                from={from}
+                to={to}
                 users={users}
                 statAccess={statAccess}
                 setStatAccess={setStatAccess}
             />
-            {snackbar}  
-            <FixedLayout vertical="bottom">    
+            {snackbar}
+            <FixedLayout vertical="bottom">
                 <Div style={{ display: 'flex', background: 'white' }}>
                     <Button size="l"
                         stretched
@@ -255,12 +262,12 @@ const FriendsPanel = (props) => {
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => {
                 props.nav.goBack();
             }} />}>
-                Доступ 
+                Доступ
             </PanelHeader>
             <FixedLayout vertical="top">
-                <Search value={search} onChange={(e) => { setSearch(e.target.value); }}/>
+                <Search value={search} onChange={(e) => { setSearch(e.target.value); }} />
             </FixedLayout>
-            <div style = {{paddingTop: 52}}>
+            <div style={{ paddingTop: 52 }}>
                 {content}
             </div>
         </Panel>
