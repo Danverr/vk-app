@@ -23,11 +23,11 @@ const launchParams = getLaunchParams();
 
 const useAppState = () => {
     const [loading, setLoading] = useState(true);
-    const [globalError, setGlobalError] = useState(null);
     const [notifications, setNotifications] = useState(
         launchParams.vk_are_notifications_enabled === "1"
     );
     const [isBanned, setIsBanned] = useState(null);
+    const [globalError, setGlobalError] = useState(null);
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [entryAdded, setEntryAdded] = useState(false);
@@ -78,7 +78,7 @@ const useAppState = () => {
             })
             .catch((error) => {
                 if (error.error_data && error.error_data.error_code !== 4) { // 4: User denied
-                    setGlobalError(error);
+                    throw error;
                 }
             });
     };
@@ -93,7 +93,6 @@ const useAppState = () => {
                 return userInfo;
             })
             .catch((error) => {
-                setGlobalError(error);
                 throw error;
             });
     };
@@ -102,7 +101,6 @@ const useAppState = () => {
         return api("GET", "/v1.2.0/users/", {}).then((res) => {
             setIsBanned(res.data.isBanned);
         }).catch((error) => {
-            setGlobalError(error);
             throw error;
         });
     };
@@ -123,21 +121,7 @@ const useAppState = () => {
         });
     };
 
-    const vkSubscribe = async () => {
-        await bridge.subscribe((e) => {
-            if (e.detail.type === 'VKWebAppAllowNotificationsResult' && e.detail.data.result) {
-                setNotifications(true);
-            } else if (e.detail.type === 'VKWebAppDenyNotificationsResult' && e.detail.data.result) {
-                setNotifications(false);
-            } else if (e.detail.type === "VKWebAppViewRestore") {
-                initApp();
-            }
-        });
-    };
-
     const [initActions] = useState([
-        {name: "VK Subscribe", func: vkSubscribe},
-        {name: "VK Bridge Init", func: bridge.send, params: ["VKWebAppInit"], await: true},
         {name: "VK Storage Loading", func: vkStorage.fetchValues},
         {name: "Init Color Scheme", func: initScheme},
         {name: "Yandex.Metrika Init", func: ymInit},
@@ -162,6 +146,8 @@ const useAppState = () => {
                 .then(() => logEvent(action.name, "OK"))
                 .catch(error => logEvent(action.name, error.message))
                 .finally(() => {
+                    action.completed = true;
+
                     if (++initActionsCompleted === initActions.length) {
                         logEvent("App Init", "Completed");
                         console.groupEnd();
@@ -172,11 +158,18 @@ const useAppState = () => {
 
         const start = moment();
 
+        // Если через 10 секунд не загрузились - выбрасываем ошибку
+        setTimeout(() => {
+            if (initActionsCompleted !== initActions.length) {
+                setGlobalError(Error("Network Error"));
+            }
+        }, 10 * 1000);
+
         //if (process.env.NODE_ENV === "development") {
         await import("./../eruda");
         //}
 
-        console.group(`APP INIT (${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
+        console.group(`APP INIT(${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
 
         if (initActionsCompleted === initActions.length) {
             logEvent("App Init", "Completed");
@@ -187,6 +180,7 @@ const useAppState = () => {
         }
 
         for (const action of initActions) {
+            if (action.completed) continue;
             logEvent(action.name, "Started");
 
             if (action.await) await runAction(action);
@@ -195,15 +189,34 @@ const useAppState = () => {
     };
 
     useEffect(() => {
-        initApp();
+        bridge.subscribe((e) => {
+            const {type, data} = e.detail;
+            if (type === undefined) return;
+            console.log("%c%s:", `font-weight: bold;`, type, data);
+
+            if (type === 'VKWebAppAllowNotificationsResult' && data.result) {
+                setNotifications(true);
+            } else if (type === 'VKWebAppDenyNotificationsResult' && data.result) {
+                setNotifications(false);
+            } else if (type === "VKWebAppViewRestore" || (type === "VKWebAppInitResult" && data.result)) {
+                initApp();
+            }
+        });
+
+        bridge.send("VKWebAppInit");
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (globalError !== null) {
+            throw globalError;
+        }
+    }, [globalError]);
 
     return {
         initApp: initApp,
         loading: loading,
         isBanned: isBanned,
-        globalError: globalError,
         vkStorage: vkStorage,
         notifications: notifications,
         accessTokenScope: launchParams.vk_access_token_settings,

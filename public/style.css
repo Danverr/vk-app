@@ -1,46 +1,46 @@
 :root {
-	--very_good: #9ef9a7;
-	--good: #d1f99e;
-	--norm: #f3f59e;
-	--bad: #fad19e;
-	--very_bad: #faa49e;
-	--light_accent: #add3ff;
+    --very_good: #9ef9a7;
+    --good: #d1f99e;
+    --norm: #f3f59e;
+    --bad: #fad19e;
+    --very_bad: #faa49e;
+    --light_accent: #add3ff;
 }
 
 .Epic.hideNavbar .Panel__in {
-	padding-bottom: 0;
+    padding-bottom: 0 !important;
 }
 
 .Epic.hideNavbar .FixedLayout {
-	padding-bottom: 0;
+    padding-bottom: 0 !important;
 }
 
 .datepicker.default {
-	background-color: var(--background_content) !important;
+    background-color: var(--background_content) !important;
 }
 
 .datepicker.default .datepicker-viewport::after {
-	background: linear-gradient(
-		var(--background_content),
-		rgba(245, 245, 245, 0) 52%,
-		rgba(245, 245, 245, 0) 48%,
-		var(--background_content)
-	);
+    background: linear-gradient(
+            var(--background_content),
+            rgba(245, 245, 245, 0) 52%,
+            rgba(245, 245, 245, 0) 48%,
+            var(--background_content)
+    );
 }
 
 .datepicker.default .datepicker-wheel {
-	border-color: var(--separator_common) !important;
+    border-color: var(--separator_common) !important;
 }
 
 .datepicker.default .datepicker-scroll li {
-	color: var(--text_muted);
-	font-family: var(--font-common);
+    color: var(--text_muted);
+    font-family: var(--font-common);
 }
 
 .datepicker-navbar-btn {
-	color: var(--accent) !important;
-	font-weight: 500;
-	font-family: var(--font-common);
+    color: var(--accent) !important;
+    font-weight: 500;
+    font-family: var(--font-common);
 }
 
 

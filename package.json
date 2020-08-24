@@ -1,6 +1,6 @@
 {
   "name": "vk-react-app",
-  "version": "v1.2.2",
+  "version": "v1.3.0",
   "description": "",
   "main": "index.js",
   "homepage": "./",
@@ -8,8 +8,7 @@
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "vk-miniapps-deploy",
-    "release": "react-scripts build && node sentry.js",
+    "deploy": "node sentry.js && vk-miniapps-deploy",
     "clean-source": "rimraf README.md src webroot package.json"
   },
   "keywords": [],

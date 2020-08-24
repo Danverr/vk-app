@@ -1,6 +1,12 @@
 .slideContainer {
     width: auto;
     overflow: auto;
+    padding-bottom: 0;
+    touch-action: unset;
+}
+
+.slideContainer * {
+    touch-action: unset;
 }
 
 .formLayout {

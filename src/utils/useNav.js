@@ -13,7 +13,6 @@ const defaultStory = "feed";
 // Панели по умолчанию для каждого view
 const defaultPanels = {
     banned: "main",
-    globalError: "main",
     intro: 0,
 
     feed: "main",

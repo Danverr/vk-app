@@ -6,6 +6,7 @@ import App from "./App";
 import * as Sentry from "@sentry/react";
 import {RewriteFrames} from "@sentry/integrations";
 import {Integrations} from "@sentry/apm";
+import ErrorBoundary from "./components/errorBoundary/errorBoundary";
 
 if (process.env.NODE_ENV === "production") {
     Sentry.init({
@@ -19,4 +20,4 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.render(<ErrorBoundary><App/></ErrorBoundary>, document.getElementById("root"));

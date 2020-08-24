@@ -1,3 +1,7 @@
+.checkInPanel * {
+    touch-action: none;
+}
+
 .checkInPanel :global(.Panel__in) {
     position: relative;
     height: 100%;

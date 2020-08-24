@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {View, Panel} from "@vkontakte/vkui";
+import {View, Panel, PanelSpinner, FixedLayout} from "@vkontakte/vkui";
 import styles from "./loadingScreen.module.css";
 
 import logo from "../../assets/logo.png";
@@ -15,8 +15,11 @@ const LoadingScreen = (props) => {
 
     return (
         <View id={props.id} activePanel="main">
-            <Panel id="main" className={styles.loadingPanel}>
+            <Panel id="main">
                 <img className={styles.backgroundImg} src={logo} alt=""/>
+                <FixedLayout vertical="bottom">
+                    <PanelSpinner/>
+                </FixedLayout>
             </Panel>
         </View>
     );

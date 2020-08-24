@@ -1,8 +1,13 @@
 .formLayout {
     overflow: auto;
+    touch-action: unset;
 }
 
-.formLayout :global(.FormLayout__row):not(:last-child) {
+.formLayout * {
+    touch-action: unset;
+}
+
+.formLayout :global(.FormLayout__row) {
     padding-bottom: 0;
 }
 

@@ -7,7 +7,6 @@ import useAppState from "./utils/useAppState";
 import useNav from "./utils/useNav";
 
 import BannedView from './panels/bannedView/bannedView';
-import GlobalErrorView from "./panels/globalError/globalErrorView";
 import LoadingScreen from "./panels/loadingScreen/loadingScreen";
 import IntroView from "./panels/intro/introView";
 
@@ -60,8 +59,7 @@ const App = () => {
     if (!state.loading) {
         logAppState(state, nav);
 
-        if (state.globalError) nav.goTo("globalError");
-        else if (state.isBanned) nav.goTo("banned");
+        if (state.isBanned) nav.goTo("banned");
         else if (state.vkStorage.getValue("showIntro")) nav.goTo("intro");
     }
 
@@ -75,7 +73,6 @@ const App = () => {
                     tabbar={nav.navbar}
                 >
                     <BannedView id="banned" state={state} nav={nav}/>
-                    <GlobalErrorView id="globalError" error={state.globalError} nav={nav}/>
                     <LoadingScreen id="loadingScreen" state={state} nav={nav}/>
                     <IntroView id="intro" state={state} nav={nav}/>
 
@@ -86,7 +83,6 @@ const App = () => {
                     <SettingsStory id="settings" state={state} nav={nav}/>
                 </Epic>
             </Root>
-
         </ConfigProvider>
     );
 };
