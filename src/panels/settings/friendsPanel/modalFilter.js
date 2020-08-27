@@ -45,8 +45,7 @@ const ModalFilter = (props) => {
                             setTo('none');
                         }}>Очистить</PanelHeaderButton>}>
                         Фильтры
-                </ModalPageHeader>}
-                onClose={props.onClose}>
+                </ModalPageHeader>}>
                 <FormLayout>
                     <FormLayoutGroup>
                         <List>
@@ -72,7 +71,7 @@ const ModalFilter = (props) => {
                                 Нет доступа к моей статистике
                             </Cell>
                         </List>
-                        <Button size="xl" onClick={props.onClose}> Закрыть </Button>
+                        <Button type = "button" size="xl" onClick={props.onClose}> Закрыть </Button>
                     </FormLayoutGroup>
                 </FormLayout>
             </ModalPage>
