@@ -1,11 +1,10 @@
-.checkInPanel * {
-    touch-action: none;
+.checkInPanel {
+    position: fixed;
 }
 
 .checkInPanel :global(.Panel__in) {
-    position: relative;
+    position: fixed;
     height: 100%;
-    overflow-y: hidden;
 }
 
 .bulletsContainer {

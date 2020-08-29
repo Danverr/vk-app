@@ -84,7 +84,7 @@ const useAppState = () => {
     };
 
     const fetchUserInfo = async () => {
-        await bridge
+        bridge
             .send("VKWebAppGetUserInfo")
             .then((userInfo) => {
                 entryWrapper.userInfo = userInfo;
@@ -122,19 +122,23 @@ const useAppState = () => {
     };
 
     const [initActions] = useState([
+        {name: "User Info Loading", func: fetchUserInfo},
         {name: "VK Storage Loading", func: vkStorage.fetchValues},
+        {name: "Ban Status Loading", func: fetchIsBanned},
         {name: "Init Color Scheme", func: initScheme},
         {name: "Yandex.Metrika Init", func: ymInit},
-        {name: "User Info Loading", func: fetchUserInfo, await: true},
-        {name: "Ban Status Loading", func: fetchIsBanned},
     ]);
     let [initActionsCompleted] = useState(0);
 
     const initApp = async () => {
         const logEvent = (title, status) => {
             let color = "#e64646";
-            if (status === "Started") color = "#d3b51d";
-            else if (status === "OK" || status === "Completed") color = "#4bb34b";
+
+            if (status === "Started") {
+                color = "#d3b51d";
+            } else if (status === "OK" || status === "Completed" || status === "Already Completed") {
+                color = "#4bb34b";
+            }
 
             console.log("%s%c%s", `[${moment().diff(start)} ms] ${title}: `, `color: ${color};`, status);
         };
@@ -169,10 +173,10 @@ const useAppState = () => {
         await import("./../eruda");
         //}
 
-        console.group(`APP INIT(${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
+        console.group(`APP INIT (${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
 
         if (initActionsCompleted === initActions.length) {
-            logEvent("App Init", "Completed");
+            logEvent("App Init", "Already Completed");
             console.groupEnd();
             return;
         } else {
@@ -180,7 +184,11 @@ const useAppState = () => {
         }
 
         for (const action of initActions) {
-            if (action.completed) continue;
+            if (action.completed) {
+                logEvent(action.name, "Already Completed");
+                continue;
+            }
+
             logEvent(action.name, "Started");
 
             if (action.await) await runAction(action);

@@ -93,7 +93,7 @@ const StatsCounter = (props) => {
     // Если за последние interval дней записей нет, вернем Placeholder
     if (props.stats[props.activeParam].length === 0) {
         return (
-            <Placeholder header="Недостаточно записей">
+            <Placeholder>
                 Для счетчика нужна хотя бы одна запись за последние {interval} дней.
             </Placeholder>
         );

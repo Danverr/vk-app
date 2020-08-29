@@ -42,7 +42,7 @@ const StatsCompare = (props) => {
     // Если записей нет, вернем Placeholder
     if (props.stats[props.activeParam].length === 0) {
         return (
-            <Placeholder header="Недостаточно записей">
+            <Placeholder>
                 Для сравнения недель нужна хотя бы одна запись.
             </Placeholder>
         );
