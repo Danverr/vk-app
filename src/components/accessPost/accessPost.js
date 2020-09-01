@@ -38,7 +38,6 @@ const AccessPost = (props) => {
         if (userToken) { // токен уже получен
             addEdge();
         } else if (!userToken && accessTokenScope.split(",").indexOf("friends") !== -1) { // токен не получен, но разрешение есть
-            postData.setPopout(<ScreenSpinner/>);
             fetchUserToken(addEdge);
         } else { // нет разрешения
             postData.wrapper.addEdge = addEdge;
