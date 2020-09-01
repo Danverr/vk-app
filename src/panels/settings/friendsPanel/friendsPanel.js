@@ -53,10 +53,17 @@ const FriendsPanel = (props) => {
     }, []);
 
     useEffect(() => {
-        if (!userToken) return;
-
         const fetchData = async () => {
             var friendsIds, toId, fromId;
+            //кому юзер дал доступ
+            await api("GET", "/v1.2.0/statAccess/", {
+                type: "toId"
+            }).then((edges) => {
+                toId = edges.data.map(user => user.id);
+                setStatAccess(toId);
+            }).catch((error) => {
+                setError({ error: error, reload: fetchData });
+            });
             await bridge.send("VKWebAppCallAPIMethod", {
                 method: "friends.get",
                 params: {
@@ -69,16 +76,7 @@ const FriendsPanel = (props) => {
                 friendsIds = friends.response.items.map(friend => friend.id);
             }).catch((error) => {
                 setError({ error: error, reload: fetchData });
-            });
-            //кому юзер дал доступ
-            await api("GET", "/v1.2.0/statAccess/", {
-                type: "toId"
-            }).then((edges) => {
-                toId = edges.data.map(user => user.id);
-                setStatAccess(toId);
-            }).catch((error) => {
-                setError({ error: error, reload: fetchData });
-            });
+            });        
             //кто дал доступ юзеру
             await api("GET", "/v1.2.0/statAccess/", {
                 type: "fromId"
