@@ -233,31 +233,6 @@ export let entryWrapper = {
         return api("GET", "/v1.2.0/entries/", queryData);
     },
 
-    init: async () => {
-        try {
-            entryWrapper.hasMore = 1;
-            entryWrapper.accessEntriesPointer = 0;
-            entryWrapper.entries = [];
-            entryWrapper.accessEntries = [];
-            entryWrapper.queue = [];
-            entryWrapper.currentToolTip = -1;
-            entryWrapper.toolTips = [];
-            entryWrapper.tQueue = [];
-            entryWrapper.t = [0, 0, 0, 0];
-            entryWrapper.loading = 0;
-            entryWrapper.currentScroll = Infinity;
-            await entryWrapper.fetchFriendsInfo();
-            await entryWrapper.fetchPseudoFriends();
-            return 1;
-        } catch (error) {
-            entryWrapper.setDisplayEntries([]);
-            entryWrapper.setLoading(<Spinner size='large' />);
-            entryWrapper.setErrorPlaceholder(error);
-            entryWrapper.wantUpdate = 1;
-            return 0;
-        }
-    },
-
     Pop: (POP_LIMIT = MAXPOP) => {
         let cur = Math.min(POP_LIMIT, entryWrapper.queue.length);
 
@@ -284,29 +259,39 @@ export let entryWrapper = {
 
 
     fetchEntries: async (isFirstTime = null) => {
+        try {
 
-        if (isFirstTime) {
-            if (!await entryWrapper.init()){ // если init зашел в catch
+            if (isFirstTime){
+                entryWrapper.hasMore = 1;
+                entryWrapper.accessEntriesPointer = 0;
+                entryWrapper.entries = [];
+                entryWrapper.accessEntries = [];
+                entryWrapper.queue = [];
+                entryWrapper.currentToolTip = -1;
+                entryWrapper.toolTips = [];
+                entryWrapper.tQueue = [];
+                entryWrapper.t = [0, 0, 0, 0];
+                entryWrapper.loading = 0;
+                entryWrapper.currentScroll = Infinity;
+                await entryWrapper.fetchFriendsInfo();
+                await entryWrapper.fetchPseudoFriends();
+            }
+
+            if (entryWrapper.queue.length) { 
+                entryWrapper.Pop();
                 return;
             }
-        }
 
-        if (entryWrapper.queue.length) { // есть что показать пользователю
-            entryWrapper.Pop();
-            return;
-        }
+            let beforeDate = moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
+            let beforeId = Infinity;
+    
+            for (let i = entryWrapper.entries.length - 1; i >= 0; --i) {
+                if (entryWrapper.entries[i].systemFlag) continue;
+                beforeDate = entryWrapper.entries[i].date;
+                beforeId = entryWrapper.entries[i].entryId;
+                break;
+            }
 
-        let beforeDate = moment.utc().add(1, 'day').format("YYYY-MM-DD HH:MM:SS");
-        let beforeId = Infinity;
-
-        for (let i = entryWrapper.entries.length - 1; i >= 0; --i) {
-            if (entryWrapper.entries[i].systemFlag) continue;
-            beforeDate = entryWrapper.entries[i].date;
-            beforeId = entryWrapper.entries[i].entryId;
-            break;
-        }
-
-        try {
             let newEntries = (await entryWrapper.fetchEntriesPack(UPLOADED_QUANTITY, beforeDate, beforeId)).data;
             entryWrapper.wasError = 0;
             entryWrapper.queue = entryWrapper.queue.concat(newEntries);
@@ -321,9 +306,12 @@ export let entryWrapper = {
                 }
                 entryWrapper.queue.sort(cmp);
             }
+
             entryWrapper.Pop();
             entryWrapper.setFetching(null);
-        } catch (error) {
+
+
+        } catch (error){
             if (isFirstTime) {
                 entryWrapper.setDisplayEntries([]);
                 entryWrapper.setLoading(<Spinner size='large' />);
