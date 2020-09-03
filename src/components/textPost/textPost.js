@@ -219,11 +219,11 @@ const TextPost = (props) => {
         let ret = [];
         let cur = "";
         for (var i of s){
-            if (i == '\n'){
+            if (i === '\n'){
                 if (cur.length) {
                     ret.push(ReactEmoji.emojify(cur));
                 }
-                ret.push(<br/>)
+                ret.push(<br key={ret.length}/>)
                 cur = "";
             }
             else {

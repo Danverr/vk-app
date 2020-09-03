@@ -8,7 +8,7 @@ import {
     ScreenSpinner,
     Cell,
 } from "@vkontakte/vkui";
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
 import getAnswer from "../../../utils/getAnswer";
