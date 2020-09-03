@@ -26,6 +26,7 @@ import getDateDescription from '../../utils/chrono';
 import ErrorSnackbar from '../errorSnackbar/errorSnackbar';
 import entryWrapper from '../entryWrapper';
 import DoneSnackbar from '../doneSnackbar/doneSnackbar';
+import ReactEmoji from 'react-emoji';
 
 const TextPost = (props) => {
     const [upd, setUpd] = useState(1);
@@ -214,20 +215,31 @@ const TextPost = (props) => {
         return null;
     };
 
-    const renderText = (s, i) => {
-        if (s === '\n')
-            return <br key={i} />
-        return <React.Fragment key={i}>
-            {s}
-        </React.Fragment>
+    const renderText = (s) => {
+        let ret = [];
+        let cur = "";
+        for (var i of s){
+            if (i == '\n'){
+                if (cur.length) {
+                    ret.push(ReactEmoji.emojify(cur));
+                }
+                ret.push(<br/>)
+                cur = "";
+            }
+            else {
+                cur += i;
+            }
+        }
+        if (cur.length) ret.push(cur);
+        return ret;
     }
 
     const postText = () => {
         const titleNode = !title || title.length === 0 ? null :
-            <Headline weight='medium'>{title.split('').map(renderText)}</Headline>;
+            <Headline weight='medium'>{ renderText(title)}</Headline>;
 
         const noteNode = !note || note.length === 0 ? null :
-            <Text weight='regular'>  {note.split('').map(renderText)} </Text>;
+            <Text weight='regular'>  { renderText(note)} </Text>;
 
         return noteNode || titleNode ? <div className={s.postText}>{titleNode}{noteNode}</div> : null;
     };
