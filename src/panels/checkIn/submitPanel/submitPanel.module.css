@@ -1,10 +1,6 @@
 .formLayout {
     overflow: auto;
-    touch-action: unset;
-}
-
-.formLayout * {
-    touch-action: unset;
+    padding-bottom: 24px;
 }
 
 .formLayout :global(.FormLayout__row) {
@@ -19,6 +15,7 @@
 .lockIcon {
     display: inline;
     margin-left: 6px;
+
     margin-top: 2px;
     color: #99a2ad;
 }

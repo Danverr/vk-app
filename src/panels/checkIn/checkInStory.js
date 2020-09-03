@@ -117,6 +117,7 @@ const CheckInStory = (props) => {
                         answer={answer}
                         setPopout={setPopout}
                         setAnswer={setAnswer}
+                        isSlideActive={activeSlideIndex === questionPanels.length}
                         setActiveSlideIndex={setActiveSlideIndex}
                         setEntryAdded={props.state.setEntryAdded}
                         isEntryUpdate={isEntryUpdate}

@@ -8,7 +8,7 @@ import {
     ScreenSpinner,
     Cell,
 } from "@vkontakte/vkui";
-import React, { useState } from "react";
+import React, {useState, useRef, useEffect} from "react";
 import api from "../../../utils/api";
 import styles from "./submitPanel.module.css";
 import getAnswer from "../../../utils/getAnswer";
@@ -23,7 +23,7 @@ const MAX_NOTE_LEN = 2048;
 const MAX_TITLE_LEN = 64;
 
 const SubmitPanel = (props) => {
-    const { answer, setAnswer, setActiveSlideIndex } = props;
+    const {answer, setAnswer, isSlideActive, setActiveSlideIndex} = props;
     const [isChecked, setCheck] = useState(!answer.isPublic.val);
     const [titleText, setTitleText] = useState(answer.title.val);
     const [noteText, setNoteText] = useState(answer.note.val);
@@ -32,6 +32,13 @@ const SubmitPanel = (props) => {
         text: "",
         mode: "default",
     });
+
+    // Убираем клавиатуру при уходе
+    useEffect(() => {
+        if (!isSlideActive) {
+            Array.from(document.querySelectorAll('input, textarea')).forEach(el => el.blur());
+        }
+    }, [isSlideActive]);
 
     // Обрабатываем изменения в поле заголовка
     const handleTitle = (event, name) => {
@@ -71,7 +78,7 @@ const SubmitPanel = (props) => {
                 mode: "error",
             });
         } else {
-            props.setPopout(<ScreenSpinner />);
+            props.setPopout(<ScreenSpinner/>);
             setFormStatus({
                 title: "",
                 text: "",
@@ -139,7 +146,7 @@ const SubmitPanel = (props) => {
 
     return (
         <>
-            <QuestionSection question={"Что Вам запомнилось?"} date={answer.date.val} />
+            <QuestionSection question={"Что Вам запомнилось?"} date={answer.date.val}/>
             <FormLayout className={styles.formLayout}>
                 {formStatus.text.length === 0 ? null : (
                     <FormStatus header={formStatus.title} mode={formStatus.mode}>
@@ -164,13 +171,13 @@ const SubmitPanel = (props) => {
                 <Cell
                     className={styles.privacySwitch}
                     asideContent={
-                        <Switch checked={isChecked} onClick={switchPublic} onChange={() => null} />
+                        <Switch checked={isChecked} onClick={switchPublic} onChange={() => null}/>
                     }
                     description={
-                        <span> Заголовок и текст будут скрыты. <br /> Друзья не увидят приватность записи. </span>}
+                        <span> Заголовок и текст будут скрыты. <br/> Друзья не увидят приватность записи. </span>}
                 >
                     <span>Приватная запись</span>
-                    <Icon12Lock className={styles.lockIcon} />
+                    <Icon12Lock className={styles.lockIcon}/>
                 </Cell>
 
                 <Button size="xl" mode="primary" onClick={saveAnswer}>

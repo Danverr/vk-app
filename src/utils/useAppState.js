@@ -40,21 +40,8 @@ const useAppState = () => {
     });
 
     useEffect(() => {
-        const showNativeAds = () => {
-            bridge
-                .send("VKWebAppShowNativeAds", {ad_format: "preloader"})
-                .then((data) => {
-                    if (data.result === false) {
-                        setTimeout(showNativeAds, 1000);
-                    }
-                })
-                .catch(() => {
-                    setTimeout(showNativeAds, 1000);
-                });
-        };
-
         if (!loading && !vkStorage.getValue("showIntro")) {
-            showNativeAds();
+            bridge.send("VKWebAppShowNativeAds", {ad_format: "preloader"})
         }
 
         // eslint-disable-next-line
