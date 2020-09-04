@@ -53,6 +53,9 @@ const FriendsPanel = (props) => {
     }, []);
 
     useEffect(() => {
+        if(!userToken)
+            return;
+        console.log(userToken);
         const fetchData = async () => {
             var friendsIds, toId, fromId;
             //кому юзер дал доступ
@@ -174,7 +177,6 @@ const FriendsPanel = (props) => {
                     Изменения сохранены
                 </Snackbar>);
         } catch (error) {
-            console.error(error);
             setError({ error: error, reload: () => changeStatAccess(add, del, addf, delf) });
         }
     }
@@ -202,7 +204,9 @@ const FriendsPanel = (props) => {
     useEffect(() => {
         //разрешение есть, но токен еще не получен
         if (!userToken && accessTokenScope.split(",").indexOf("friends") !== -1)
-            fetchUserToken(); //получаем, не показывая плейсхолдер
+            fetchUserToken().catch((error) => {
+                setError({ error: error, reload: fetchUserToken });
+            }); //получаем, не показывая плейсхолдер
     }, [userToken, accessTokenScope, fetchUserToken])
 
     //токен не получен и разрешения нет

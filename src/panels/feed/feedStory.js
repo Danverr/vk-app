@@ -167,6 +167,7 @@ const Feed = (props) => {
             toggleContext();
             return;
         }
+        setFetching(null);
         entryWrapper.hasMore = 1;
         setDisplayEntries([]);
         entryWrapper.mode = e;

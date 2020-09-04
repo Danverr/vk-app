@@ -64,9 +64,8 @@ const useAppState = () => {
                 }
             })
             .catch((error) => {
-                if (error.error_data && error.error_data.error_code !== 4) { // 4: User denied
+                if (error.error_data && error.error_data.error_code !== 4) // 4: User denied
                     throw error;
-                }
             });
     };
 
