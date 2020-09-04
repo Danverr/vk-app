@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext } from '@vkontakte/vkui';
+import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, Snackbar } from '@vkontakte/vkui';
 import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
 import { Button, Placeholder, ModalRoot, ModalCard } from '@vkontakte/vkui';
 
@@ -17,6 +17,7 @@ import entryWrapper from '../../components/entryWrapper';
 import AccessPost from '../../components/accessPost/accessPost';
 import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
+import Icon56LockOutline from '@vkontakte/icons/dist/56/lock_outline';
 
 const PIXELS = 200;
 
@@ -42,6 +43,23 @@ const Feed = (props) => {
         (!displayEntries.length) ? <Spinner size="large" /> : <Spinner size="small" /> : null);
     const [error, setError] = useState(null);
 
+    const fetchTokenCallback = () => {
+        if (!entryWrapper.userToken) {
+            setSnackField(
+                <Snackbar
+                before={<Icon56LockOutline width={24} height={24}/>}
+                onClose = {()=>{setSnackField(null)}}
+                duration={5000}
+                >
+                    Нет доступа к списку друзей
+                </Snackbar>
+            )
+        }
+        else {
+            entryWrapper.addEdge();
+        }
+    } 
+
     const modal = (
         <ModalRoot
             activeModal={activeModal}
@@ -55,7 +73,7 @@ const Feed = (props) => {
                         title: "Дать разрешение",
                         mode: 'primary',
                         action: () => {
-                            props.state.fetchUserToken(entryWrapper.addEdge);
+                            props.state.fetchUserToken(null, fetchTokenCallback);
                             setActiveModal(null)
                         }
                     }

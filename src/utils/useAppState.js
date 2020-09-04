@@ -47,7 +47,7 @@ const useAppState = () => {
         // eslint-disable-next-line
     }, [loading]);
 
-    const fetchUserToken = async (callback = null) => {
+    const fetchUserToken = async (callback = null, finallyCallback = null) => {
         await bridge
             .send("VKWebAppGetAuthToken", {
                 app_id: APP_ID,
@@ -66,7 +66,12 @@ const useAppState = () => {
             .catch((error) => {
                 if (error.error_data && error.error_data.error_code !== 4) // 4: User denied
                     throw error;
-            });
+            })
+            .finally(()=>{
+                if (finallyCallback){
+                    finallyCallback();
+                }
+            })
     };
 
     const fetchUserInfo = async () => {
