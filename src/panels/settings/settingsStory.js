@@ -88,7 +88,7 @@ const SettingsStory = (props) => {
                     </CellButton>
                 </Group>
                 <Footer>
-                    Версия приложения {process.env.REACT_APP_VERSION} {process.env.NODE_ENV}
+                    Версия приложения {process.env.REACT_APP_VERSION}-{process.env.NODE_ENV}
                 </Footer>
             </Panel>
             <ImportPanel
