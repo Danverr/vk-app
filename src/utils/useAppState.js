@@ -156,9 +156,9 @@ const useAppState = () => {
             }
         }, 10 * 1000);
 
-        //if (process.env.NODE_ENV === "development") {
-        await import("./../eruda");
-        //}
+        if (process.env.NODE_ENV === "development") {
+            await import("./../eruda");
+        }
 
         console.group(`APP INIT (${process.env.REACT_APP_VERSION} ${process.env.NODE_ENV})`);
 
