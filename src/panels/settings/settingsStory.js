@@ -14,14 +14,13 @@ import DaylioPanel from "./importEntries/daylioPanel";
 import PixelsPanel from "./importEntries/pixelsPanel";
 
 const SettingsStory = (props) => {
-    const [modal, setModal] = useState(null);
     const [importCount, setImportCount] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
-    const {popout, setPopout} = props.nav;
+    const {modal, setModal, popout, setPopout} = props.nav;
 
     useEffect(() => {
         if (props.nav.activePanel !== "friends") setModal(null);
-    }, [props.nav.activePanel]);
+    }, [props.nav.activePanel, setModal]);
 
     return (
         <View

@@ -36,6 +36,7 @@ const useNav = () => {
     let [scrollHistory] = useState({});
     let [isNavbarVis] = useState(true);
     let [popout] = useState(null);
+    let [modal] = useState(null);
     const [viewHistory] = useState([defaultStory]);
     const [panelHistory] = useState(getDefaultPanelHistory());
 
@@ -68,10 +69,16 @@ const useNav = () => {
     });
 
     const setPopout = (newPopout) => {
-        // Создаём новую запись в истории браузера
-        window.history.pushState([getActiveStory(), getActivePanel()], popout);
         saveScroll();
         popout = newPopout;
+        window.history.pushState([getActiveStory(), getActivePanel()], popout);
+        setNav(getNav());
+    };
+
+    const setModal = (newModal) => {
+        saveScroll();
+        modal = newModal;
+        window.history.pushState([getActiveStory(), getActivePanel()], modal);
         setNav(getNav());
     };
 
@@ -82,6 +89,8 @@ const useNav = () => {
 
         if (popout) { // Убираем popout
             popout = null;
+        } else if (modal) { // Убираем modal
+            modal = null;
         } else if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
             saveScroll();
             panelHistory[getActiveStory()].pop();
@@ -113,10 +122,9 @@ const useNav = () => {
         // Сохраняем позицию скролла перед уходом
         saveScroll();
 
-        // При уходе убираем popout
-        if (popout) {
-            popout = null;
-        }
+        // При уходе убираем popout и modal
+        popout = null;
+        modal = null;
 
         if (panel === null) {
             // Возвращаем iOS Swipe Back
@@ -171,6 +179,8 @@ const useNav = () => {
         clearStory: clearStory,
         popout: popout,
         setPopout: setPopout,
+        modal: modal,
+        setModal: setModal,
         goBack: goBack,
         goTo: goTo,
         setNavbarVis: setNavbarVis,

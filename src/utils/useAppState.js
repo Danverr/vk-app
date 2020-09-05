@@ -67,8 +67,8 @@ const useAppState = () => {
                 if (error.error_data && error.error_data.error_code !== 4) // 4: User denied
                     throw error;
             })
-            .finally(()=>{
-                if (finallyCallback){
+            .finally(() => {
+                if (finallyCallback) {
                     finallyCallback();
                 }
             })
@@ -97,8 +97,20 @@ const useAppState = () => {
     };
 
     const ymInit = async () => {
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const timeout = 500;
+        let attempts = 10;
+
+        while (attempts--) {
+            if (window["yaCounter65896372"] === undefined) {
+                await sleep(timeout);
+            } else {
+                break;
+            }
+        }
+
         if (window["yaCounter65896372"] === undefined) {
-            setTimeout(await ymInit, 100);
+            throw Error("Yandex.Metrika Init Failed");
         }
     };
 

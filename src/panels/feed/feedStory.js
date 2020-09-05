@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
-import { Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, Snackbar } from '@vkontakte/vkui';
-import { List, Cell, PanelHeaderContent, CardGrid, Spinner } from '@vkontakte/vkui';
-import { Button, Placeholder, ModalRoot, ModalCard } from '@vkontakte/vkui';
+import {Panel, PanelHeader, View, PullToRefresh, PanelHeaderContext, Snackbar} from '@vkontakte/vkui';
+import {List, Cell, PanelHeaderContent, CardGrid, Spinner} from '@vkontakte/vkui';
+import {Button, Placeholder, ModalRoot, ModalCard} from '@vkontakte/vkui';
 
 import Icon28Newsfeed from '@vkontakte/icons/dist/28/newsfeed';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -27,12 +27,11 @@ const Feed = (props) => {
     const [contextOpened, setContextOpened] = useState(null);
     const [mode, setMode] = useState(entryWrapper.mode);
     const [snackField, setSnackField] = useState(null);
-    const [activeModal, setActiveModal] = useState(null);
-    const {popout, setPopout} = props.nav;
+    const {modal: activeModal, setModal: setActiveModal, popout, setPopout} = props.nav;
 
     const ButtonHolder = () => (
         <Button size="m" mode="tertiary" onClick={() => {
-            setLoading(<Spinner size='small' />);
+            setLoading(<Spinner size='small'/>);
             entryWrapper.fetchEntries();
         }}>
             Загрузить записи
@@ -40,31 +39,34 @@ const Feed = (props) => {
     );
 
     const [displayEntries, setDisplayEntries] = useState(entryWrapper.entries);
-    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder /> : entryWrapper.hasMore ?
-        (!displayEntries.length) ? <Spinner size="large" /> : <Spinner size="small" /> : null);
+    const [loading, setLoading] = useState(entryWrapper.wasError ? <ButtonHolder/> : entryWrapper.hasMore ?
+        (!displayEntries.length) ? <Spinner size="large"/> : <Spinner size="small"/> : null);
     const [error, setError] = useState(null);
 
     const fetchTokenCallback = () => {
         if (!entryWrapper.userToken) {
             setSnackField(
                 <Snackbar
-                before={<Icon28ErrorOutline width={24} height={24} fill="#E64646"/>}
-                onClose = {()=>{setSnackField(null)}}
-                duration={5000}
+                    before={<Icon28ErrorOutline width={24} height={24} fill="#E64646"/>}
+                    onClose={() => {
+                        setSnackField(null)
+                    }}
+                    duration={5000}
                 >
                     Нет доступа к списку друзей
                 </Snackbar>
             )
-        }
-        else {
+        } else {
             entryWrapper.addEdge();
         }
-    } 
+    }
 
     const modal = (
         <ModalRoot
             activeModal={activeModal}
-            onClose={() => { setActiveModal(null) }}
+            onClose={() => {
+                setActiveModal(null)
+            }}
         >
             <ModalCard
                 header="Нужно разрешение"
@@ -79,10 +81,12 @@ const Feed = (props) => {
                         }
                     }
                 ]}
-                id="tokenQuery" 
-                onClose={() => { setActiveModal(null) }}
+                id="tokenQuery"
+                onClose={() => {
+                    setActiveModal(null)
+                }}
                 icon={<Icon56LockOutline/>}
-                >
+            >
 
             </ModalCard>
         </ModalRoot>
@@ -95,7 +99,7 @@ const Feed = (props) => {
     const setErrorSnackbar = (error) => {
         setSnackField(<ErrorSnackbar onClose={() => {
             setSnackField(null);
-        }} />);
+        }}/>);
     };
 
     const isVisibleBot = (id) => {
@@ -116,7 +120,7 @@ const Feed = (props) => {
         if (!entryWrapper.toolTips.length) return;
 
         while (entryWrapper.toolTips.length && isVisible(entryWrapper.entryIndex(entryWrapper.toolTips[0]))) {
-            document.body.style.overflow = 'hidden';            
+            document.body.style.overflow = 'hidden';
             entryWrapper.tQueue.push(entryWrapper.toolTips[0]);
             entryWrapper.toolTips.splice(0, 1);
         }
@@ -125,7 +129,7 @@ const Feed = (props) => {
     };
 
     const handleScroll = () => {
-        if (document.scrollingElement.scrollTop > entryWrapper.currentScroll){
+        if (document.scrollingElement.scrollTop > entryWrapper.currentScroll) {
             document.scrollingElement.scrollTop = entryWrapper.currentScroll;
         }
         DetectTips();
@@ -164,7 +168,7 @@ const Feed = (props) => {
             pState.setEntryAdded(null);
             setSnackField(<DoneSnackbar onClose={() => {
                 setSnackField(null)
-            }} />);
+            }}/>);
         }
         if (!pState.userInfo || !entryWrapper.wantUpdate) return;
         entryWrapper.wantUpdate = 0;
@@ -225,7 +229,7 @@ const Feed = (props) => {
                 setActiveModal: setActiveModal,
                 state: props.state,
                 nav: props.nav,
-            }} key={id} />
+            }} key={id}/>
         }
         return <TextPost postData={{
             post: entry,
@@ -237,12 +241,12 @@ const Feed = (props) => {
             setUpdatingEntryData: props.state.setUpdatingEntryData,
             wrapper: entryWrapper,
             nav: props.nav,
-        }} key={id} />
+        }} key={id}/>
     };
 
     const Empty = () => {
         return <Placeholder
-            icon={<Icon56WriteOutline fill='var(--text_secondary)' />}
+            icon={<Icon56WriteOutline fill='var(--text_secondary)'/>}
             header="Нет записей"
             stretched={true}
             action={<Button
@@ -260,7 +264,7 @@ const Feed = (props) => {
             action={<Button onClick={() => {
                 setError(null);
                 entryWrapper.fetchEntries(1)
-            }}> Попробовать снова </Button>} />
+            }}> Попробовать снова </Button>}/>
         :
         <View
             id={props.id}
@@ -274,27 +278,27 @@ const Feed = (props) => {
                 <PanelHeader separator={false} className={s.header}>
                     <PanelHeaderContent
                         onClick={toggleContext}
-                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}>
+                        aside={<Icon16Dropdown style={{transform: `rotate(${contextOpened ? '180deg' : '0'})`}}/>}>
                         {mode === "feed" ? 'Лента' : 'Мой дневник'}
                     </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                     <List>
-                        <Cell before={<Icon28Newsfeed />}
-                            onClick={() => {
-                                select('feed')
-                            }}
-                            asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Все записи"
+                        <Cell before={<Icon28Newsfeed/>}
+                              onClick={() => {
+                                  select('feed')
+                              }}
+                              asideContent={mode === "feed" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Все записи"
                         >
                             Лента
                         </Cell>
-                        <Cell before={<Icon28ArticleOutline />}
-                            onClick={() => {
-                                select('diary')
-                            }}
-                            asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)" /> : null}
-                            description="Только мои записи"
+                        <Cell before={<Icon28ArticleOutline/>}
+                              onClick={() => {
+                                  select('diary')
+                              }}
+                              asideContent={mode === "diary" ? <Icon24Done fill="var(--accent)"/> : null}
+                              description="Только мои записи"
                         >
                             Мой дневник
                         </Cell>
