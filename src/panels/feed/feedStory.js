@@ -18,6 +18,7 @@ import AccessPost from '../../components/accessPost/accessPost';
 import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
 import Icon56LockOutline from '@vkontakte/icons/dist/56/lock_outline';
+import Icon28ErrorOutline from '@vkontakte/icons/dist/28/error_outline';
 
 const PIXELS = 200;
 
@@ -47,7 +48,7 @@ const Feed = (props) => {
         if (!entryWrapper.userToken) {
             setSnackField(
                 <Snackbar
-                before={<Icon56LockOutline width={24} height={24}/>}
+                before={<Icon28ErrorOutline width={24} height={24} fill="#E64646"/>}
                 onClose = {()=>{setSnackField(null)}}
                 duration={5000}
                 >
@@ -78,7 +79,10 @@ const Feed = (props) => {
                         }
                     }
                 ]}
-                id="tokenQuery" onClose={() => { setActiveModal(null) }}>
+                id="tokenQuery" 
+                onClose={() => { setActiveModal(null) }}
+                icon={<Icon56LockOutline/>}
+                >
 
             </ModalCard>
         </ModalRoot>
