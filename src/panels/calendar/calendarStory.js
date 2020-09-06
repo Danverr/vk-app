@@ -174,7 +174,7 @@ const CalendarStory = (props) => {
               popout={popout}
               activePanel={props.nav.activePanel}
               history={props.nav.panelHistory[props.nav.activePanel]}
-              onSwipeBack={props.nav.goBack}
+              onSwipeBack={() => props.nav.goBack(true)}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Календарь</PanelHeader>

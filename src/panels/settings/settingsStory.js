@@ -29,7 +29,7 @@ const SettingsStory = (props) => {
             modal={modal}
             activePanel={props.nav.activePanel}
             history={props.nav.panelHistory[props.id]}
-            onSwipeBack={props.nav.goBack}
+            onSwipeBack={() => props.nav.goBack(true)}
         >
             <Panel id="main">
                 <PanelHeader separator={false}>Настройки</PanelHeader>

@@ -64,7 +64,7 @@ const IntroView = (props) => {
             id={props.id}
             activePanel={props.nav.activePanel}
             history={props.nav.panelHistory[props.id]}
-            onSwipeBack={props.nav.goBack}
+            onSwipeBack={() => props.nav.goBack(true)}
         >
             {slidesData.map((slideData, index) => (
                 <SlidePanel

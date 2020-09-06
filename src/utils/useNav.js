@@ -68,29 +68,36 @@ const useNav = () => {
         setSavedScroll();
     });
 
-    const setPopout = (newPopout) => {
-        saveScroll();
-        popout = newPopout;
-        window.history.pushState([getActiveStory(), getActivePanel()], popout);
-        setNav(getNav());
-    };
+    const setPopout = (type, newPopout) => {
+        if (type === "modal") {
+            if (modal === newPopout) return;
+            modal = newPopout;
+        } else if (type === "popout") {
+            if (popout === newPopout) return;
+            popout = newPopout;
+        }
 
-    const setModal = (newModal) => {
         saveScroll();
-        modal = newModal;
-        window.history.pushState([getActiveStory(), getActivePanel()], modal);
+        window.history.pushState([getActiveStory(), getActivePanel()], newPopout);
+
         setNav(getNav());
     };
 
     // Функция возврата с экрана
-    const goBack = () => {
+    const goBack = (isSwipeBack = false) => {
         // Сохраняем позицию скролла перед уходом
         saveScroll();
+        isSwipeBack = isSwipeBack === true;
 
-        if (popout) { // Убираем popout
-            popout = null;
-        } else if (modal) { // Убираем modal
-            modal = null;
+        if (isSwipeBack) {
+            setPopout("popout", null);
+            setPopout("modal", null);
+        }
+
+        if (!isSwipeBack && popout) { // Убираем popout
+            setPopout("popout", null);
+        } else if (!isSwipeBack && modal) { // Убираем modal
+            setPopout("modal", null);
         } else if (panelHistory[getActiveStory()].length > 1) { // Переход между панелями
             saveScroll();
             panelHistory[getActiveStory()].pop();
@@ -123,8 +130,8 @@ const useNav = () => {
         saveScroll();
 
         // При уходе убираем popout и modal
-        popout = null;
-        modal = null;
+        setPopout("popout", null);
+        setPopout("modal", null);
 
         if (panel === null) {
             // Возвращаем iOS Swipe Back
@@ -178,9 +185,9 @@ const useNav = () => {
         panelHistory: panelHistory,
         clearStory: clearStory,
         popout: popout,
-        setPopout: setPopout,
+        setPopout: newPopout => setPopout("popout", newPopout),
         modal: modal,
-        setModal: setModal,
+        setModal: newModal => setPopout("modal", newModal),
         goBack: goBack,
         goTo: goTo,
         setNavbarVis: setNavbarVis,

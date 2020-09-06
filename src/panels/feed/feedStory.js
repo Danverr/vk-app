@@ -271,7 +271,7 @@ const Feed = (props) => {
             popout={popout}
             activePanel={props.nav.activePanel}
             history={props.nav.panelHistory[props.id]}
-            onSwipeBack={props.nav.goBack}
+            onSwipeBack={() => props.nav.goBack(true)}
             modal={modal}
         >
             <Panel id='main'>

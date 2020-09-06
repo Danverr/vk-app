@@ -100,7 +100,7 @@ const ProfilesStory = (props) => {
             id={props.id}
             activePanel={activePanel}
             history={props.nav.panelHistory[props.id]}
-            onSwipeBack={props.nav.goBack}
+            onSwipeBack={() => props.nav.goBack(true)}
         >
 
             <ChooseProfilePanel
