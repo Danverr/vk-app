@@ -53,7 +53,7 @@ const DaylioPanel = (props) => {
                 if(entry.length === 1 && entry[0] === "") return 0;
                 return 1;
             });
-            console.log(entries);
+
             for (const entry of entries) {
                 if (entry.length !== 7 || moods.indexOf(entry[4]) === -1 || !moment(`${entry[0]} ${entry[3]}:00`).isValid) {
                     setTop("Некорректный формат файла");

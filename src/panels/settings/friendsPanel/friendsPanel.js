@@ -53,63 +53,60 @@ const FriendsPanel = (props) => {
     }, []);
 
     useEffect(() => {
-        if(!userToken)
+        if (!userToken)
             return;
-        console.log(userToken);
+
         const fetchData = async () => {
-            var friendsIds, toId, fromId;
-            //кому юзер дал доступ
-            await api("GET", "/v1.2.0/statAccess/", {
-                type: "toId"
-            }).then((edges) => {
-                toId = edges.data.map(user => user.id);
-                setStatAccess(toId);
-            }).catch((error) => {
-                setError({ error: error, reload: fetchData });
-            });
-            await bridge.send("VKWebAppCallAPIMethod", {
-                method: "friends.get",
-                params: {
-                    access_token: userToken,
-                    v: "5.120",
-                    order: "name",
-                    fields: "photo_50, photo_100"
-                }
-            }).then((friends) => {
-                friendsIds = friends.response.items.map(friend => friend.id);
-            }).catch((error) => {
-                setError({ error: error, reload: fetchData });
-            });        
-            //кто дал доступ юзеру
-            await api("GET", "/v1.2.0/statAccess/", {
-                type: "fromId"
-            }).then((edges) => {
-                fromId = edges.data.map(user => user.id);
-            }).catch((error) => {
-                setError({ error: error, reload: fetchData });
-            });
+            try {
+                var friendsIds, toId, fromId;
+                //кому юзер дал доступ
+                await api("GET", "/v1.2.0/statAccess/", {
+                    type: "toId"
+                }).then((edges) => {
+                    toId = edges.data.map(user => user.id);
+                    setStatAccess(toId);
+                });
+                await bridge.send("VKWebAppCallAPIMethod", {
+                    method: "friends.get",
+                    params: {
+                        access_token: userToken,
+                        v: "5.120",
+                        order: "name",
+                        fields: "photo_50, photo_100"
+                    }
+                }).then((friends) => {
+                    friendsIds = friends.response.items.map(friend => friend.id);
+                });
+                //кто дал доступ юзеру
+                await api("GET", "/v1.2.0/statAccess/", {
+                    type: "fromId"
+                }).then((edges) => {
+                    fromId = edges.data.map(user => user.id);
+                });
 
-            let res = [...new Set([...friendsIds, ...toId, ...fromId])];
+                let res = [...new Set([...friendsIds, ...toId, ...fromId])];
 
-            await bridge.send("VKWebAppCallAPIMethod", {
-                method: "users.get",
-                params: {
-                    access_token: userToken,
-                    v: "5.120",
-                    user_ids: res.join(","),
-                    fields: "photo_50, photo_100, sex"
-                }
-            }).then((users) => {
-                updateUsers(users.response.map(user => {
-                    return {
-                        toId: toId.indexOf(user.id) !== -1,
-                        fromId: fromId.indexOf(user.id) !== -1,
-                        ...user
-                    };
-                }));
-            }).catch((error) => {
+                await bridge.send("VKWebAppCallAPIMethod", {
+                    method: "users.get",
+                    params: {
+                        access_token: userToken,
+                        v: "5.120",
+                        user_ids: res.join(","),
+                        fields: "photo_50, photo_100, sex"
+                    }
+                }).then((users) => {
+                    updateUsers(users.response.map(user => {
+                        return {
+                            toId: toId.indexOf(user.id) !== -1,
+                            fromId: fromId.indexOf(user.id) !== -1,
+                            ...user
+                        };
+                    }));
+                });
+            }
+            catch (error) {
                 setError({ error: error, reload: fetchData });
-            });
+            }
         }
         fetchData();
     }, [userToken, updateUsers]);
