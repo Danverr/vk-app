@@ -23,7 +23,7 @@ const Calendar = (props) => {
     return (
         <div>
             <Navigation
-                NavLabel={moment(curMonth).format("MMMM YYYY")}
+                curMonth={moment(curMonth)}
                 onClickPrev={() => {
                     let date = moment(curMonth);
                     date.add(-1, 'months');
