@@ -50,7 +50,7 @@ const DaylioPanel = (props) => {
 
             const csvparse = require('js-csvparser');
             const entries = csvparse(reader.result).data.filter(entry => {
-                if(entry.length === 1 && entry[0] === "") return 0;
+                if (entry.length === 1 && entry[0] === "") return 0;
                 return 1;
             });
 
@@ -128,7 +128,7 @@ const DaylioPanel = (props) => {
             </Group>
             <div style={{height: '80.4px'}}/>
             <FixedLayout vertical="bottom">
-                <FormLayout style={{background: 'white'}}>
+                <FormLayout style={{background: 'var(--background_content)'}}>
                     <File
                         top={<Text className={s.errorText}> {top} </Text>}
                         disabled={importCount === 0}

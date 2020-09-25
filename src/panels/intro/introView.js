@@ -13,14 +13,12 @@ const IntroView = (props) => {
     const slidesData = [
         {
             title: "Что такое mood?",
-            text:
-                "Это трекер настроения, тревожности и стресса для тебя и твоих близких. Личный дневник и статистика настроения друзей теперь в одном мини-приложении ВК.",
+            text: "Это трекер настроения, тревожности и стресса, в котором можно делится своими записями и статистикой с близкими друзьями.",
             img: intro0,
         },
         {
             title: "Наша цель",
-            text:
-                "У всех бывают трудные дни, но не всегда с ними легко справиться в одиночку. Mood без лишних слов даст Вам знать, когда близкому человеку потребуется поддержка.",
+            text: "У всех бывают трудные дни, но не всегда с ними легко справиться в одиночку. Mood без лишних слов даст Вам знать, когда близкому человеку потребуется поддержка.",
             img: intro1,
         },
         {
@@ -68,12 +66,12 @@ const IntroView = (props) => {
         >
             {slidesData.map((slideData, index) => (
                 <SlidePanel
-                            id={index}
-                            key={"introSlide_" + index}
-                            index={index}
-                            slideData={slideData}
-                            nav={props.nav}
-                            progress={((index + 1) * 100) / slidesData.length}
+                    id={index}
+                    key={"introSlide_" + index}
+                    index={index}
+                    slideData={slideData}
+                    nav={props.nav}
+                    progress={((index + 1) * 100) / slidesData.length}
                 />
             ))}
         </View>

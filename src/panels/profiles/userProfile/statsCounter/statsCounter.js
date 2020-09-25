@@ -104,6 +104,7 @@ const StatsCounter = (props) => {
             <div className={styles.flexGroup}>
                 <PieChart width={75} height={200}>
                     <Pie
+                        stroke="none"
                         isAnimationActive={false}
                         data={data[props.activeParam]} dataKey="val" nameKey="name"
                         cx="100%" cy="50%" outerRadius="200%"

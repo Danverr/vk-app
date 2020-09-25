@@ -1,41 +1,49 @@
-.navigation{
+.navigation {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-top: 4px;
     margin-bottom: 16px;
 }
-.navItem{
+
+.navItem {
     text-align: center;
 }
-.navButton{
+
+.navButton {
     border: 0;
     outline: none;
     background: none;
 }
-.navText{
+
+.navText {
     text-transform: capitalize;
 }
-.weekdays{
+
+.weekdays {
     color: var(--text_tertiary);
     margin-top: 4px;
     margin-bottom: 4px;
 }
-.weekday{
+
+.weekday {
     flex-grow: 1;
     text-align: center;
 }
-.tileGroup{
+
+.tileGroup {
     width: 100%;
 }
-.tile{
+
+.tile {
     display: flex;
     align-items: center;
     justify-content: center;
     padding-top: 4px;
     padding-bottom: 4px;
 }
-.border{
+
+.border {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,34 +52,40 @@
     width: 34px;
     background: var(--tile_background);
     border-radius: 50%;
-  }
+}
+
 .circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;    
+    white-space: nowrap;
     height: 0%;
     width: 0%;
-    border: 13px solid white;
+    border: 13px solid var(--background_content);
     border-radius: 50%;
     transition-property: height, width, border;
     transition-duration: 0.3s;
     transition-timing-function: ease;
 }
-.circleActive{
+
+.circleActive {
     height: 26px;
     width: 26px;
-    border: 0px solid white;
+    color: black;
+    border: 0px solid var(--background_content);
 }
-.borderActive{
+
+.borderActive {
     height: 30px;
     width: 30px;
     border: 2px solid var(--accent);
 }
-.tileText{
+
+.tileText {
     font-size: 14px;
     line-height: 14px;
 }
-td{
+
+td {
     padding: 0;
 }

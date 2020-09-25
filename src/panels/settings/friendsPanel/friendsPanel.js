@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
     Div,
     FixedLayout,
@@ -37,7 +37,7 @@ const FriendsPanel = (props) => {
     const [from, setFrom] = useState('none');
     const [to, setTo] = useState('none');
     const [search, setSearch] = useState('');
-    const { accessTokenScope, userToken, fetchUserToken } = props.state;
+    const {accessTokenScope, userToken, fetchUserToken} = props.state;
 
     const cmp = (a, b) => {
         if ((`${a.first_name} ${a.last_name}`) < (`${b.first_name} ${b.last_name}`))
@@ -103,9 +103,8 @@ const FriendsPanel = (props) => {
                         };
                     }));
                 });
-            }
-            catch (error) {
-                setError({ error: error, reload: fetchData });
+            } catch (error) {
+                setError({error: error, reload: fetchData});
             }
         }
         fetchData();
@@ -114,7 +113,7 @@ const FriendsPanel = (props) => {
     const changeStatAccess = async (add, del, addf, delf) => {
         try {
             if (addf) {
-                props.setPopout(<ScreenSpinner />);
+                props.setPopout(<ScreenSpinner/>);
 
                 var addWithSign;
                 await bridge.send("VKWebAppCallAPIMethod", {
@@ -130,7 +129,7 @@ const FriendsPanel = (props) => {
                 });
 
                 await api("POST", "/v1.2.0/statAccess/", {
-                    users: JSON.stringify(addWithSign.map((user) => ({ id: user.user_id, sign: user.sign })))
+                    users: JSON.stringify(addWithSign.map((user) => ({id: user.user_id, sign: user.sign})))
                 }).then((res) => {
                     add.forEach((id) => {
                         entryWrapper.pseudoFriends[id] = 1;
@@ -147,7 +146,7 @@ const FriendsPanel = (props) => {
                 });
             }
             if (delf) {
-                props.setPopout(<ScreenSpinner />);
+                props.setPopout(<ScreenSpinner/>);
                 await api("DELETE", "/v1.2.0/statAccess/", {
                     toId: del.join(', ')
                 }).then((res) => {
@@ -169,12 +168,12 @@ const FriendsPanel = (props) => {
                     className={s.snackbar}
                     layout="vertical"
                     onClose={() => setSnackbar(null)}
-                    before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
-                        fill="#fff" width={14} height={14} /></Avatar>}>
+                    before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
+                        fill="#fff" width={14} height={14}/></Avatar>}>
                     Изменения сохранены
                 </Snackbar>);
         } catch (error) {
-            setError({ error: error, reload: () => changeStatAccess(add, del, addf, delf) });
+            setError({error: error, reload: () => changeStatAccess(add, del, addf, delf)});
         }
     }
 
@@ -196,13 +195,13 @@ const FriendsPanel = (props) => {
         setTo(res.to);
     }
 
-    var content = <Spinner size="large" style={{ paddingTop: '20px' }} />;
+    var content = <Spinner size="large" style={{paddingTop: '20px'}}/>;
 
     useEffect(() => {
         //разрешение есть, но токен еще не получен
         if (!userToken && accessTokenScope.split(",").indexOf("friends") !== -1)
             fetchUserToken().catch((error) => {
-                setError({ error: error, reload: fetchUserToken });
+                setError({error: error, reload: fetchUserToken});
             }); //получаем, не показывая плейсхолдер
     }, [userToken, accessTokenScope, fetchUserToken])
 
@@ -214,7 +213,9 @@ const FriendsPanel = (props) => {
             action={<Button onClick={() => {
                 if (pressedOnAllowButton) return;
                 pressedOnAllowButton = true;
-                setTimeout(() => { pressedOnAllowButton = false }, 1000);
+                setTimeout(() => {
+                    pressedOnAllowButton = false
+                }, 1000);
                 fetchUserToken();
             }}> Дать разрешение </Button>}>
             Для редактирования доступа к статистике нам нужен список ваших друзей.
@@ -223,7 +224,7 @@ const FriendsPanel = (props) => {
         content = <ErrorPlaceholder error={error.error} action={<Button onClick={() => {
             setError(null);
             error.reload();
-        }}> Попробовать снова </Button>} />;
+        }}> Попробовать снова </Button>}/>;
     else if (users && statAccess)
         content = (<div>
             <SearchUsers
@@ -236,19 +237,19 @@ const FriendsPanel = (props) => {
             />
             {snackbar}
             <FixedLayout vertical="bottom">
-                <Div style={{ display: 'flex', background: 'white' }}>
+                <Div style={{display: 'flex', background: 'var(--background_content)'}}>
                     <Button size="l"
-                        stretched
-                        mode="secondary"
-                        style={{ marginRight: 8 }}
-                        onClick={() => {
-                            props.setModal(<ModalFilter
-                                to={to}
-                                from={from}
-                                onClose={() => props.setModal(null)}
-                                onChange={changeFilter}
-                            />);
-                        }}>
+                            stretched
+                            mode="secondary"
+                            style={{marginRight: 8}}
+                            onClick={() => {
+                                props.setModal(<ModalFilter
+                                    to={to}
+                                    from={from}
+                                    onClose={() => props.setModal(null)}
+                                    onChange={changeFilter}
+                                />);
+                            }}>
                         Фильтры
                     </Button>
                     <Button size="l" stretched onClick={onClickSave}>Сохранить</Button>
@@ -260,13 +261,15 @@ const FriendsPanel = (props) => {
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => {
                 props.nav.goBack();
-            }} />}>
+            }}/>}>
                 Доступ
             </PanelHeader>
             <FixedLayout vertical="top">
-                <Search value={search} onChange={(e) => { setSearch(e.target.value); }} />
+                <Search value={search} onChange={(e) => {
+                    setSearch(e.target.value);
+                }}/>
             </FixedLayout>
-            <div style={{ paddingTop: 52 }}>
+            <div style={{paddingTop: 52}}>
                 {content}
             </div>
         </Panel>

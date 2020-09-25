@@ -89,8 +89,8 @@ const PixelsPanel = (props) => {
                     className={s.snackbar}
                     layout="vertical"
                     onClose={() => setSnackbar(null)}
-                    before={<Avatar size={24} style={{ backgroundColor: 'var(--accent)' }}><Icon16Done
-                        fill="#fff" width={14} height={14} /></Avatar>}>
+                    before={<Avatar size={24} style={{backgroundColor: 'var(--accent)'}}><Icon16Done
+                        fill="#fff" width={14} height={14}/></Avatar>}>
                     Изменения сохранены
                 </Snackbar>);
                 props.nav.goBack();
@@ -128,7 +128,7 @@ const PixelsPanel = (props) => {
             </Group>
             <div style={{height: '80.4px'}}/>
             <FixedLayout vertical="bottom">
-                <FormLayout style={{background: 'white'}}>
+                <FormLayout style={{background: 'var(--background_content)'}}>
                     <File
                         top={<Text className={s.errorText}> {top} </Text>}
                         disabled={importCount === 0}

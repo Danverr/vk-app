@@ -38,14 +38,31 @@ const useAppState = () => {
         showHealthNotifTooltip: true,
         showAccessNotifTooltip: true,
     });
+    const [colorScheme, _setColorScheme] = useState('bright_light');
+    const lightSchemes = ['bright_light', 'client_light'];
 
-    useEffect(() => {
+    function setColorScheme(scheme, needChange = false) {
+        let isLight = lightSchemes.includes(scheme);
+
+        if (needChange) {
+            isLight = !isLight;
+        }
+
+        _setColorScheme(isLight ? 'bright_light' : 'space_gray');
+
+        bridge.send('VKWebAppSetViewSettings', {
+            'status_bar_style': isLight ? 'dark' : 'light',
+            'action_bar_color': "var(--content_background)"
+        });
+    }
+
+    // Эффект для показа рекламы
+    /*useEffect(() => {
         if (!loading && !vkStorage.getValue("showIntro")) {
             bridge.send("VKWebAppShowNativeAds", {ad_format: "preloader"})
         }
-
         // eslint-disable-next-line
-    }, [loading]);
+    }, [loading]);*/
 
     const fetchUserToken = async (callback = null, finallyCallback = null) => {
         await bridge
@@ -114,21 +131,10 @@ const useAppState = () => {
         }
     };
 
-    const initScheme = async () => {
-        return bridge.send('VKWebAppSetViewSettings', {
-            'status_bar_style': 'dark',
-            'action_bar_color': '#fff'
-        }).catch((error) => {
-            error.message = error.error_data.error_reason;
-            throw error;
-        });
-    };
-
     const [initActions] = useState([
         {name: "User Info Loading", func: fetchUserInfo},
         {name: "VK Storage Loading", func: vkStorage.fetchValues},
         {name: "Ban Status Loading", func: fetchIsBanned},
-        {name: "Init Color Scheme", func: initScheme},
         {name: "Yandex.Metrika Init", func: ymInit},
     ]);
     let [initActionsCompleted] = useState(0);
@@ -152,7 +158,7 @@ const useAppState = () => {
             await action.func(...params)
                 .then(() => logEvent(action.name, "OK"))
                 .catch(error => logEvent(action.name, error.message))
-                .finally(() => {
+                .then(() => {
                     action.completed = true;
 
                     if (++initActionsCompleted === initActions.length) {
@@ -211,6 +217,8 @@ const useAppState = () => {
                 setNotifications(false);
             } else if (type === "VKWebAppViewRestore" || (type === "VKWebAppInitResult" && data.result)) {
                 initApp();
+            } else if (type === 'VKWebAppUpdateConfig') {
+                setColorScheme(data.scheme);
             }
         });
 
@@ -225,6 +233,8 @@ const useAppState = () => {
     }, [globalError]);
 
     return {
+        colorScheme: colorScheme,
+        isLightScheme: lightSchemes.includes(colorScheme),
         initApp: initApp,
         loading: loading,
         isBanned: isBanned,

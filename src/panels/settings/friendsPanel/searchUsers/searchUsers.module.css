@@ -1,15 +1,17 @@
-.controls{
+.controls {
     display: flex;
-    background: white;
+    background: var(--background_content);
     padding-top: 0px;
     padding-bottom: 8px;
 }
-.container{
+
+.container {
     display: flex;
     align-items: flex-start;
     justify-content: center;
     min-height: 400px;
 }
-.item{
+
+.item {
     width: 100%;
 }

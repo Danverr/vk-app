@@ -3,6 +3,7 @@ import {View, Panel, PanelSpinner, FixedLayout} from "@vkontakte/vkui";
 import styles from "./loadingScreen.module.css";
 
 import logo from "../../assets/logo.png";
+import logoDark from "../../assets/logoDark.png";
 
 const LoadingScreen = (props) => {
     const {setNavbarVis} = props.nav;
@@ -16,7 +17,7 @@ const LoadingScreen = (props) => {
     return (
         <View id={props.id} activePanel="main">
             <Panel id="main">
-                <img className={styles.backgroundImg} src={logo} alt=""/>
+                <img className={styles.backgroundImg} src={props.state.isLightScheme ? logo : logoDark} alt=""/>
                 <FixedLayout vertical="bottom">
                     <PanelSpinner/>
                 </FixedLayout>

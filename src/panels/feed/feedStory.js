@@ -9,6 +9,8 @@ import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+import Icon56LockOutline from '@vkontakte/icons/dist/56/lock_outline';
+import Icon28ErrorOutline from '@vkontakte/icons/dist/28/error_outline';
 
 import s from './feedStory.module.css';
 import ErrorPlaceholder from '../../components/errorPlaceholder/errorPlaceholder';
@@ -17,8 +19,7 @@ import entryWrapper from '../../components/entryWrapper';
 import AccessPost from '../../components/accessPost/accessPost';
 import DoneSnackbar from '../../components/doneSnackbar/doneSnackbar';
 import ErrorSnackbar from '../../components/errorSnackbar/errorSnackbar';
-import Icon56LockOutline from '@vkontakte/icons/dist/56/lock_outline';
-import Icon28ErrorOutline from '@vkontakte/icons/dist/28/error_outline';
+import DonatBanner from "../../components/donatBanner/donatBanner";
 
 const PIXELS = 200;
 
@@ -307,6 +308,7 @@ const Feed = (props) => {
                 {(entryWrapper.hasMore || displayEntries.length) ?
                     <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
                         <CardGrid className="entriesGrid">
+                            {!loading ? <DonatBanner isLightScheme={props.state.isLightScheme}/> : null}
                             {displayEntries.map(renderData)}
                         </CardGrid>
                         {(!entryWrapper.hasMore && !displayEntries.length) && Empty()}

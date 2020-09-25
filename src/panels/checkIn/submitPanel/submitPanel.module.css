@@ -15,7 +15,6 @@
 .lockIcon {
     display: inline;
     margin-left: 6px;
-
     margin-top: 2px;
-    color: #99a2ad;
+    color: var(--text_secondary);
 }

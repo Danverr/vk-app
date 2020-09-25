@@ -64,7 +64,7 @@ const App = () => {
     }
 
     return (
-        <ConfigProvider isWebView={true} scheme={"bright_light"}>
+        <ConfigProvider isWebView={true} scheme={state.colorScheme}>
             <Root activeView="Epic">
                 <Epic
                     id="Epic"

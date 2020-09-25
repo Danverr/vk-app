@@ -32,11 +32,10 @@
     width: 8px;
     padding: 0 !important;
     margin: 0 4px;
-    opacity: 0.2;
-    background: #000;
+    background: var(--text_tertiary);
     border-radius: 50%;
 }
 
 .bulletSelected {
-    opacity: 1;
+    background: var(--text_primary);
 }
