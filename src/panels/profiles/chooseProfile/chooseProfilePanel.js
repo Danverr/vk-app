@@ -6,6 +6,7 @@ import moment from "moment";
 
 import TextPost from "../../../components/textPost/textPost";
 import ErrorPlaceholder from "../../../components/errorPlaceholder/errorPlaceholder";
+import DonatBanner from "../../../components/donatBanner/donatBanner";
 
 const fetchFriendsInfo = async () => {
     // ID друзей к которым есть доступ
@@ -137,7 +138,12 @@ const ChooseProfilePanel = (props) => {
             error.reload();
         }}> Попробовать снова </Button>}/>;
     } else if (usersInfo && stats) {
-        content = <CardGrid>{profileCards}</CardGrid>
+        content = (
+            <CardGrid>
+                {<DonatBanner isLightScheme={props.isLightScheme}/>}
+                {profileCards}
+            </CardGrid>
+        );
     }
 
     return (

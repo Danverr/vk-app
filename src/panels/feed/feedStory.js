@@ -308,7 +308,6 @@ const Feed = (props) => {
                 {(entryWrapper.hasMore || displayEntries.length) ?
                     <PullToRefresh onRefresh={toggleRefresh} isFetching={fetching}>
                         <CardGrid className="entriesGrid">
-                            {!loading ? <DonatBanner isLightScheme={props.state.isLightScheme}/> : null}
                             {displayEntries.map(renderData)}
                         </CardGrid>
                         {(!entryWrapper.hasMore && !displayEntries.length) && Empty()}

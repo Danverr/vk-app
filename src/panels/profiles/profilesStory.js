@@ -109,6 +109,7 @@ const ProfilesStory = (props) => {
                 goToUserProfile={() => props.nav.goTo(props.id, "userProfile")}
                 userInfo={userInfo}
                 formatStats={formatStats}
+                isLightScheme={props.state.isLightScheme}
                 activePanel={props.nav.activePanel}
             />
 
